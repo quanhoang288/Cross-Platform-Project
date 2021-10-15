@@ -3,19 +3,32 @@ import React, {useState} from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 import { InputText, FunctionalityItem } from './src/components/block';
 import { registerRootComponent } from 'expo'; 
+import { NativeBaseProvider, Box, Input, Avatar, TextArea, Button } from 'native-base';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import Home from './src/screens/Home';
+import { CreatePost, PostList, Comment } from './src/screens/post';
+import { Profile } from './src/screens/account';
+import { stacks } from './src/constants/title';
+const Stack = createNativeStackNavigator();
 
 const App = () => {
-  const [text, setText] = useState('default text');
   
   return (
-    <View style={styles.container}>
-      <InputText 
-        label="Test Label" 
-        labelStyle={styles.label}
-        inputStyle={styles.input}
-      />
-      <FunctionalityItem/>
-    </View>
+    <NativeBaseProvider>
+      <NavigationContainer>
+        <Stack.Navigator>
+
+          <Stack.Screen name={stacks.home.name} component={Home} options={{ title: stacks.home.title, headerRight: () => (<Button style={{marginRight: 10}} color="#fff">Info</Button>)  }} />
+          <Stack.Screen name={stacks.createPost.name} component={CreatePost} options={{ title: stacks.createPost.title, headerRight: () => (<Button style={{marginRight: 10}} color="#fff">Post</Button>) }} />
+          <Stack.Screen name={stacks.newsFeed.name} component={PostList} options={{ title: stacks.newsFeed.title }}/>
+          <Stack.Screen name={stacks.comment.name} component={Comment} options={{ title: stacks.comment.title }}/>
+          <Stack.Screen name={stacks.profile.name} component={Profile} options={{ title: stacks.profile.title }}/>
+
+        </Stack.Navigator>
+      </NavigationContainer>
+    </NativeBaseProvider>
+
   );
 }
 
