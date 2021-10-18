@@ -1,35 +1,59 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Text, TextArea, IconButton, Icon, HStack, Stack } from 'native-base';
-import { Entypo, Ionicons, MaterialIcons } from '@expo/vector-icons';
-import { View } from 'native-base';
+
+import { Input, Icon } from 'react-native-elements';
+import { StyleSheet, View } from 'react-native';
+import { style } from 'styled-system';
+import { DEVICE_HEIGHT } from '../../constants/dimensions';
+
 const CreatePost = props => {
     const [postContent, setPostContent] = useState('');
 
-    useEffect(() => {
-        console.log(postContent);
-    }, [postContent]);
-
     return (
-        <Stack flex="1" justifyContent="space-between" space="2">        
-            <TextArea 
+        <View style={styles.container}>      
+            <Input
                 placeholder="What's in your mind?"
                 value={postContent}
-                onChangeText={(text) => setPostContent(text)}
-                height="90%"
-
+                onChangeText={text => setPostContent(text)}
+                containerStyle={styles.inputOutterWrapper}
+                inputContainerStyle={styles.inputInnerWrapper}
+                inputStyle={styles.inputText}
+                multiline
+                numberOfLines={25}
             />
 
-            <HStack flex="1" justifyContent="space-between" style={{borderColor: "red"}}>
-                <IconButton icon={<Icon as={Entypo} name='emoji-happy'/>} size="sm"></IconButton>
-                <IconButton icon={<Icon as={MaterialIcons} name='image'/>} size="sm"></IconButton>
-                <IconButton icon={<Icon as={MaterialIcons} name='video-collection'/>} size="sm"></IconButton>
-               
-            </HStack>
-
-        </Stack>
+            <View style={styles.buttonGroup}>
+                <Icon type='entypo' name='emoji-happy' size={32}/>
+                <Icon type='material' name='image' size={32} />
+                <Icon type='material' name='video-collection' size={32}/>
+            </View>
+        </View>
     );
 };
+
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        paddingBottom: 4
+    },
+    inputOutterWrapper: {
+        flex: 4,
+        marginBottom: 2,
+        width: "100%",
+    },
+    inputInnerWrapper: {
+        flex: 1,
+    },
+    inputText: {
+        height: '95%',
+    },
+    buttonGroup: {
+        flexDirection: 'row',
+        justifyContent: "space-around",
+        marginBottom: 2
+    }
+})
 
 CreatePost.propTypes = {
     

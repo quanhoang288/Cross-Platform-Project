@@ -1,58 +1,112 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Avatar, Box, Button, Divider, HStack, Image, Icon, IconButton, Stack, Text, VStack, ZStack, ScrollView } from 'native-base';
-import { TouchableWithoutFeedback, TouchableOpacity, TouchableHighlight, TouchableNativeFeedback } from 'react-native';
-import { AntDesign, Feather, FontAwesome5, Ionicons } from "@expo/vector-icons"
+import { View, StyleSheet, ScrollView, TouchableOpacity, ImageBackground } from 'react-native';
+import { Avatar, Button, Divider, Icon, Image, ListItem, Text } from 'react-native-elements';
 import { PostList } from '../post';
+import { DEVICE_WIDTH } from '../../constants/dimensions';
+
+
 const Profile = props => {
     return (
 		<ScrollView showsHorizontalScrollIndicator={false}>
-        <Stack>
-            <Image 
-                source={{
-                    uri: "https://wallpaperaccess.com/full/317501.jpg",
-                }}
-                alt="Alternate Text"
-                size="2xl"
-                width="100%"
-            >
-            </Image>
-            <Box position="relative" style={{alignItems: "center", marginBottom: 10}}>
-                <Box style={{marginTop: -50, width: "fit-content"}}>
-                <TouchableWithoutFeedback onPress={() => {console.log('pressed')}}>
-                    <Avatar
-                        source={{
-                            uri: "https://i.etsystatic.com/29282700/r/il/e3aae5/3152845862/il_340x270.3152845862_q44u.jpg",
-                        }}
-                        alignSelf="center"
-                        size="xl"
-                    >
-                        Profile
-                    </Avatar>
-                </TouchableWithoutFeedback>         
-                </Box>
-            </Box>
-            <Text bold style={{textAlign: "center", fontSize: 24}}> Quân Hoàng </Text>
-            <HStack marginX="4" marginTop="4" justifyContent="center" space="2">
-				<Button backgroundColor="blue.400" leftIcon={<Icon as={Ionicons} name="person-add" size="sm" />} height="10" >Add friend</Button>
-				<Button backgroundColor="blue.400" leftIcon={<Icon as={AntDesign} name="message1" size="sm" />} height="10" >Message</Button>
-                <Button backgroundColor="gray.400" leftIcon={<Icon as={Feather} name='more-horizontal'/>} height="10" />
-			</HStack>
-			<Divider my="4" color="gray.400" />
+            <View>
+                <ImageBackground 
+                    source={{
+                        uri: "https://wallpaperaccess.com/full/317501.jpg",
+                    }}
+                    alt="This is cover image"
+                    style={styles.cover}
+                >
+                    <Icon type='feather' name='more-horizontal' size={32} style={{marginRight: 6}}/>
+                </ImageBackground>
+                <View style={styles.profileOutterContainer}>
+                    <View style={styles.profileInnerContainer}>
+                        <Avatar
+                            rounded
+                            size='large'
+                            source={{
+                                uri: "https://i.etsystatic.com/29282700/r/il/e3aae5/3152845862/il_340x270.3152845862_q44u.jpg",
+                            }}
+                            onPress={() => console.log('Pressed on avatar!')}
+                        />
+                    </View>
+                </View>
+                <Text style={styles.name}> Quân Hoàng </Text>
+                
+                <View style={styles.buttonGroupContainer}>
+                    <View style={styles.buttonGroup}>   
+                        <Button 
+                            title='Add friend' 
+                            icon={{
+                                type:'ionicons', 
+                                name: "person-add",
+                                
+                            }}
+                        />
+                        <Button 
+                            title='Message' 
+                            icon={{
+                                type:'ant-design', 
+                                name: "message1",
+                                
+                            }}
+                        />
+                    </View>
+                </View>
 
-			<TouchableOpacity activeOpacity="0.5" onPress={() => console.log('Friend list to be implemented')}>
-				<HStack space="4" marginX="4" >
-					<Icon as={FontAwesome5} name="user-friends" size="sm"></Icon>
-					<Text>Friends (177)</Text>
-				</HStack>
-			</TouchableOpacity>
-			<Divider my="4" color="gray.400" />
+                <TouchableOpacity>    
+                    <ListItem>
+                        <Icon type='font-awesome-5' name='user-friends'/>
+                        <ListItem.Content>
+                            <ListItem.Title>Friends</ListItem.Title>
+                            <ListItem.Subtitle>177 friends</ListItem.Subtitle>
+                        </ListItem.Content> 
+                        <ListItem.Chevron color='black'/>
+                    </ListItem>
+                </TouchableOpacity>
 
-			<PostList/>
-        </Stack>
+                <PostList/>
+            </View>
 		</ScrollView>
     );
 };
+
+const styles = StyleSheet.create({
+    container: {
+        backgroundColor: '#FFF',
+    },
+    cover: {
+        width: DEVICE_WIDTH,
+        height: 256,
+        alignItems: 'flex-end',
+    }, 
+    profileOutterContainer: {
+        alignItems: 'center',
+        marginBottom: 6,
+        position: 'relative'
+    },
+    profileInnerContainer: {
+        marginTop: -50, 
+        width: "fit-content"
+    },
+    
+    name: {
+        textAlign: "center", 
+        fontSize: 24,
+        fontWeight: 'bold'
+    }, 
+    buttonGroupContainer: {
+        alignItems: 'center',
+    },
+    buttonGroup: {
+        width: '65%',
+        flexDirection: 'row', 
+        marginVertical: 10, 
+        marginHorizontal: 4,
+        justifyContent: 'space-between'
+    }
+
+});
 
 Profile.propTypes = {
     

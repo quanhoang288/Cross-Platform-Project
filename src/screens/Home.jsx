@@ -1,23 +1,48 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { TextArea, Button } from 'native-base';
-import { View } from 'react-native';
+import { Button } from 'react-native-elements';
+import { View, StyleSheet } from 'react-native';
 import { stacks } from '../constants/title';
 
 const Home = ({ navigation }) => {
     return (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'space-evenly' }}>
-            
-            <Button onPress={() => navigation.navigate(stacks.createPost.name)}>Add new post</Button>
-            <Button onPress={() => navigation.navigate(stacks.newsFeed.name)}>News Feed</Button>
-            <Button onPress={() => navigation.navigate(stacks.comment.name)}>Comment</Button>
-            <Button onPress={() => navigation.navigate(stacks.profile.name)}>Profile</Button>
-
-
+        <View style={styles.container}>   
+            <Button 
+                title="Add new post" 
+                containerStyle={styles.buttonContainer} 
+                onPress={() => navigation.navigate(stacks.createPost.name)}
+            />
+            <Button 
+                title="News Feed" 
+                containerStyle={styles.buttonContainer} 
+                onPress={() => navigation.navigate(stacks.newsFeed.name)}
+            />
+            <Button 
+                title="Comment" 
+                containerStyle={styles.buttonContainer} 
+                onPress={() => navigation.navigate(stacks.comment.name)}
+            />
+            <Button 
+                title="Profile" 
+                containerStyle={styles.buttonContainer} 
+                onPress={() => navigation.navigate(stacks.profile.name)}
+            />
         </View>
     );
 };
 
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        alignItems: 'center', 
+        justifyContent: 'center'
+    },
+    buttonContainer: {
+        height: 40,
+        width: 200,
+        marginVertical: 20,
+    }
+})
 Home.propTypes = {
     
 };

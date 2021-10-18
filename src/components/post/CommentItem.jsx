@@ -1,33 +1,47 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Container, View, Avatar, HStack, Stack, Text, IconButton, Icon, Image } from 'native-base';
-import { Feather, AntDesign, FontAwesome5  } from '@expo/vector-icons'; 
+import { View, StyleSheet } from 'react-native';
+import { Avatar, Icon, Text } from 'react-native-elements';
 
 const CommentItem = props => {
     return (
-        <HStack flex="1" justifyContent="space-between">
+        <View style={styles.container}>
             <Avatar
-                bg="pink.600"
+                rounded
                 source={{
                     uri: "https://pbs.twimg.com/profile_images/1177303899243343872/B0sUJIH0_400x400.jpg",
-                }}
-                marginX={2}
-            >
-                Profile
-            </Avatar>
-            <Stack space={2} flex={2} borderRadius={10}>
-                <Text fontSize="md" bold>Quan Hoang</Text>
+                }}   
+            />
+            <View style={styles.commentContainer}>
+                <Text style={{fontWeight: 'bold'}}>Quan Hoang</Text>
                 <Text>This is post comment This is post comment This is post comment This is post comment </Text>
-                <Text fontSize="sm">2h</Text>
-            </Stack>
-            <IconButton icon={<Icon as={AntDesign} name='hearto'/>} paddingTop={0}/>
-
-        </HStack>
+                <Text>2h</Text>
+            </View>
+            <Icon type='font-awesome' name='heart-o' size={28}/>
+        </View>
     );
 };
 
 CommentItem.propTypes = {
     
 };
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingTop: 6,
+        marginBottom: 10,
+        marginHorizontal: 6,
+        backgroundColor: '#fff'
+    }, 
+    commentContainer: {
+        flex: 2,
+        borderRadius: 10,
+        marginHorizontal: 6
+    }
+
+})
 
 export default CommentItem;
