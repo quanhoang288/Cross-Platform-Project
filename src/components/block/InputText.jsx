@@ -1,42 +1,37 @@
 import React from 'react';
 import {StyleSheet, Text, TextInput, View} from 'react-native';
 import PropTypes from 'prop-types';
+import {Input, Icon} from 'react-native-elements'
 
-const InputText = ({wrapperStyle, inputStyle, labelStyle, label, placeHolderText, editable}) => {
-    
-    const styles = StyleSheet.create({
-        wrapperStyle: wrapperStyle,
-        labelStyle: labelStyle,
-        inputStyle: inputStyle,
-    });
 
-    return (
-        <View style={styles.wrapperStyle}>
-            <Text style={styles.labelStyle}>{label}</Text>
-            <TextInput 
-                style={styles.inputStyle}
-                placeholder={placeHolderText}
-                editable={editable}
-                value="Hard-coded value"
-            />
-        </View>
-    );
+const InputText = () => {
+  return (
+    <Input
+      leftIcon={
+        <Icon
+          name="map-marker"
+          type="font-awesome"
+          color="#86939e"
+          size={25}
+        />
+      }
+      leftIconContainerStyle={{ marginLeft: 4, marginRight: 12 }}
+      inputContainerStyle={{
+        margin: 8
+      }}
+      placeholder="password"
+    />
+  );
 };
 
 
 
 InputText.propTypes = {
-    wrapperStyle: PropTypes.object,
-    style: PropTypes.object,
-    labelStyle: PropTypes.object,
-    label: PropTypes.string,
-    placeHolderText: PropTypes.string,
-    editable: PropTypes.bool
+    
 };
 
 InputText.defaultProps = {
-    placeHolderText: '',
-    editable: true,
+    
 };
 
 export default InputText;
