@@ -6,13 +6,21 @@ import {ListItem, Text, Icon } from 'react-native-elements';
 const FunctionalityItem = props => {
 	return (
 		<ListItem bottomDivider onPress={() => {}}>
-			<Icon name='image' type='feather' size={32}/>
+			<Icon
+				name={props.icon.name}
+				type={props.icon.type}
+				size={32}
+			/>
 			<ListItem.Content>
 				<ListItem.Title>
-					<Text>My Status</Text>
+					<Text style={{fontSize:20, fontWeight:'500'}}>
+						{props.content}
+					</Text>
 				</ListItem.Title>
 				<View style={{ flexDirection: 'row' }}>
-					<Text>Tap to add status update</Text>
+					<Text style={{fontSize:13}}>
+						{props.note}
+					</Text>
 				</View>
 			</ListItem.Content>
 			{/* <ListItem.Accordion>
