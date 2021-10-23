@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Image, View } from 'native-base';
-import { Dimensions, StyleSheet } from 'react-native';
+import { Image, Text } from 'react-native-elements';
+import { Dimensions, StyleSheet, View } from 'react-native';
 
 export const SLIDER_WIDTH = Dimensions.get('window').width;
 export const ITEM_WIDTH = Math.round(SLIDER_WIDTH * 1);
@@ -14,7 +14,6 @@ const CarouselItem = ({ item, index }) => {
                     uri: item.uri,
                 }}
                 alt="Image Alt"
-                size="2xl"
                 style={styles.image}
             />
         </View>
@@ -28,6 +27,7 @@ const styles = StyleSheet.create({
     },
     image: {
         width: ITEM_WIDTH,
+        height: 256,
     }
 })
 

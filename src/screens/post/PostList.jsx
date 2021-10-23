@@ -1,7 +1,70 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { View, ScrollView, StyleSheet } from 'react-native';
 import { PostItem } from '../../components/post';
+import { Divider, Icon, ListItem } from 'react-native-elements';
+
+
+const ModalContent = () => {
+    const functionalities = [
+        {
+            title: 'Edit post',
+            icon: {
+                type: 'feather',
+                name: 'edit'
+            },
+        },
+        {
+            title: 'Hide post',
+            icon: {
+                type: 'material-icon',
+                name: 'cancel-presentation'
+            },
+        },
+        {
+            title: 'Delete post',
+            icon: {
+                type: 'ant-design',
+                name: 'delete'
+            },
+        },
+        {
+            title: 'Report post',
+            icon: {
+                type: 'ant-design',
+                name: 'warning'
+            },
+        },
+    ];
+
+    return (
+        <View style={{
+            height: 300, 
+            backgroundColor: '#fff',
+            justifyContent: 'center',
+            borderTopStartRadius: 10,
+            borderTopEndRadius: 10,
+        }}>
+            {
+                functionalities.map((func, idx) => (
+                    <ListItem
+                        key={idx}
+                    >
+                        <Icon type={func.icon.type} name={func.icon.name} style={{marginRight: 4}}/>
+                        <ListItem.Content>
+                            <ListItem.Title>
+                                {func.title}
+                            </ListItem.Title>
+                            <Divider/>
+                        </ListItem.Content>
+                    </ListItem>
+                ))
+                
+            }
+            
+        </View>
+    )
+} 
 
 const PostList = props => {
     const posts = [
@@ -62,21 +125,28 @@ const PostList = props => {
             },
         },
     ]
+
+    
     return (
+        <>
         <ScrollView showsVerticalScrollIndicator={false}>
             <View style={styles.container}>
                 {posts.map(post => (
-                    <PostItem key={post.content.id} author={post.author} content={post.content} />
+                    <PostItem 
+                        key={post.content.id} 
+                        author={post.author} 
+                        content={post.content} 
+                    />
                 ))}
             </View>
         </ScrollView>
+        </>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        marginTop: 10,
     }
 })
 
