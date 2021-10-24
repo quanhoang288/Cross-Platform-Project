@@ -6,8 +6,6 @@ import {Input, Icon} from 'react-native-elements'
 
 
 const InputText = (props) => {
-  // const [inputText, setInputText] = useState("");
-
 
   let inputProps = {}
   if(props.icon){
@@ -25,17 +23,16 @@ const InputText = (props) => {
     }
   }
 
-  if(props.image){
-    inputProps={
+  if(props.label){
+    inputProps = {
       ...inputProps,
-
+      label: props.label
     }
   }
 
   return (
     <Input
       name=""
-      label={props.label}
       onChange={ (e) => props.handleChange(e.target.name, e.target.value) }
 
       labelStyle={{ marginTop: 16 }}
@@ -63,13 +60,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(110, 120, 170, 1)',
     height: 45,
-    marginVertical: 10,
+    marginVertical: 6,
   },
   inputStyle:{
     flex: 1,
     marginLeft: 8,
     color: 'black',
-    fontFamily: 'UbuntuLight',
     fontSize: 18,
   },
   errorInputStyle:{

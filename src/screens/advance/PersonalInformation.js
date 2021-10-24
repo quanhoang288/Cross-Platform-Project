@@ -8,19 +8,23 @@ const personalInformation = () =>{
   return(
     <View style={styles.container}>
       <InputText 
-        placeholderText={"User name"}
+        label={'User Name:'}
+        placeholderText={"NXTung"}
       />
 
       <InputText 
-        placeholderText={"Gender"}
+        label={'Gender:'}
+        placeholderText={"Male or Female"}
       />
 
       <InputText 
-        placeholderText={"Birthday"}
+        label={'Birthday:'}
+        placeholderText={"dd/mm/yyyy"}
       />
 
       <InputText 
-        placeholderText={"Contact"}
+        label={'Contact:'}
+        placeholderText={"09xx.xxx.xxx"}
       />
 
       <Button
@@ -43,7 +47,6 @@ const styles = StyleSheet.create({
   },
 
   loadingProps:{
-    size: 'small',
     color: 'white'
   },
   titleStyle:{

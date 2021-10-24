@@ -49,7 +49,7 @@ const MenuAdvance = () =>{
           type:'feather'
         }}
         content="Help ?"
-        note="Is there anything I can do for you?"
+        note="Is there anything I can help for you?"
       />
 
       <FunctionalityItem

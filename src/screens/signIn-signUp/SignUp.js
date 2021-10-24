@@ -8,27 +8,39 @@ const SignUp = () =>{
   return(
     <View style={styles.container}>
       <InputText 
+        label="User Name"
+        icon={{
+          name:"user",
+          type:"feather"
+        }}
+        placeholderText={"John Parkour"}
+      />
+
+      <InputText 
+        label="Phone Number"
         icon={{
           name:"phone",
           type:"antdesign"
         }}
-        placeholderText={"Phone number"}
+        placeholderText={"09xx.xxx.xxx"}
       />
 
       <InputText 
+        label="Password"
         icon={{
           name:"lock",
           type:"feather"
         }}
-        placeholderText={"Password"}
+        placeholderText={"********"}
       />
 
       <InputText 
+        label="Confirm Password"
         icon={{
           name:"lock",
           type:"feather"
         }}
-        placeholderText={"Confirm Password"}
+        placeholderText={"********"}
       />
 
       <Button
@@ -46,12 +58,13 @@ const SignUp = () =>{
 
 const styles = StyleSheet.create({
   container:{
+    marginTop: 20,
     alignItems:'center',
     justifyContent:'center'
   },
 
   loadingProps:{
-    size: 'small',
+
     color: 'white'
   },
   titleStyle:{

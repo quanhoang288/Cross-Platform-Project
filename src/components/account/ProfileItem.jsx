@@ -1,37 +1,103 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Avatar, ListItem, Text } from 'react-native-elements';
+import { Avatar, ListItem, Text, Icon, Button } from 'react-native-elements';
 import {View} from 'react-native';
+import { height } from 'styled-system';
 
 const ProfileItem = props => {
   return (
     <ListItem bottomDivider onPress={() => {}}>
       <Avatar
         rounded
-        size={40}
-        source={
-          {uri: 'https://scontent.fhan5-8.fna.fbcdn.net/v/t1.6435-9/46995983_2719316961626784_3110419529126117376_n.jpg?_nc_cat=110&ccb=1-5&_nc_sid=730e14&_nc_ohc=vV7yubtliM8AX8m6PGL&_nc_ht=scontent.fhan5-8.fna&oh=c1a431bf4ff34dd400683629821d4170&oe=61920917'}
-          }
+        size={48}
+        source={{uri: props.avatar.source}}
       >
-        <Avatar.Accessory
+        {/* <Avatar.Accessory
           iconProps={{ name: 'add' }}
           size={16}
           backgroundColor="#25D366"
-        />
+        /> */}
       </Avatar>
-      <ListItem.Content>
+      <ListItem.Content str  >
         <ListItem.Title>
-          <Text>My Status</Text>
+          <Text style={{fontSize:16}}  >{props.title}</Text>
         </ListItem.Title>
         <View style={{ flexDirection: 'row' }}>
-          <Text>Tap to add status update</Text>
+          <Text style={{fontSize:12, marginTop:8 }}  >{props.comment}</Text>
+          {props.displayButtonGroup &&  
+            <>
+              <Button
+                title={props.button.buttonAccept}
+                titleStyle={{ fontWeight: 'normal', fontSize:16 }}
+                buttonStyle={{
+                  backgroundColor: 'rgb(0, 150, 255)',
+                  // borderColor: 'transparent',
+                  borderWidth: 0,
+                  marginTop: 0,
+                  // borderRadius: 30,
+                }}
+                containerStyle={{
+                  marginTop:8,
+                  marginBottom:0,
+                  marginRight:8,
+                  height: 28,
+                  width:80,
+                  justifyContent:'center'
+                }}
+              />
+
+              <Button
+                title={props.button.buttonDelete}
+                titleStyle={{ fontWeight: 'normal', fontSize:16 }}
+                buttonStyle={{
+                  backgroundColor: 'rgb(160, 160, 160)',
+                  // borderColor: 'transparent',
+                  borderWidth: 0,
+                  marginTop: 0,
+                  // borderRadius: 30,
+                }}
+                containerStyle={{
+                  marginTop:8,
+                  marginBottom:0,
+                  height: 28,
+                  width:80,
+                  justifyContent:'center'
+                }}
+              />
+            </>
+          }
         </View>
       </ListItem.Content>
-      {/* <ListItem.Accordion>
-      </ListItem.Accordion> */}
+      {props.displayButtonAdvance && 
+        <>
+          <Button
+            icon={{
+              name: 'dots-three-horizontal',
+              type: 'entypo',
+              size: 20,
+              color: 'rgba(110, 120, 170, 1)',
+            }}
+            buttonStyle={{
+              backgroundColor: 'white',
+            }}
+          />
+        </>
+      }
+
+      {props.displayDescription && 
+        <>
+          <Text>{props.time}</Text>
+        </>
+      }
     </ListItem>
   );
 };
+
+ProfileItem.defaultProps = {
+  displayButtonGroup: false,
+  displayDescription: false,
+  displayButtonAdvance: false,
+}
 
 ProfileItem.propTypes = {
     

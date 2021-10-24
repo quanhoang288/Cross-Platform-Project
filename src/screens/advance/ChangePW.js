@@ -41,7 +41,6 @@ const styles = StyleSheet.create({
   },
 
   loadingProps:{
-    size: 'small',
     color: 'white'
   },
   titleStyle:{
