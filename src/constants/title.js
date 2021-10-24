@@ -10,5 +10,7 @@ export const stacks = {
     advance: {name:'advance', title:'Advance'},
     personalInformation: {name:'personalInformation', title:'Personal Information'},
     notification:{name: 'Notification', title:'Notification'},
+    listFriend:{name: 'listFriend', title:'List Friend'},
+    friendRequest:{name: 'friendRequest', title:'List Friend Request'},
 };
 

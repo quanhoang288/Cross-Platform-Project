@@ -31,6 +31,14 @@ const Home = ({navigation}) => {
         title = "Personal Information"
         onPress = {() => navigation.navigate(stacks.personalInformation.name)}
       />
+      <Button
+        title = "List Friend"
+        onPress = {() => navigation.navigate(stacks.listFriend.name)}
+      />
+      <Button
+        title = "List Friend Request"
+        onPress = {() => navigation.navigate(stacks.friendRequest.name)}
+      />
     </View>
   )
 }
