@@ -2,18 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Text } from 'react-native-elements';
 import { Stack } from '../components/common';
-
-const Personal = () => {
-    return (
-        <Text>Personal</Text>
-    );
-}
+import { Profile } from '../screens/account';
 
 const screens = [
     {
-        name: 'messsage',
-        component: Personal,
-        options: {}
+        name: 'profile',
+        component: Profile,
+        options: {
+            headerShown: false,
+        }
     }
 ];
 
