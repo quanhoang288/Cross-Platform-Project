@@ -1,17 +1,32 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Text, TouchableOpacity, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import {View } from 'react-native';
+import {ListItem, Text, Icon } from 'react-native-elements';
 
 const FunctionalityItem = props => {
-    return (
-        <TouchableOpacity onPress={() => {console.log("Pressed")}}>
-            <View>
-                <Ionicons name="md-checkmark-circle" size={32} color="green" />
-                <Text>Functionality Item</Text>
-            </View>
-        </TouchableOpacity>
-    );
+	return (
+		<ListItem bottomDivider onPress={() => {}}>
+			<Icon
+				name={props.icon.name}
+				type={props.icon.type}
+				size={32}
+			/>
+			<ListItem.Content>
+				<ListItem.Title>
+					<Text style={{fontSize:20, fontWeight:'500'}}>
+						{props.content}
+					</Text>
+				</ListItem.Title>
+				<View style={{ flexDirection: 'row' }}>
+					<Text style={{fontSize:13}}>
+						{props.note}
+					</Text>
+				</View>
+			</ListItem.Content>
+			{/* <ListItem.Accordion>
+			</ListItem.Accordion> */}
+		</ListItem>
+	);
 };
 
 FunctionalityItem.propTypes = {
