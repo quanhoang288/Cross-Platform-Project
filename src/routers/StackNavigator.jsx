@@ -5,6 +5,7 @@ import TabNavigator from './TabNavigator';
 import Home from '../screens/Home';
 import { CreatePost, PostList, Comment } from '../screens/post';
 import { Profile } from '../screens/account';
+import { Button } from 'react-native-elements';
 const Stack = createNativeStackNavigator();
 
 const stackScreens = [
@@ -18,6 +19,16 @@ const stackScreens = [
     {
         name: stacks.createPost.name,
         component: CreatePost,
+        options: {
+            headerRight: () => (
+                <Button
+                    onPress={() => {}}
+                    title="Save"
+                    color="#fff"
+                    style={{marginRight: 10}}
+              />
+            )
+        }
     }, 
     {
         name: stacks.newsFeed.name,
