@@ -3,8 +3,13 @@ import PropTypes from 'prop-types';
 import { Button, Image } from 'react-native-elements';
 import { View, StyleSheet } from 'react-native';
 import { FunctionalityItem } from '../../components/block';
+import { useNavigation } from '@react-navigation/core';
+import { stacks } from '../../constants/title';
 
-const MenuAdvance = () =>{
+const MenuAdvance = () => {
+
+  const navigation = useNavigation();
+
   return(
     <View style={styles.container}>
       <FunctionalityItem
@@ -14,6 +19,7 @@ const MenuAdvance = () =>{
         }}
         content="Personal Information"
         note="Show your personal information"
+        onPress={() => navigation.navigate(stacks.personalInformation.name)}
       />
 
       <FunctionalityItem
@@ -23,6 +29,8 @@ const MenuAdvance = () =>{
         }}
         content="Friends"
         note="See your friends"
+        onPress={() => navigation.navigate(stacks.listFriend.name)}
+
       />
 
       <FunctionalityItem
@@ -32,6 +40,8 @@ const MenuAdvance = () =>{
         }}
         content="Black list"
         note="Person who you don't wanna see"
+        onPress={() => navigation.navigate(stacks.personalInformation.name)}
+
       />
 
       <FunctionalityItem
@@ -41,6 +51,8 @@ const MenuAdvance = () =>{
         }}
         content="Change password"
         note=""
+        onPress={() => navigation.navigate(stacks.changePW.name)}
+
       />
 
       <FunctionalityItem

@@ -3,13 +3,13 @@ import PropTypes from 'prop-types';
 import { Text } from 'react-native-elements';
 import { Stack } from '../components/common';
 import { Profile } from '../screens/account';
+import { MenuAdvance } from '../screens/advance';
 
 const screens = [
     {
-        name: 'profile',
-        component: Profile,
+        name: 'Personal Setting',
+        component: MenuAdvance,
         options: {
-            headerShown: false,
         }
     }
 ];

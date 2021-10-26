@@ -1,5 +1,5 @@
 import React from 'react';
-import { HomeStack, MessageStack, NotificationStack, PersonalStack, PostStack, SearchStack } from '../stacks';
+import { MessageStack, NotificationStack, PersonalStack, PostStack, SearchStack } from '../stacks';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Icon } from 'react-native-elements';
 

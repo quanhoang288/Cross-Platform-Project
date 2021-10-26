@@ -2,10 +2,11 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { stacks } from '../constants/title';
 import TabNavigator from './TabNavigator';
-import Home from '../screens/Home';
 import { CreatePost, PostList, Comment } from '../screens/post';
 import { Profile } from '../screens/account';
 import { Button } from 'react-native-elements';
+import { ChangePW, PersonalInformation } from '../screens/advance';
+import { ListFriend } from '../screens/listFriend';
 const Stack = createNativeStackNavigator();
 
 const stackScreens = [
@@ -45,6 +46,28 @@ const stackScreens = [
             headerShown: false,
         }
     }, 
+    {
+        name: stacks.personalInformation.name,
+        options: {
+            title: stacks.personalInformation.title,
+        },
+        component: PersonalInformation,
+    }, 
+    {
+        name: stacks.listFriend.name,
+        options: {
+            title: stacks.listFriend.title,
+        },
+        component: ListFriend,
+    }, 
+    {
+        name: stacks.changePW.name,
+        options: {
+            title: stacks.changePW.title,
+        },
+        component: ChangePW,
+    }, 
+
 ]
 
 const StackNavigator = props => {

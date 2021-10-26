@@ -22,7 +22,7 @@ const ChangePW = () =>{
       />
 
       <Button
-        title="Sign Up"
+        title="Update"
         loading={false}
         loadingProps={styles.loadingProps}
         titleStyle={styles.titleStyle}
