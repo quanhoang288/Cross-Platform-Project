@@ -5,7 +5,7 @@ import {ListItem, Text, Icon } from 'react-native-elements';
 
 const FunctionalityItem = props => {
 	return (
-		<ListItem bottomDivider onPress={() => {}}>
+		<ListItem bottomDivider onPress={props.onPress}>
 			<Icon
 				name={props.icon.name}
 				type={props.icon.type}
