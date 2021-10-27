@@ -12,10 +12,6 @@ const CarouselSwipe = props => {
         {uri: 'https://i.etsystatic.com/29282700/r/il/e3aae5/3152845862/il_340x270.3152845862_q44u.jpg'},
         {uri: 'https://wallpaperaccess.com/full/317501.jpg'},
         {uri: 'https://i.etsystatic.com/29282700/r/il/e3aae5/3152845862/il_340x270.3152845862_q44u.jpg'},
-        {uri: 'https://wallpaperaccess.com/full/317501.jpg'},
-        {uri: 'https://i.etsystatic.com/29282700/r/il/e3aae5/3152845862/il_340x270.3152845862_q44u.jpg'},
-        {uri: 'https://wallpaperaccess.com/full/317501.jpg'},
-        {uri: 'https://i.etsystatic.com/29282700/r/il/e3aae5/3152845862/il_340x270.3152845862_q44u.jpg'},
     ];
     
 
@@ -35,7 +31,7 @@ const CarouselSwipe = props => {
                 inactiveDotScale={0.6}
                 activeDotIndex={ activeTab }
                 dotsLength={items.length}
-                
+                // dotContainerStyle={{marginVertical: 10}}
             />
             
         </View>

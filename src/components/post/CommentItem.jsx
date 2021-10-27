@@ -17,7 +17,7 @@ const CommentItem = props => {
                 <Text>This is post comment This is post comment This is post comment This is post comment </Text>
                 <Text>2h</Text>
             </View>
-            <Icon type='font-awesome' name='heart-o' size={28}/>
+            <Icon type='font-awesome' name='heart-o' size={28} iconStyle={{marginRight: 6}}/>
         </View>
     );
 };
