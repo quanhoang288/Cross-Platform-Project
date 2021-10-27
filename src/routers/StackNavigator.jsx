@@ -21,11 +21,13 @@ const stackScreens = [
         name: stacks.createPost.name,
         component: CreatePost,
         options: {
+            title: stacks.createPost.title,
             headerRight: () => (
                 <Button
                     onPress={() => {}}
                     title="Save"
                     color="#fff"
+                    buttonStyle={{borderRadius: 10}}
                     style={{marginRight: 10}}
               />
             )
@@ -43,7 +45,7 @@ const stackScreens = [
         name: stacks.profile.name,
         component: Profile,
         options: {
-            headerShown: false,
+
         }
     }, 
     {
@@ -75,9 +77,10 @@ const StackNavigator = props => {
         <Stack.Navigator
             screenOptions={{
                 headerStyle: {
-                    backgroundColor: 'rgb(0, 102, 255)'
+                    // backgroundColor: 'rgb(0, 102, 255)'
+                    backgroundColor: '#fff'
                 },
-                headerTintColor: '#fff',
+                // headerTintColor: '#fff',
                 
             }}
         >

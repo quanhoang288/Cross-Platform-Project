@@ -17,6 +17,16 @@ const MenuAdvance = () => {
           name:'user',
           type:'feather'
         }}
+        content="User profile"
+        note="View your personal posts and images"
+        onPress={() => navigation.navigate(stacks.profile.name)}
+      />
+
+      <FunctionalityItem
+        icon={{
+          name:'user',
+          type:'feather'
+        }}
         content="Personal Information"
         note="Show your personal information"
         onPress={() => navigation.navigate(stacks.personalInformation.name)}
