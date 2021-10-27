@@ -27,7 +27,8 @@ const styles = StyleSheet.create({
     },
     image: {
         width: ITEM_WIDTH,
-        height: 256,
+        height: 300,
+        maxHeight: 330
     }
 })
 

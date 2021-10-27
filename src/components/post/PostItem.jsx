@@ -28,6 +28,7 @@ const PostItem = ({author, content, handleShowMore}) => {
                     type='feather' 
                     name='more-horizontal' 
                     size={32} 
+                    iconStyle={{marginRight: 6}}
                     style={{marginRight: 6}} 
                     onPress={() => {}}
                 />
@@ -85,7 +86,8 @@ const styles = StyleSheet.create({
         marginLeft: 6,
     },
     postContent: {
-        marginBottom: 4,
+        flex: 1,
+        // marginBottom: 4,
     },
     textContent: {
         marginHorizontal: 6,
@@ -96,10 +98,10 @@ const styles = StyleSheet.create({
         // width: "40%",
         // justifyContent: "space-between",
         flexDirection: 'row',
-        marginVertical: 4,
+        marginBottom: 10,
     },
     icon: {
-        marginRight: 10,
+        marginRight: 20,
         flexDirection: 'row',
         alignItems: 'center', 
         justifyContent: 'space-between'

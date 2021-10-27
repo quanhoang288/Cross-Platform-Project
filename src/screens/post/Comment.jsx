@@ -24,7 +24,7 @@ const Comment = props => {
     return (
         <View style={styles.container}>
             <ScrollView showsVerticalScrollIndicator={false} style={styles.commentList}>
-                <View>
+                {/* <View> */}
                     <CommentItem/>
                     <CommentItem/>
                     <CommentItem/>
@@ -34,11 +34,23 @@ const Comment = props => {
                     <CommentItem/>
                     <CommentItem/>
                     <CommentItem/>
-                </View>
+                {/* </View> */}
             </ScrollView>
             <View style={styles.commentSection}>
-                <Icon type='feather' name='camera' size={28} />
-                <Input placeholder="Enter your comment" multiline textAlignVertical='top' containerStyle={styles.commentInputContainer} inputStyle={{maxHeight: 60}}/>
+                <Icon 
+                    type='feather' 
+                    name='camera'
+                    size={28}
+                    containerStyle={{alignSelf: 'center'}} 
+                    iconStyle={styles.cameraIcon}/>
+                <Input 
+                    placeholder="Enter your comment" 
+                    multiline
+                    inputContainerStyle={styles.commentInputContainer} 
+                    numberOfLines={3}
+                    rightIcon={<Icon name='send' type='ionicons' size={28} iconStyle={{color: 'blue', marginLeft: 6}}/>}
+                    // inputStyle={{maxHeight: 60}}
+                />
             </View>
         </View>
     );
@@ -52,12 +64,20 @@ const styles = StyleSheet.create({
         marginBottom: 6
     }, 
     commentSection: {
-        marginHorizontal: 6,
-        alignItems: 'center',
+        marginBottom: 6,
+        maxHeight: 50,
         flexDirection: 'row',
     }, 
     commentInputContainer: {
-        // maxWidth: DEVICE_WIDTH - 50
+        borderRadius: 20,
+        borderColor: 'rgba(110, 120, 170, 1)',
+        borderWidth: 1,
+        width: '90%',
+        paddingLeft: 10,
+    },
+    cameraIcon: {
+        marginLeft: 6, 
+        alignSelf: 'center'
     }
     
 })

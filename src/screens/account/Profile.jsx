@@ -17,7 +17,7 @@ const Profile = props => {
                     alt="This is cover image"
                     style={styles.cover}
                 >
-                    <Icon type='feather' name='more-horizontal' size={32} style={{marginRight: 6}}/>
+                    <Icon type='feather' name='more-horizontal' size={32} style={{marginRight: 6, marginTop: 6}}/>
                 </ImageBackground>
                 <View style={styles.profileOutterContainer}>
                     <View style={styles.profileInnerContainer}>
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     },
     profileInnerContainer: {
         marginTop: -50, 
-        width: "fit-content"
+        // width: "fit-content"
     },
     
     name: {
