@@ -28,7 +28,7 @@ const ChatScreen = () => {
       },
       {
         _id: 2,
-        text: 'Hi',
+        text: require('../../assets/avatar.jpg'),
         createdAt: new Date(),
         user: {
           _id: 1,

@@ -11,3 +11,4 @@ web-build/
 *.lock
 # macOS
 .DS_Store
+package.lock
