@@ -46,62 +46,62 @@ const SuggestFriend =[
         UserImg : require('../../../assets/avatar3.jpg'),
     },
     {
-        id: '1',
+        id: '4',
         UserName: 'Trung Vu Hoang',
         UserImg : require('../../../assets/avatar.jpg'),
     },
     {
-        id: '2',
+        id: '5',
         UserName: 'Quan Hoang Huy',
         UserImg : require('../../../assets/avatar2.jpg'),
     },
     {
-        id: '3',
+        id: '6',
         UserName: 'Nguyen Xuan Tung',
         UserImg : require('../../../assets/avatar3.jpg'),
     },
     {
-        id: '1',
+        id: '7',
         UserName: 'Trung Vu Hoang',
         UserImg : require('../../../assets/avatar.jpg'),
     },
     {
-        id: '2',
+        id: '8',
         UserName: 'Quan Hoang Huy',
         UserImg : require('../../../assets/avatar2.jpg'),
     },
     {
-        id: '3',
+        id: '9',
         UserName: 'Nguyen Xuan Tung',
         UserImg : require('../../../assets/avatar3.jpg'),
     },
     {
-        id: '1',
+        id: '10',
         UserName: 'Trung Vu Hoang',
         UserImg : require('../../../assets/avatar.jpg'),
     },
     {
-        id: '2',
+        id: '11',
         UserName: 'Quan Hoang Huy',
         UserImg : require('../../../assets/avatar2.jpg'),
     },
     {
-        id: '3',
+        id: '12',
         UserName: 'Nguyen Xuan Tung',
         UserImg : require('../../../assets/avatar3.jpg'),
     },
     {
-        id: '1',
+        id: '13',
         UserName: 'Trung Vu Hoang',
         UserImg : require('../../../assets/avatar.jpg'),
     },
     {
-        id: '2',
+        id: '14',
         UserName: 'Quan Hoang Huy',
         UserImg : require('../../../assets/avatar2.jpg'),
     },
     {
-        id: '3',
+        id: '15',
         UserName: 'Nguyen Xuan Tung',
         UserImg : require('../../../assets/avatar3.jpg'),
     },
@@ -118,16 +118,12 @@ const SearchBarCustom = (props) => {
 const SearchFriend = () =>{
     return(
         <>
-        <SearchBarCustom
-          placeholder="Search here"
-          platform="ios"
-        //   onChangeText={this.handlerSearch}
-        />
-        <ScrollView>
-        
-        
-        
-        
+          <SearchBarCustom
+            placeholder="Search here"
+            platform="ios"
+          //   onChangeText={this.handlerSearch}
+          />
+        {/* <ScrollView> */}
             <FlatList data={SuggestFriend}
                           keyExtractor={item=>item.id}
                           renderItem={({item}) =>(
@@ -152,10 +148,7 @@ const SearchFriend = () =>{
                           </TouchableOpacity>
                           )}
             />
-        
-        
-        
-        </ScrollView>
+          {/* </ScrollView> */}
         </>
     )
 }

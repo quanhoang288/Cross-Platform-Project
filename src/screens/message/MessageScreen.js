@@ -83,7 +83,7 @@ const Messages = [
       'choi game ko',
   },
   {
-    id: '1',
+    id: '8',
     userName: 'Quan Hoang',
     userImg: require('../../../assets/avatar2.jpg'),
     unreadMessages: 20,
@@ -91,7 +91,7 @@ const Messages = [
       'Hom nay toi co don qua',
   },
   {
-    id: '2',
+    id: '9',
     userName: 'TungNX',
     userImg: require('../../../assets/avatar3.jpg'),
     unreadMessages: 4,
@@ -99,7 +99,7 @@ const Messages = [
       'Nho Khanh Van',
   },
   {
-    id: '3',
+    id: '10',
     userName: 'Trung',
     userImg: require('../../../assets/avatar.jpg'),
     unreadMessages: 5,
@@ -107,7 +107,7 @@ const Messages = [
       'xin chao',
   },
   {
-    id: '4',
+    id: '11',
     userName: 'MessiThanh',
     userImg: require('../../../assets/avatar3.jpg'),
     unreadMessages: 2,
@@ -115,7 +115,7 @@ const Messages = [
       'hom nay toi buon',
   },
   {
-    id: '5',
+    id: '12',
     userName: 'Duong',
     userImg: require('../../../assets/avatar3.jpg'),
     unreadMessages: 10,
@@ -123,7 +123,7 @@ const Messages = [
       'ai nhan tin minh ik',
   },
   {
-    id: '6',
+    id: '13',
     userName: 'Truong',
     userImg: require('../../../assets/avatar3.jpg'),
     unreadMessages: 5,
@@ -134,7 +134,7 @@ const Messages = [
 const MessageScreen = ({ navigation }) => {
     return (
         // <View>
-            <ScrollView>
+            // <ScrollView>
                 <FlatList data={Messages}
                           keyExtractor={item=>item.id}
                           renderItem={({item}) =>(
@@ -158,7 +158,7 @@ const MessageScreen = ({ navigation }) => {
                           )}
                 />
 
-            </ScrollView>
+            // </ScrollView>
         // </View>
     );
 };
