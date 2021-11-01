@@ -30,53 +30,53 @@ const ChatSetting = ({ navigation })  => {
             rounded
             size={100}
             
-            source={require('../../assets/avatar.jpg')} 
+            source={require('../../../assets/avatar.jpg')} 
             />
             <TouchableOpacity>
             <ListItem>
-                <Image source={require('../../assets/findicon.png')} rounded/>
+                <Image source={require('../../../assets/findicon.png')} rounded/>
                 <ListItem.Title>Find Message</ListItem.Title>
             </ListItem>
             </TouchableOpacity>
             <TouchableOpacity>
             <ListItem>
-                <Image source={require('../../assets/profileicon.jpg')} rounded/>
+                <Image source={require('../../../assets/profileicon.jpg')} rounded/>
                 <ListItem.Title>Profile</ListItem.Title>
             </ListItem>
             </TouchableOpacity>
             <TouchableOpacity>
             <ListItem>
-                <Image source={require('../../assets/notificationicon.png')} rounded/>
+                <Image source={require('../../../assets/notificationicon.png')} rounded/>
                 <ListItem.Title>Notification</ListItem.Title>
             </ListItem>
             </TouchableOpacity>
             <TouchableOpacity>
             <ListItem>
-                <Image source={require('../../assets/notificationicon.png')} rounded/>
+                <Image source={require('../../../assets/notificationicon.png')} rounded/>
                 <ListItem.Title>Nickname</ListItem.Title>
             </ListItem>
             </TouchableOpacity>
             <TouchableOpacity>
             <ListItem>
-                <Image source={require('../../assets/notificationicon.png')} rounded/>
+                <Image source={require('../../../assets/notificationicon.png')} rounded/>
                 <ListItem.Title>Group</ListItem.Title>
             </ListItem>
             </TouchableOpacity>
             <TouchableOpacity>
             <ListItem>
-                <Image source={require('../../assets/notificationicon.png')} rounded/>
+                <Image source={require('../../../assets/notificationicon.png')} rounded/>
                 <ListItem.Title>Report</ListItem.Title>
             </ListItem>
             </TouchableOpacity>
             <TouchableOpacity>
             <ListItem>
-                <Image source={require('../../assets/notificationicon.png')} rounded/>
+                <Image source={require('../../../assets/notificationicon.png')} rounded/>
                 <ListItem.Title>Block</ListItem.Title>
             </ListItem>
             </TouchableOpacity>
         <TouchableOpacity>
             <ListItem>
-                <Image source={require('../../assets/notificationicon.png')} rounded/>
+                <Image source={require('../../../assets/notificationicon.png')} rounded/>
                 <ListItem.Title>Delete</ListItem.Title>
             </ListItem>
         </TouchableOpacity>

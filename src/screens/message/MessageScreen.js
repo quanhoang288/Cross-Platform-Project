@@ -21,6 +21,7 @@ import {
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { stacks } from '../../constants/title';
 // import { ConversationItem } from '../components/chat';
 
 // const ScreenWidth = Dimensions.get('window').width;
@@ -28,7 +29,7 @@ const Messages = [
   {
     id: '1',
     userName: 'Quan Hoang',
-    userImg: require('../../assets/avatar2.jpg'),
+    userImg: require('../../../assets/avatar2.jpg'),
     unreadMessages: 20,
     messageText:
       'Hom nay toi co don qua',
@@ -36,7 +37,7 @@ const Messages = [
   {
     id: '2',
     userName: 'TungNX',
-    userImg: require('../../assets/avatar3.jpg'),
+    userImg: require('../../../assets/avatar3.jpg'),
     unreadMessages: 4,
     messageText:
       'Nho Khanh Van',
@@ -44,7 +45,7 @@ const Messages = [
   {
     id: '3',
     userName: 'Trung',
-    userImg: require('../../assets/avatar.jpg'),
+    userImg: require('../../../assets/avatar.jpg'),
     unreadMessages: 5,
     messageText:
       'xin chao',
@@ -52,7 +53,7 @@ const Messages = [
   {
     id: '4',
     userName: 'MessiThanh',
-    userImg: require('../../assets/avatar3.jpg'),
+    userImg: require('../../../assets/avatar3.jpg'),
     unreadMessages: 2,
     messageText:
       'hom nay toi buon',
@@ -60,7 +61,7 @@ const Messages = [
   {
     id: '5',
     userName: 'Duong',
-    userImg: require('../../assets/avatar3.jpg'),
+    userImg: require('../../../assets/avatar3.jpg'),
     unreadMessages: 10,
     messageText:
       'ai nhan tin minh ik',
@@ -68,7 +69,7 @@ const Messages = [
   {
     id: '6',
     userName: 'Truong',
-    userImg: require('../../assets/avatar3.jpg'),
+    userImg: require('../../../assets/avatar3.jpg'),
     unreadMessages: 5,
     messageText:
       'hello',
@@ -76,7 +77,7 @@ const Messages = [
   {
     id: '7',
     userName: 'Vanh',
-    userImg: require('../../assets/avatar3.jpg'),
+    userImg: require('../../../assets/avatar3.jpg'),
     unreadMessages: 5,
     messageText:
       'choi game ko',
@@ -84,7 +85,7 @@ const Messages = [
   {
     id: '1',
     userName: 'Quan Hoang',
-    userImg: require('../../assets/avatar2.jpg'),
+    userImg: require('../../../assets/avatar2.jpg'),
     unreadMessages: 20,
     messageText:
       'Hom nay toi co don qua',
@@ -92,7 +93,7 @@ const Messages = [
   {
     id: '2',
     userName: 'TungNX',
-    userImg: require('../../assets/avatar3.jpg'),
+    userImg: require('../../../assets/avatar3.jpg'),
     unreadMessages: 4,
     messageText:
       'Nho Khanh Van',
@@ -100,7 +101,7 @@ const Messages = [
   {
     id: '3',
     userName: 'Trung',
-    userImg: require('../../assets/avatar.jpg'),
+    userImg: require('../../../assets/avatar.jpg'),
     unreadMessages: 5,
     messageText:
       'xin chao',
@@ -108,7 +109,7 @@ const Messages = [
   {
     id: '4',
     userName: 'MessiThanh',
-    userImg: require('../../assets/avatar3.jpg'),
+    userImg: require('../../../assets/avatar3.jpg'),
     unreadMessages: 2,
     messageText:
       'hom nay toi buon',
@@ -116,7 +117,7 @@ const Messages = [
   {
     id: '5',
     userName: 'Duong',
-    userImg: require('../../assets/avatar3.jpg'),
+    userImg: require('../../../assets/avatar3.jpg'),
     unreadMessages: 10,
     messageText:
       'ai nhan tin minh ik',
@@ -124,7 +125,7 @@ const Messages = [
   {
     id: '6',
     userName: 'Truong',
-    userImg: require('../../assets/avatar3.jpg'),
+    userImg: require('../../../assets/avatar3.jpg'),
     unreadMessages: 5,
     messageText:
       'hello',
@@ -132,12 +133,13 @@ const Messages = [
 ];
 const MessageScreen = ({ navigation }) => {
     return (
-        <View>
+        // <View>
             <ScrollView>
                 <FlatList data={Messages}
                           keyExtractor={item=>item.id}
                           renderItem={({item}) =>(
-                          <TouchableOpacity onPress={() => navigation.navigate('Chat')}>
+                          <TouchableOpacity onPress={() => navigation.navigate(stacks.chatScreen.name)}>
+                          
                           <View>
                               <ListItem>
                                   <Avatar rounded size={40} source={item.userImg} />
@@ -157,7 +159,7 @@ const MessageScreen = ({ navigation }) => {
                 />
 
             </ScrollView>
-        </View>
+        // </View>
     );
 };
 

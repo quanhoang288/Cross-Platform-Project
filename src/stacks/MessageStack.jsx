@@ -3,25 +3,25 @@ import PropTypes from 'prop-types';
 import { View } from 'react-native';
 import { Text } from 'react-native-elements';
 import { Stack } from '../components/common';
+import { MessageScreen } from '../screens/message';
+import { stacks } from '../constants/title';
 
-const Message = () => {
-    return (
-        <Text>Message</Text>
-    );
-}
 
 const screens = [
     {
-        name: 'messsage',
-        component: Message,
-        options: {}
+        name: stacks.messageScreen.name,
+        title: stacks.messageScreen.title,
+        component: MessageScreen,
+        options: {
+            
+        }
     }
 ];
 
 const MessageStack = props => { 
     return (
-        <Message/>
-        // <Stack screens={screens} />
+        
+        <Stack screens={screens} />
     );
 };
 

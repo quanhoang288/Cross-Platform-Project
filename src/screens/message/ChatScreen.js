@@ -23,17 +23,17 @@ const ChatScreen = () => {
         user: {
           _id: 2,
           name: 'Quan',
-          avatar: require('../../assets/avatar.jpg'),
+          avatar: require('../../../assets/avatar.jpg'),
         },
       },
       {
         _id: 2,
-        text: require('../../assets/avatar.jpg'),
+        text: require('../../../assets/avatar.jpg'),
         createdAt: new Date(),
         user: {
           _id: 1,
           name: 'Trung',
-          avatar: require('../../assets/avatar.jpg'),
+          avatar: require('../../../assets/avatar.jpg'),
         },
       },
     ]);

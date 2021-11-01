@@ -7,6 +7,7 @@ import { Profile } from '../screens/account';
 import { Button } from 'react-native-elements';
 import { ChangePW, PersonalInformation } from '../screens/advance';
 import { ListFriend } from '../screens/listFriend';
+import { ChatScreen, MessageScreen } from '../screens/message';
 const Stack = createNativeStackNavigator();
 
 const stackScreens = [
@@ -69,6 +70,23 @@ const stackScreens = [
         },
         component: ChangePW,
     }, 
+    {
+        name: stacks.chatScreen.name,
+        component: ChatScreen,
+        options:{
+            headerRight: () => (
+                <Button
+                //   onPress={() => alert('This is a button!')}
+                  title="ChatSetting"
+                  color="#fff"
+                />
+              ),
+        }
+    },
+    {
+        name: 'message',
+        component: MessageScreen,
+    }
 
 ]
 

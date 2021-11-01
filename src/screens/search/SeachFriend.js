@@ -33,77 +33,77 @@ const SuggestFriend =[
     {
         id: '1',
         UserName: 'Trung Vu Hoang',
-        UserImg : require('../../assets/avatar.jpg'),
+        UserImg : require('../../../assets/avatar.jpg'),
     },
     {
         id: '2',
         UserName: 'Quan Hoang Huy',
-        UserImg : require('../../assets/avatar2.jpg'),
+        UserImg : require('../../../assets/avatar2.jpg'),
     },
     {
         id: '3',
         UserName: 'Nguyen Xuan Tung',
-        UserImg : require('../../assets/avatar3.jpg'),
+        UserImg : require('../../../assets/avatar3.jpg'),
     },
     {
         id: '1',
         UserName: 'Trung Vu Hoang',
-        UserImg : require('../../assets/avatar.jpg'),
+        UserImg : require('../../../assets/avatar.jpg'),
     },
     {
         id: '2',
         UserName: 'Quan Hoang Huy',
-        UserImg : require('../../assets/avatar2.jpg'),
+        UserImg : require('../../../assets/avatar2.jpg'),
     },
     {
         id: '3',
         UserName: 'Nguyen Xuan Tung',
-        UserImg : require('../../assets/avatar3.jpg'),
+        UserImg : require('../../../assets/avatar3.jpg'),
     },
     {
         id: '1',
         UserName: 'Trung Vu Hoang',
-        UserImg : require('../../assets/avatar.jpg'),
+        UserImg : require('../../../assets/avatar.jpg'),
     },
     {
         id: '2',
         UserName: 'Quan Hoang Huy',
-        UserImg : require('../../assets/avatar2.jpg'),
+        UserImg : require('../../../assets/avatar2.jpg'),
     },
     {
         id: '3',
         UserName: 'Nguyen Xuan Tung',
-        UserImg : require('../../assets/avatar3.jpg'),
+        UserImg : require('../../../assets/avatar3.jpg'),
     },
     {
         id: '1',
         UserName: 'Trung Vu Hoang',
-        UserImg : require('../../assets/avatar.jpg'),
+        UserImg : require('../../../assets/avatar.jpg'),
     },
     {
         id: '2',
         UserName: 'Quan Hoang Huy',
-        UserImg : require('../../assets/avatar2.jpg'),
+        UserImg : require('../../../assets/avatar2.jpg'),
     },
     {
         id: '3',
         UserName: 'Nguyen Xuan Tung',
-        UserImg : require('../../assets/avatar3.jpg'),
+        UserImg : require('../../../assets/avatar3.jpg'),
     },
     {
         id: '1',
         UserName: 'Trung Vu Hoang',
-        UserImg : require('../../assets/avatar.jpg'),
+        UserImg : require('../../../assets/avatar.jpg'),
     },
     {
         id: '2',
         UserName: 'Quan Hoang Huy',
-        UserImg : require('../../assets/avatar2.jpg'),
+        UserImg : require('../../../assets/avatar2.jpg'),
     },
     {
         id: '3',
         UserName: 'Nguyen Xuan Tung',
-        UserImg : require('../../assets/avatar3.jpg'),
+        UserImg : require('../../../assets/avatar3.jpg'),
     },
 ]
 
@@ -111,17 +111,23 @@ const SearchBarCustom = (props) => {
     const [value, setValue] = useState('');
     return <SearchBar value={value} onChangeText={setValue} {...props} />;
   };
-
+// handlerSearch= (text) =>{
+//     const formattedQuery = text.toLowerCase()
+//     const data = 
+// }
 const SearchFriend = () =>{
     return(
-        <View>
+        <>
         <SearchBarCustom
           placeholder="Search here"
           platform="ios"
-          
+        //   onChangeText={this.handlerSearch}
         />
-        <View>
         <ScrollView>
+        
+        
+        
+        
             <FlatList data={SuggestFriend}
                           keyExtractor={item=>item.id}
                           renderItem={({item}) =>(
@@ -146,9 +152,11 @@ const SearchFriend = () =>{
                           </TouchableOpacity>
                           )}
             />
+        
+        
+        
         </ScrollView>
-        </View>
-        </View>
+        </>
     )
 }
 

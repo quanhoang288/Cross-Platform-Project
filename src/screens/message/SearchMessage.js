@@ -23,6 +23,7 @@ import {
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { stacks } from '../../constants/title';
 // const InputFieldsStyle = {
 //     borderWidth: 0,
     
@@ -124,7 +125,7 @@ const SearchMessage = ({navigation}) =>{
             <FlatList data={SuggestFriend}
                           keyExtractor={item=>item.id}
                           renderItem={({item}) =>(
-                          <TouchableOpacity onPress={() => navigation.navigate('Chat')}>
+                          <TouchableOpacity onPress={() => navigation.navigate(stacks.chatScreen.name)}>
                           <View>
                               <ListItem>
                                   <Avatar rounded size={40} source={item.UserImg} />
