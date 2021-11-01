@@ -9,8 +9,11 @@ export const stacks = {
     changePW: {name: 'changePW', title: 'Change Password'},
     advance: {name:'advance', title:'Advance'},
     personalInformation: {name:'personalInformation', title:'Personal Information'},
-    notification:{name: 'Notification', title:'Notification'},
-    listFriend:{name: 'listFriend', title:'List Friend'},
-    friendRequest:{name: 'friendRequest', title:'List Friend Request'},
+    notification: {name: 'Notification', title:'Notification'},
+    listFriend: {name: 'listFriend', title:'List Friend'},
+    friendRequest: {name: 'friendRequest', title:'List Friend Request'},
+    chatScreen: {name: 'chat',title:'Chat'},
+    searchFriend: {name: 'search', title:'Search'},
+    messageScreen: {name: 'message', title:'Message'},
 };
 
