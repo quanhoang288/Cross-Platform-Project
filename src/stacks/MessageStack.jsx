@@ -9,12 +9,18 @@ import { stacks } from '../constants/title';
 
 const screens = [
     {
+<<<<<<< HEAD
         name: stacks.messageScreen.name,
         title: stacks.messageScreen.title,
         component: MessageScreen,
         options: {
             
         }
+=======
+        name: 'message',
+        component: Message,
+        options: {}
+>>>>>>> 39f182c (add routing signIn/signUp)
     }
 ];
 

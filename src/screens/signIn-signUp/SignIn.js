@@ -5,10 +5,14 @@ import { View, StyleSheet } from 'react-native';
 import { InputText } from '../../components/block';
 import { DEVICE_WIDTH, DEVICE_HEIGHT } from '../../constants/dimensions'; 
 import { borderTop } from 'styled-system';
+import { useNavigation } from '@react-navigation/core';
+import { stacks } from '../../constants/title';
 
 const SignIn = () =>{
   const [credentials, setCredential] = useState({name:"", password:""});
   const handleChange = (name, value) => {setCredential({...credentials, [name]:value })} 
+
+  const navigation = useNavigation();
 
   return(
     <View style={styles.container}>
@@ -63,7 +67,9 @@ const SignIn = () =>{
           height:50,
           width:200
         }}
-        // onPress={() => console.log('aye')}
+        onPress={() => {
+          navigation.navigate('Tabs');
+        }}
       />
 
       <Text >Dont' have an account ?</Text>
@@ -82,7 +88,9 @@ const SignIn = () =>{
           marginBottom:12,
           justifyContent: 'center',
         }}
-        // onPress={() => console.log('aye')}
+        onPress={() => {
+          navigation.navigate(stacks.signUp.name);
+        }}
       />
     </View>
   )
