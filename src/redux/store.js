@@ -1,6 +1,13 @@
-import { createStore, applyMiddleware } from "redux";
+import { createStore, combineReducers, applyMiddleware } from "redux";
 import thunk from "redux-thunk";
+import { modalReducer } from "./reducers"; 
 
-const store = createStore(null, applyMiddleware(thunk));
+
+
+const reducers = combineReducers({
+    modal: modalReducer
+});
+
+const store = createStore(reducers);
 
 export default store;
