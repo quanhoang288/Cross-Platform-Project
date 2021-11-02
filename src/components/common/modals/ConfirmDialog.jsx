@@ -1,22 +1,25 @@
 import React, { useState } from "react";
-import { Button, Text, View, SafeAreaView, StyleSheet } from "react-native";
+import { View, SafeAreaView, StyleSheet } from "react-native";
 import Modal from "react-native-modal";
-import { Card } from 'react-native-elements';
+import { Divider, Text } from 'react-native-elements';
+import { useDispatch } from "react-redux";
+import { hideModal } from "../../../redux/reducers/modalReducer";
 
 
 const DialogWrapper = props => {
+
+    const dispatch = useDispatch();
+    // console.log(props);
     return (
-      <View style={{ flex: 1 }}>
         <Modal 
-          isVisible={props.isModalVisible}
+          isVisible={true}
           swipeDirection={['down']}
-          onSwipeComplete={props.toggleModal}
-          onBackdropPress={props.toggleModal}
+          onSwipeComplete={() => dispatch(hideModal())}
+          onBackdropPress={() => dispatch(hideModal())}
         >
           {props.children}
-    
         </Modal>
-      </View>
+
     );
 }
 
@@ -26,10 +29,10 @@ const DialogContent = props => {
             <Text style={styles.title}>{props.title}</Text>
             <Divider />    
             <View style={{marginTop: 10}}>
-              <Text>{props.content}</Text>
+              <Text style={styles.contentText}>{props.content}</Text>
               <View style={styles.buttonGroup}>
-                  <Text>{props.noOptionTitle}</Text>
-                  <Text style={{marginLeft: 10}}>{props.yesOptionTitle}</Text>
+                  <Text style={styles.noOptionStyle}>{props.noOptionTitle}</Text>
+                  <Text style={styles.yesOptionStyle}>{props.yesOptionTitle}</Text>
               </View>
             </View>
         </View>
@@ -37,32 +40,47 @@ const DialogContent = props => {
 }
 
 DialogContent.defaultProps = {
-    noOptionTitle: 'Cancel',
-    yesOptionTitle: 'OK',
+    noOptionTitle: 'KHÔNG',
+    yesOptionTitle: 'CÓ',
 };
 
 const ConfirmDialog = props => {
     return (
-        <DialogWrapper isModalVisible={props.isModalVisible} toggleModal={props.toggleModal}>
-            <DialogContent/>
+        <DialogWrapper>
+            <DialogContent {...props}/>
         </DialogWrapper>
     );
 }
 
 const styles = StyleSheet.create({
     content: {
+        padding: 10,
         backgroundColor: 'white',
         justifyContent: 'center',
         borderColor: 'rgba(0, 0, 0, 0.1)',
     },
+    contentText: {
+        fontSize: 16,
+        marginBottom: 20,
+    },
     title: {
-        fontSize: 20, 
+        fontSize: 24, 
         fontWeight: 'bold', 
         marginBottom: 4,
     },
     buttonGroup: {
         flexDirection: 'row',
-        justifyContent: 'flex-end'
+        justifyContent: 'flex-end',
+    }, 
+    noOptionStyle: {
+        fontSize: 18,
+        fontWeight: 'bold'
+    }, 
+    yesOptionStyle: {
+        fontWeight: 'bold',
+        fontSize: 18,
+        marginLeft: 20, 
+        color: 'blue'
     }
 });
 
