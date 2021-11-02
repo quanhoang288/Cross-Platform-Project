@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import {
   View,
   ScrollView,
+  StatusBar,
   StyleSheet,
   SafeAreaView,
   Dimensions,
   TouchableOpacity,
   FlatList,
-  
+  Platform,
   TextInput,
 } from 'react-native';
 import {
@@ -117,17 +118,16 @@ const SearchBarCustom = (props) => {
 // }
 const SearchFriend = () =>{
     return(
-        <>
+        <SafeAreaView style={styles.container}>
           <SearchBarCustom
             placeholder="Search here"
-            platform="ios"
+            platform={Platform.OS}
           //   onChangeText={this.handlerSearch}
           />
         {/* <ScrollView> */}
             <FlatList data={SuggestFriend}
                           keyExtractor={item=>item.id}
                           renderItem={({item}) =>(
-                          <TouchableOpacity >
                           <View>
                               <ListItem>
                                   <Avatar rounded size={40} source={item.UserImg} />
@@ -145,17 +145,16 @@ const SearchFriend = () =>{
                                   </TouchableOpacity>
                               </ListItem>
                           </View>
-                          </TouchableOpacity>
                           )}
             />
           {/* </ScrollView> */}
-        </>
+        </SafeAreaView>
     )
 }
 
 const styles = StyleSheet.create({
-    searchBar:{
-        backgroundColor:'white'
-    }
+    container: {
+        marginTop: StatusBar.currentHeight
+    },
 })
 export default SearchFriend;

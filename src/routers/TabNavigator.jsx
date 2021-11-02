@@ -12,9 +12,9 @@ const tabScreens = [
         options: {
             headerShown: false,
             tabBarLabel: 'Home',
-            tabBarIcon: ({ color, size }) => (
-                <Icon type='entypo' name='home' color={color} size={size}/>
-            )
+            // tabBarIcon: ({ color, size }) => (
+            //     <Icon type='entypo' name='home' color={color} size={size}/>
+            // )
         }
     },
     {
@@ -23,9 +23,9 @@ const tabScreens = [
         options: {
             headerShown: false,
             tabBarLabel: 'Search',
-            tabBarIcon: ({ color, size }) => (
-                <Icon type='fontawesome' name='search' color={color} size={size}/>
-            )
+            // tabBarIcon: ({ color, size }) => (
+            //     <Icon type='fontawesome' name='search' color={color} size={size}/>
+            // )
         }
     },
     {
@@ -34,9 +34,9 @@ const tabScreens = [
         options: {
             headerShown: false,
             tabBarLabel: 'Message',
-            tabBarIcon: ({ color, size }) => (
-                <Icon type='antdesign' name='message1' color={color} size={size}/>
-            )
+            // tabBarIcon: ({ color, size }) => (
+            //     <Icon type='antdesign' name='message1' color={color} size={size}/>
+            // )
         }
     },
     {
@@ -45,9 +45,9 @@ const tabScreens = [
         options: {
             headerShown: false,
             tabBarLabel: 'Notification',
-            tabBarIcon: ({ color, size }) => (
-                <Icon type='ionicon' name='notifications' color={color} size={size}/>
-            )
+            // tabBarIcon: ({ color, size }) => (
+            //     <Icon type='ionicon' name='notifications' color={color} size={size}/>
+            // )
         }
     },
     {
@@ -56,20 +56,48 @@ const tabScreens = [
         options: {
             headerShown: false,
             tabBarLabel: 'Profile',
-            tabBarIcon: ({ color, size }) => (
-                <Icon type='material-community' name='account' color={color} size={size}/>
-            )
+            // tabBarIcon: ({ color, size }) => (
+            //     <Icon type='material-community' name='account' color={color} size={size}/>
+            // )
         }
     },
     
 ]
 
 const TabNavigator = props => {
+    const routeToIconMappings = {
+        PostStack: {
+            type: 'entypo',
+            name: 'home',
+        }, 
+        SearchStack: {
+            type: 'fontawesome',
+            name: 'search',
+        },
+        MessageStack: {
+            type: 'antdesign',
+            name: 'message1',
+        },
+        NotificationStack: {
+            type: 'ionicon',
+            name: 'notifications',
+        }, 
+        PersonalStack: {
+            type: 'material-community',
+            name: 'account',
+        }
+    };
+
     return (
         <Tab.Navigator
-            screenOptions={{
+            screenOptions={({route}) => ({
                 tabBarActiveTintColor: 'blue',
-            }}
+                tabBarShowLabel: false,
+                tabBarIcon: ({color, size}) => {
+                    return <Icon type={routeToIconMappings[route.name].type} name={routeToIconMappings[route.name].name} size={28} color={color} />;
+                },
+
+            })}
         >
             {
                 tabScreens.map((screen, idx) => (
