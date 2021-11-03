@@ -7,12 +7,9 @@ import { Profile } from '../screens/account';
 import { Button } from 'react-native-elements';
 import { ChangePW, PersonalInformation } from '../screens/advance';
 import { ListFriend } from '../screens/listFriend';
-<<<<<<< HEAD
 import { ChatScreen, MessageScreen } from '../screens/message';
-=======
 import { SignIn, SignUp } from '../screens/signIn-signUp';
 
->>>>>>> 39f182c (add routing signIn/signUp)
 const Stack = createNativeStackNavigator();
 
 const stackScreens = [
@@ -28,7 +25,7 @@ const stackScreens = [
         name: stacks.signUp.name,
         component: SignUp,
         options: {
-            
+            title: stacks.signUp.title,
         }
     },
 
