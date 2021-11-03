@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import {Input, Icon} from 'react-native-elements'
 
 
-
 const InputText = (props) => {
 
   let inputProps = {}
@@ -33,8 +32,7 @@ const InputText = (props) => {
   return (
     <Input
       name=""
-      onChange={ (e) => props.handleChange(e.target.name, e.target.value) }
-
+      // onChange={ (e) => props.handleChange(e.target.name, e.target.value) }
       labelStyle={{ marginTop: 16 }}
       inputContainerStyle={styles.inputContainer}
       inputStyle={styles.inputStyle}

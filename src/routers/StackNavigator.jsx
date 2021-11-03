@@ -8,9 +8,27 @@ import { Button } from 'react-native-elements';
 import { ChangePW, PersonalInformation } from '../screens/advance';
 import { ListFriend } from '../screens/listFriend';
 import { ChatScreen, MessageScreen } from '../screens/message';
+import { SignIn, SignUp } from '../screens/signIn-signUp';
+
 const Stack = createNativeStackNavigator();
 
 const stackScreens = [
+    {
+        name: stacks.signIn.name,
+        component: SignIn,
+        options: {
+            headerShown: false,
+        }
+    },
+    
+    {
+        name: stacks.signUp.name,
+        component: SignUp,
+        options: {
+            title: stacks.signUp.title,
+        }
+    },
+
     {
         name: 'Tabs',
         component: TabNavigator,

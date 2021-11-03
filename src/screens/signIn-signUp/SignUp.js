@@ -3,8 +3,12 @@ import PropTypes from 'prop-types';
 import { Button, Image } from 'react-native-elements';
 import { View, StyleSheet } from 'react-native';
 import { InputText } from '../../components/block';
+import { useNavigation } from '@react-navigation/core';
 
 const SignUp = () =>{
+  const navigation = useNavigation();
+
+
   return(
     <View style={styles.container}>
       <InputText 
@@ -50,7 +54,9 @@ const SignUp = () =>{
         titleStyle={styles.titleStyle}
         buttonStyle={styles.buttonStyle}
         containerStyle={styles.containerStyle}
-        onPress={() => console.log('aye')}
+        onPress={() => {
+          navigation.navigate('Tabs');
+        }}
       />
     </View>
   )
