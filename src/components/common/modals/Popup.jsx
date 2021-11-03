@@ -1,35 +1,33 @@
 import React, { useState } from "react";
 import { Button, Text, View, SafeAreaView, StyleSheet } from "react-native";
 import Modal from "react-native-modal";
-import {ListItem, Divider, Icon} from 'react-native-elements';
 import { useDispatch } from "react-redux";
 import { hideModal } from "../../../redux/reducers/modalReducer";
 
 
-const ModalWrapper = (props) => {
+const PopupWrapper = props => {
     const dispatch = useDispatch();
 
     return (
         <Modal 
           isVisible={props.isModalVisible}
           swipeDirection={['down']}
-          // onSwipeComplete={props.hideModal}
-          // onBackdropPress={props.hideModal}
           onSwipeComplete={() => dispatch(hideModal())}
           onBackdropPress={() => dispatch(hideModal())}
-          style={styles.view}
         >
           {props.children}
-    
         </Modal>
     );
-  }
+}
 
-const BottomHalfModal = (props) => {
+
+const Popup = props => {
     return (
-        <ModalWrapper isModalVisible={props.isModalVisible} hideModal={props.hideModal}>
-            {props.children}
-        </ModalWrapper>
+        <PopupWrapper isModalVisible={props.isModalVisible}>
+            <View style={styles.content}>
+                {props.children}
+             </View>
+        </PopupWrapper>
     );
 }
 
@@ -39,10 +37,15 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         borderColor: 'rgba(0, 0, 0, 0.1)',
     },
-    view: {
-        justifyContent: 'flex-end',
-        margin: 0,
+    title: {
+        fontSize: 20, 
+        fontWeight: 'bold', 
+        marginBottom: 4,
+    },
+    buttonGroup: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end'
     }
 });
 
-export default BottomHalfModal;
+export default Popup;

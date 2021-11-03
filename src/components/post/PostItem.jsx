@@ -5,10 +5,14 @@ import { Avatar, Button, Icon, Image, Text } from 'react-native-elements'
 import { CarouselSwipe, CarouselTest } from '../common';
 import { useNavigation } from '@react-navigation/native';
 import { stacks } from '../../constants/title';
+import { useDispatch } from 'react-redux';
+import { showModal } from '../../redux/reducers/modalReducer';
+import { types } from '../../constants/modalTypes';
 
 const PostItem = ({author, content, handleShowMore}) => {
     const navigation = useNavigation();
-   
+    const dispatch = useDispatch();
+
     return (
         <View style={styles.container}>
             <View style={styles.profileContainer}> 
@@ -30,7 +34,14 @@ const PostItem = ({author, content, handleShowMore}) => {
                     size={32} 
                     iconStyle={{marginRight: 6}}
                     style={{marginRight: 6}} 
-                    onPress={() => {}}
+                    onPress={() => {
+                        dispatch(showModal({
+                            modalType: types.postAdvance,
+                            propsData: {
+                                postId: 1,
+                            },
+                        }))
+                    }}
                 />
             </View>
 

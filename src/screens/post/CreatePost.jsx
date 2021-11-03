@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
-import { Input, Icon, Image } from 'react-native-elements';
+import { Divider, Input, Icon, Image } from 'react-native-elements';
 import { ImageBackground, StyleSheet, View } from 'react-native';
-import { style } from 'styled-system';
+import { marginRight, style } from 'styled-system';
 import { DEVICE_HEIGHT, DEVICE_WIDTH } from '../../constants/dimensions';
 
 const CreatePost = props => {
@@ -41,6 +41,7 @@ const CreatePost = props => {
                 inputStyle={styles.inputText}
                 multiline
                 numberOfLines={25}
+                underlineColorAndroid='transparent'
             />
 
             <View style={styles.mediaContainer}>
@@ -61,11 +62,15 @@ const CreatePost = props => {
                 )}
                 
             </View>
+            
+            {/* <Divider/> */}
 
             <View style={styles.buttonGroup}>
                 <Icon type='entypo' name='emoji-happy' size={32}/>
-                <Icon type='material' name='image' size={32} />
-                <Icon type='material' name='video-collection' size={32}/>
+                <View style={styles.mediaButtonGroup}>
+                    <Icon type='material' name='image' size={32} style={{marginRight: 20}} />
+                    <Icon type='material' name='video-collection' size={32}/>
+                </View>
             </View>
         </View>
     );
@@ -95,10 +100,16 @@ const styles = StyleSheet.create({
         width: 90,
         height: 100,
     },
+    mediaButtonGroup: {
+        flexDirection: 'row',
+        marginRight: 20,
+    },
     buttonGroup: {
         flexDirection: 'row',
-        justifyContent: "space-around",
-        marginBottom: 2
+        justifyContent: "space-between",
+        marginTop: 10,
+        marginBottom: 4,
+        marginLeft: 20,
     }, 
     removeIcon: {
         backgroundColor: '#fff', 

@@ -10,10 +10,9 @@ import { stacks } from '../constants/title';
 const screens = [
     {
         name: stacks.messageScreen.name,
-        title: stacks.messageScreen.title,
         component: MessageScreen,
         options: {
-            
+            title: stacks.messageScreen.title,
         }
     }
 ];

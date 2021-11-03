@@ -4,7 +4,7 @@ import { Text } from 'react-native-elements';
 import { Stack } from '../components/common';
 import { SearchFriend } from '../screens/search';
 import { stacks } from '../constants/title';
-
+import { SafeAreaView } from 'react-native';
 
 const screens = [
     {

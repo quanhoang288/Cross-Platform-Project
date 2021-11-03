@@ -4,7 +4,7 @@ import { stacks } from '../constants/title';
 import TabNavigator from './TabNavigator';
 import { CreatePost, PostList, Comment } from '../screens/post';
 import { Profile } from '../screens/account';
-import { Button } from 'react-native-elements';
+import { Button, Icon } from 'react-native-elements';
 import { ChangePW, PersonalInformation } from '../screens/advance';
 import { ListFriend } from '../screens/listFriend';
 import { ChatScreen, MessageScreen } from '../screens/message';
@@ -51,11 +51,7 @@ const stackScreens = [
               />
             )
         }
-    }, 
-    {
-        name: stacks.newsFeed.name,
-        component: PostList,
-    }, 
+    },  
     {
         name: stacks.comment.name,
         component: Comment,
@@ -92,13 +88,14 @@ const stackScreens = [
         name: stacks.chatScreen.name,
         component: ChatScreen,
         options:{
+            title: stacks.chatScreen.title,
             headerRight: () => (
-                <Button
-                //   onPress={() => alert('This is a button!')}
-                  title="ChatSetting"
-                  color="#fff"
+                <Icon 
+                    type='feather' 
+                    name='more-horizontal' 
+                    size={32} 
                 />
-              ),
+            ),
         }
     },
     {
@@ -116,7 +113,6 @@ const StackNavigator = props => {
                     // backgroundColor: 'rgb(0, 102, 255)'
                     backgroundColor: '#fff'
                 },
-                // headerTintColor: '#fff',
                 
             }}
         >
