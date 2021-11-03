@@ -6,6 +6,7 @@ import { InputText } from '../../components/block';
 import { useNavigation } from '@react-navigation/core';
 import { DEVICE_WIDTH, DEVICE_HEIGHT } from '../../constants/dimensions'; 
 import { errorMessages } from '../../constants/message';
+import { auth } from '../../apis';
 
 const SignUp = () =>{
   const navigation = useNavigation();
@@ -115,7 +116,6 @@ const SignUp = () =>{
           name:"user",
           type:"feather"
         }}
-        placeholderText={"John Parkour"}
         errorMessage={errors.userName}
         value={credentials.userName}
         handleTextChange={handleTextChange}
@@ -129,7 +129,6 @@ const SignUp = () =>{
           name:"phone",
           type:"antdesign"
         }}
-        placeholderText={"09xx.xxx.xxx"}
         errorMessage={errors.phoneNumber}
         value={credentials.phoneNumber}
         handleTextChange={handleTextChange}
@@ -142,7 +141,6 @@ const SignUp = () =>{
           name:"lock",
           type:"feather"
         }}
-        placeholderText={"********"}
         rightIcon={{
           name:"eye-off",
           type:"feather"
@@ -160,7 +158,6 @@ const SignUp = () =>{
           name:"lock",
           type:"feather"
         }}
-        placeholderText={"********"}
         rightIcon={{
           name:"eye-off",
           type:"feather"
@@ -178,9 +175,6 @@ const SignUp = () =>{
         titleStyle={styles.titleStyle}
         buttonStyle={styles.buttonStyle}
         containerStyle={styles.containerStyle}
-        // onPress={() => {
-        //   navigation.navigate('Tabs');
-        // }}
         onPress = {handleSignUp}
       />
     </View>

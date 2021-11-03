@@ -22,36 +22,6 @@ const InputText = (props) => {
     }
   }
 
-  // if(props.rightIcon){
-  //   if (!props.errorMessage){
-  //     inputProps = {
-  //       ...inputProps,
-  //       rightIcon:(
-  //         <Icon
-  //           name="checkcircleo"
-  //           type="antdesign"
-  //           style={{ marginLeft: 12 }}
-  //           color="rgba(110, 120, 170, 1)"
-  //           size={25}
-  //         />
-  //       ),
-  //     }
-  //   }
-  //   else {
-  //     inputProps = {
-  //       ...inputProps,
-  //       rightIcon:(
-  //         <Icon
-  //           name="exclamationcircleo"
-  //           type="antdesign"
-  //           style={{ marginLeft: 12 }}
-  //           color="rgba(110, 120, 170, 1)"
-  //           size={25}
-  //         />
-  //       ),
-  //     }
-  //   }
-  // }
 
   if(props.label){
     inputProps = {
@@ -71,6 +41,7 @@ const InputText = (props) => {
 
   return (
     <Input
+      labelStyle={{ marginTop: 16 }}
       inputContainerStyle={styles.inputContainer}
       inputStyle={styles.inputStyle}
       placeholder={props.placeholderText}
@@ -117,7 +88,7 @@ InputText.propTypes = {
 };
 
 InputText.defaultProps = {
-    
+    type: 'name'
 };
 
 export default InputText;

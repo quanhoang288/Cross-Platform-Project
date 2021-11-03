@@ -23,8 +23,6 @@ const FunctionalityItem = props => {
 					</Text>
 				</View>
 			</ListItem.Content>
-			{/* <ListItem.Accordion>
-			</ListItem.Accordion> */}
 		</ListItem>
 	);
 };
