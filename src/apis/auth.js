@@ -1,10 +1,10 @@
 import api from './api';
 
-const login = async (email, password) => {
+const login = async (phonenumber, password) => {
   const loginInfo = await api({
     method: 'POST',
     url: '/users/login',
-    data: { email, password },
+    data: { phonenumber, password },
   });
   return loginInfo;
 };
