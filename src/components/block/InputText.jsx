@@ -7,13 +7,13 @@ import {Input, Icon} from 'react-native-elements'
 const InputText = (props) => {
 
   let inputProps = {}
-  if(props.icon){
+  if(props.leftIcon){
     inputProps = {
       ...inputProps,
       leftIcon:(
         <Icon
-          name={props.icon.name}
-          type={props.icon.type}
+          name={props.leftIcon.name}
+          type={props.leftIcon.type}
           style={{ marginRight: 12 }}
           color="rgba(110, 120, 170, 1)"
           size={25}
@@ -22,26 +22,65 @@ const InputText = (props) => {
     }
   }
 
+  // if(props.rightIcon){
+  //   if (!props.errorMessage){
+  //     inputProps = {
+  //       ...inputProps,
+  //       rightIcon:(
+  //         <Icon
+  //           name="checkcircleo"
+  //           type="antdesign"
+  //           style={{ marginLeft: 12 }}
+  //           color="rgba(110, 120, 170, 1)"
+  //           size={25}
+  //         />
+  //       ),
+  //     }
+  //   }
+  //   else {
+  //     inputProps = {
+  //       ...inputProps,
+  //       rightIcon:(
+  //         <Icon
+  //           name="exclamationcircleo"
+  //           type="antdesign"
+  //           style={{ marginLeft: 12 }}
+  //           color="rgba(110, 120, 170, 1)"
+  //           size={25}
+  //         />
+  //       ),
+  //     }
+  //   }
+  // }
+
   if(props.label){
     inputProps = {
       ...inputProps,
-      label: props.label
+      label: props.label,
+      labelStyle: { marginTop: 8 }
+    }
+  }
+
+  if(props.errorMessage){
+    inputProps = {
+      ...inputProps,
+      errorMessage: props.errorMessage,
+      errorStyle: styles.errorInputStyle
     }
   }
 
   return (
     <Input
-      name=""
-      // onChange={ (e) => props.handleChange(e.target.name, e.target.value) }
-      labelStyle={{ marginTop: 16 }}
       inputContainerStyle={styles.inputContainer}
       inputStyle={styles.inputStyle}
       placeholder={props.placeholderText}
       autoCapitalize="none"
       autoCorrect={false}
       keyboardType='phone-pad'
-      errorStyle={styles.errorInputStyle}
       returnKeyType="next"
+      secureTextEntry={props.secureTextEntry}
+      value={props.value}
+      onChangeText={(text) => props.handleTextChange(props.name, text)}
       {...inputProps}
     />
   );
@@ -52,13 +91,11 @@ const styles = StyleSheet.create({
 
   },
   inputContainer:{
-    paddingLeft: 8,
-    paddingRight:8,
-    borderRadius: 40,
-    borderWidth: 1,
+    padding: 0,
+    // borderRadius: 4,
+    // borderWidth: 1,
     borderColor: 'rgba(110, 120, 170, 1)',
     height: 45,
-    marginVertical: 6,
   },
   inputStyle:{
     flex: 1,
@@ -67,9 +104,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   errorInputStyle:{
-    marginTop: 0,
-    textAlign: 'center',
     color: '#F44336',
+    fontSize: 16,
+    // marginLeft: 8,
+    marginTop: 0,
+    marginBottom: 12,
   }
 })
 
