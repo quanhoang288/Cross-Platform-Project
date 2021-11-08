@@ -81,6 +81,7 @@ const MenuAdvance = () => {
         }}
         content="Sign out"
         note=""
+        onPress={() => navigation.navigate(stacks.signOut.name)}
       />
     </View>
   )

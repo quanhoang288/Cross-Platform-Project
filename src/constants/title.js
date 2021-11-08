@@ -6,6 +6,7 @@ export const stacks = {
     profile: {name: 'Profile', title: 'User profile'},
     signIn: {name: 'signIn', title: 'Sign In'},
     signUp: {name: 'signUp', title: 'Sign Up'},
+    signOut: {name: 'signOut', title: 'Sign Out'},
     changePW: {name: 'changePW', title: 'Change Password'},
     advance: {name:'advance', title:'Advance'},
     personalInformation: {name:'personalInformation', title:'Personal Information'},

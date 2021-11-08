@@ -83,7 +83,16 @@ const stackScreens = [
             title: stacks.changePW.title,
         },
         component: ChangePW,
-    }, 
+    },
+
+    {
+        name: stacks.signOut.name,
+        component: SignIn,
+        options: {
+            headerShown: false,
+        }
+    },
+
     {
         name: stacks.chatScreen.name,
         component: ChatScreen,
