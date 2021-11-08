@@ -19,5 +19,3 @@ const register = async (phonenumber, username, password) => {
 }
 
 export { login, register };
-
-

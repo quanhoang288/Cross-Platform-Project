@@ -1,12 +1,38 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { View, StyleSheet, ScrollView, TouchableOpacity, ImageBackground } from 'react-native';
 import { Avatar, Button, Divider, Icon, Image, ListItem, Text } from 'react-native-elements';
 import { PostList } from '../post';
 import { DEVICE_WIDTH } from '../../constants/dimensions';
-
+import { post } from '../../apis'
 
 const Profile = props => {
+
+    let token ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InR1bmdueCIsImlkIjoiNjE4MTA5NDk2YmRjYzkyZGIwNDU1MDEyIiwiaWF0IjoxNjM2Mzc3ODgyfQ.PERJlxqWua9oaUhed9pywKdrKc-lyVwWCnLitQtvPjY';
+
+    const [data, setData] = useState();
+    useEffect(() => {
+        post.getListPost(null, token)
+        .then((result)=> {
+            setData({
+                ...data,
+                // image: result.data.data.image,
+                // video: result.data.data.video,
+                like: result.data.data.like,
+                countComments: result.data.data.countComments,
+                author:{
+                    userName: result.data.data.author.username,
+                    avatar: result.data.data.author.avatar.fileName
+                },
+                described: result.data.data.described,
+                time: result.data.data.createdAt,
+            })
+        })
+        .catch((error) => {
+            console.log();
+        });
+    },[]);
+
     return (
 		<ScrollView showsHorizontalScrollIndicator={false}>
             <View>

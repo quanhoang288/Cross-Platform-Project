@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-
 import { Divider, Input, Icon, Image } from 'react-native-elements';
 import { ImageBackground, StyleSheet, View } from 'react-native';
 import { marginRight, style } from 'styled-system';
 import { DEVICE_HEIGHT, DEVICE_WIDTH } from '../../constants/dimensions';
+import { post } from '../../apis'
+
 
 const CreatePost = props => {
     const [postContent, setPostContent] = useState('');
@@ -31,6 +32,23 @@ const CreatePost = props => {
         }
     ]);
 
+    // token = constant
+    let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InR1bmdueCIsImlkIjoiNjE4MTA5NDk2YmRjYzkyZGIwNDU1MDEyIiwiaWF0IjoxNjM2Mzc3ODgyfQ.PERJlxqWua9oaUhed9pywKdrKc-lyVwWCnLitQtvPjY"
+
+    const [data, setData] = useState({described: ""});
+    const [isLoading, setLoading] = useState(true);
+
+    const handleTextChange = (name, val) => {
+        setData({
+            ...data,
+            [name]: val,
+        })
+    }
+
+    const handleSubmit = () => {post.addPost(data.described, token)};
+
+
+
     return (
         <View style={styles.container}>      
             <Input
@@ -42,6 +60,7 @@ const CreatePost = props => {
                 multiline
                 numberOfLines={25}
                 underlineColorAndroid='transparent'
+                handleTextChange={handleTextChange}
             />
 
             <View style={styles.mediaContainer}>
