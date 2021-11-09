@@ -47,7 +47,7 @@ const InputText = (props) => {
       placeholder={props.placeholderText}
       autoCapitalize="none"
       autoCorrect={false}
-      keyboardType='phone-pad'
+      keyboardType='default'
       returnKeyType="next"
       secureTextEntry={props.secureTextEntry}
       value={props.value}

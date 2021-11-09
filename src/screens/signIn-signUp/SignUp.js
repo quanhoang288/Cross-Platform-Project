@@ -1,15 +1,23 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Image } from 'react-native-elements';
 import { View, StyleSheet, StatusBar } from 'react-native';
 import { InputText } from '../../components/block';
-import { useNavigation } from '@react-navigation/core';
+import { useNavigation, useRoute } from '@react-navigation/core';
 import { DEVICE_WIDTH, DEVICE_HEIGHT } from '../../constants/dimensions'; 
 import { errorMessages } from '../../constants/message';
+import { useDispatch, useSelector } from 'react-redux';
+import { registerActions } from '../../redux/actions';
 import { auth } from '../../apis';
+import { stacks } from '../../constants/title';
+import Toast from 'react-native-root-toast';
 
-const SignUp = () =>{
+const SignUp = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+
+
+  const dispatch = useDispatch();
 
   const [credentials, setCredential] = useState({
     userName: "",
@@ -26,9 +34,43 @@ const SignUp = () =>{
   })
 
   const [isSignUpButtonClicked, setSignUpButtonClicked] = useState(false);
+  const registerState = useSelector(state => state.register);
+
+  useEffect(() => {
+    if (route.name === stacks.signUp.name) {
+      dispatch(registerActions.resetState());
+    }
+  }, [route]);
+
+  useEffect(() => {
+    if (registerState.error) {
+
+      if (Platform.OS === 'web') {
+        window.alert(registerState.error.message);
+      } else {
+        const toast = Toast.show(registerState.error.message, {
+          duration: Toast.durations.LONG,
+          position: Toast.positions.TOP + 10,
+          backgroundColor: '#F2353B',
+          shadow: true,
+          animation: true,
+          hideOnPress: true,
+          delay: 0,
+        });
+    
+        setTimeout(() => {
+          Toast.hide(toast);
+        }, 2000);
+      }
+      
+      dispatch(registerActions.resetState());
+  
+    }
+  }, [registerState])
+
 
   const isValidUserName = (val) => {
-    return isSignUpButtonClicked ? (val!= "") : (val != null);
+    return val != '';
   }
 
   const isValidPhoneNumber = (val) => {
@@ -80,9 +122,11 @@ const SignUp = () =>{
   const isValidInput = (data) => {
     // update state
     const checkUserName = isValidUserName(data.userName);
-    const checkPhone = isValidPhoneNumber(data.phonenumber);
+    const checkPhone = isValidPhoneNumber(data.phoneNumber);
     const checkPassword = isValidPassword(data.password);
     const checkConfirmPassword = isValidConfirmPassword(data.confirmPassword);
+
+    console.log(checkUserName);
 
     setErrors({
       ...errors,
@@ -91,20 +135,47 @@ const SignUp = () =>{
       password: checkPassword ? null : errorMessages.invalidPassword,
       confirmPassword: checkConfirmPassword ? null : errorMessages.invalidConfirmPassword
     });
+    return checkUserName && checkPassword && checkConfirmPassword && checkPhone;
   }
 
   const handleSignUp = () =>{
     if (!isSignUpButtonClicked) setSignUpButtonClicked(true);
 
-    const data = {
-      username: credentials.userName,
-      phonenumber: credentials.phoneNumber,
-      password: credentials.password,
+    if(isValidInput(credentials)) {
+      const data = {
+        username: credentials.userName,
+        phonenumber: credentials.phoneNumber,
+        password: credentials.password,
+      }
+
+      register(data);
     }
-    if(isValidInput(data)) {
-      // call API
-      // navigation.navigate('Tabs');
-    }
+
+  }
+
+  const register = (data) => {
+    const {
+        phonenumber,
+        username,
+        password
+    } = data;
+    
+    dispatch(registerActions.registerRequest());
+
+    auth.register(phonenumber, username, password)
+        .then(user => {
+            console.log(user);
+            dispatch(registerActions.registerSuccess());
+            navigation.navigate(stacks.signIn.name);
+        })
+        .catch(error => {
+            if (error.response) {
+              console.log(error.response.data);
+              console.log(error.response.status);
+              dispatch(registerActions.registerFailure(error.response.data));
+            }
+        });
+    
   }
 
   return(
@@ -175,7 +246,8 @@ const SignUp = () =>{
         titleStyle={styles.titleStyle}
         buttonStyle={styles.buttonStyle}
         containerStyle={styles.containerStyle}
-        onPress = {handleSignUp}
+        onPress={handleSignUp}
+        loading={registerState.registering}
       />
     </View>
   )
