@@ -7,12 +7,16 @@ import { StackNavigator } from './src/routers';
 import { RootModal } from './src/components/common';
 import { useDispatch, useSelector, Provider } from 'react-redux';
 import store from './src/redux/store';
+import { RootSiblingParent } from 'react-native-root-siblings';
+
 
 
 const AppWrapper = () => {
     return (
       <Provider store={store}>
-        <App/>
+        <RootSiblingParent>
+          <App/>
+        </RootSiblingParent>
       </Provider>
     );
 }

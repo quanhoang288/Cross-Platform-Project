@@ -1,11 +1,13 @@
 import { createStore, combineReducers, applyMiddleware } from "redux";
 import thunk from "redux-thunk";
-import { modalReducer } from "./reducers"; 
+import { authReducer, modalReducer, registerReducer } from "./reducers"; 
 
 
 
 const reducers = combineReducers({
-    modal: modalReducer
+    modal: modalReducer,
+    auth: authReducer,
+    register: registerReducer,
 });
 
 const store = createStore(reducers);

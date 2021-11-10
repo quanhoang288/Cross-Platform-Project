@@ -45,9 +45,6 @@ const tabScreens = [
         options: {
             headerShown: false,
             tabBarLabel: 'Notification',
-            // tabBarIcon: ({ color, size }) => (
-            //     <Icon type='ionicon' name='notifications' color={color} size={size}/>
-            // )
         }
     },
     {
@@ -56,9 +53,6 @@ const tabScreens = [
         options: {
             headerShown: false,
             tabBarLabel: 'Profile',
-            // tabBarIcon: ({ color, size }) => (
-            //     <Icon type='material-community' name='account' color={color} size={size}/>
-            // )
         }
     },
     

@@ -1,18 +1,76 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Image, Text } from 'react-native-elements';
-import { View, StyleSheet, StatusBar } from 'react-native';
+import { View, StyleSheet, StatusBar, Platform } from 'react-native';
 import { InputText } from '../../components/block';
 import { DEVICE_WIDTH, DEVICE_HEIGHT } from '../../constants/dimensions'; 
 import { stacks } from '../../constants/title';
 import { errorMessages } from '../../constants/message';
-import { useNavigation } from '@react-navigation/core';
-
+import { useNavigation, useRoute } from '@react-navigation/core';
+import { useDispatch, useSelector } from 'react-redux';
+import { authActions } from '../../redux/actions';
+import { auth } from '../../apis';
+import Toast from 'react-native-root-toast';
 
 const SignIn = () =>{
   const navigation = useNavigation();
+  const route = useRoute();
+  const dispatch = useDispatch();
 
-  // 
+  const register = useSelector(state => state.register);
+  const authState = useSelector(state => state.auth);
+
+  useEffect(() => {
+    if (register.registered && route.name === stacks.signIn.name) {
+
+      if (Platform.OS === 'web') {
+        window.alert('Registered successfully!');
+      } else {
+        const toast = Toast.show('Registered successfully!', {
+          duration: Toast.durations.LONG,
+          position: Toast.positions.TOP + 10,
+          backgroundColor: '#12D687',
+          shadow: true,
+          animation: true,
+          hideOnPress: true,
+          delay: 0,
+        });
+    
+        setTimeout(() => {
+          Toast.hide(toast);
+        }, 2000);
+      }
+  
+  
+    }
+  }, [register]);
+
+  useEffect(() => {
+    if (authState.error && route.name === stacks.signIn.name) {
+      if (Platform.OS === 'web') {
+        window.alert(authState.error.message);
+      } else {
+        const toast = Toast.show(authState.error.message, {
+          duration: Toast.durations.LONG,
+          position: Toast.positions.TOP + 10,
+          backgroundColor: '#F2353B',
+          shadow: true,
+          animation: true,
+          hideOnPress: true,
+          delay: 0,
+        });
+    
+        setTimeout(() => {
+          Toast.hide(toast);
+        }, 2000);
+      }
+      
+      dispatch(authActions.resetState());
+    }
+  }, [authState]);
+
+
+  
   const [credentials, setCredential] = useState({phoneNumber: "", password: "" });
   const [errors, setErrors] = useState({phoneNumber: null, password: null })
 
@@ -58,6 +116,7 @@ const SignIn = () =>{
       phoneNumber: checkPhone ? null : errorMessages.invalidPhoneNumber,
       password: checkPassword ? null : errorMessages.invalidPassword,
     });
+    return checkPhone && checkPassword;
   }
 
   const handleSignIn = () =>{
@@ -68,10 +127,31 @@ const SignIn = () =>{
       password: credentials.password,
     }
     if(isValidInput(data)) {
-      // call API
-      // navigation.navigate('Tabs');
+      login(data);
     }
   }
+
+  const login = (data) => {
+
+    const {phonenumber, password} = data;
+    
+    dispatch(authActions.loginRequest());
+
+    auth.login(phonenumber, password)
+        .then(userInfo => {
+            const user = {
+                ...userInfo.data.data,
+                token: userInfo.data.token
+            }
+            dispatch(authActions.loginSuccess(user));
+            navigation.navigate('Tabs');
+        })
+        .catch(error => {
+            if (error.response) {
+              dispatch(authActions.loginFailure(error.response.data));
+            }
+        });
+}
 
   return(
     <View style={styles.container} >
@@ -134,7 +214,7 @@ const SignIn = () =>{
           height:50,
           width:200
         }}
-
+        loading={authState.loggingIn}
         onPress={handleSignIn}
       />
 

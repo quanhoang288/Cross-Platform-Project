@@ -5,10 +5,18 @@ import { View, StyleSheet } from 'react-native';
 import { FunctionalityItem } from '../../components/block';
 import { useNavigation } from '@react-navigation/core';
 import { stacks } from '../../constants/title';
+import { useDispatch } from 'react-redux';
+import { authActions } from '../../redux/actions';
 
 const MenuAdvance = () => {
 
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+
+  const handleSignOut = () => {
+    dispatch(authActions.logout());
+    navigation.navigate(stacks.signIn.name);
+  }
 
   return(
     <View style={styles.container}>
@@ -81,7 +89,7 @@ const MenuAdvance = () => {
         }}
         content="Sign out"
         note=""
-        onPress={() => navigation.navigate(stacks.signOut.name)}
+        onPress={handleSignOut}
       />
     </View>
   )
