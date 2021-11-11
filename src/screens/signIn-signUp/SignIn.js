@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { authActions } from '../../redux/actions';
 import { auth } from '../../apis';
 import Toast from 'react-native-root-toast';
+import { API_URL } from '../../configs';
 
 const SignIn = () =>{
   const navigation = useNavigation();
@@ -200,7 +201,6 @@ const SignIn = () =>{
 
       <Button
         title="Sign In"
-        loading={false}
         loadingProps={{color: 'white'}}
         titleStyle={{
           fontWeight: 'bold',
@@ -222,7 +222,6 @@ const SignIn = () =>{
 
       <Button
         title="Sign Up"
-        loading={false}
         loadingProps={{color: 'blue'}}
         titleStyle={{
           fontWeight: 'bold',
