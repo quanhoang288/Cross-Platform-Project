@@ -3,40 +3,50 @@ import PropTypes from 'prop-types';
 import { View, ScrollView, StyleSheet } from 'react-native';
 import { PostItem } from '../../components/post';
 import { Divider, Icon, ListItem } from 'react-native-elements';
-import { post } from '../../apis';
+import { post, like, comment } from '../../apis';
 
 const PostList = props => {
-    
+    // userId
     let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im54dHVuZyIsImlkIjoiNjE4ZDJiNzQzNjhhZDgzYTk4YzgyMGMwIiwiaWF0IjoxNjM2NzI4NTc2fQ.ZowtOOrPquHHRWKLL_l8fAWdnP1q0Qde8JkiiOsNpu0";
 
+    // API getPosts
     const [posts, setPosts] = useState([]);
     useEffect(() => {
         post.getListPost(null, token)
         .then((result)=> {
             // console.log(result.data);
             const curPosts = result.data.data;
-            setPosts(curPosts.map(post => {
-                return {
-                    author:{
-                        name: post.author.username,
-                        profileURI: post.author.avatar.fileName
-                    },
-                    content: {
-                        id: post._id,
-                        timestamp: post.createdAt,
-                        textContent: post.described,
-                        imageURI: 'https://i.scdn.co/image/ab67616d0000b273d6b89ae618df05a835f9e755',
-                        numLikes: post.like,
-                        numComments: post.countComments,
-                    },
-                }})
-            );
+            setPosts(curPosts);
         })
         .catch((error) => {
             console.log(error);
         });
     },[]);
     
+    // API like
+    const actionLike = (postId) => {
+        like.actionLike(postId, token)
+        .then(result => {
+            // console.log(result.data);
+            const curLikes = result.data.data.like;  //numLikes
+            const curIsLike = result.data.data.isLike;
+            setPosts(posts.map(post => {
+                if(post._id === postId){
+                    return{
+                        ...post,
+                        like: curLikes,
+                        isLike: curIsLike,
+                    };
+                }
+                return post; 
+            }));
+        })
+        .catch(error => {
+            console.log(error);
+        })
+    }
+        
+    // API getComment
 
 
     return (
@@ -45,9 +55,9 @@ const PostList = props => {
             <View style={styles.container}>
                 {posts.map(post => (
                     <PostItem 
-                        key={post.content.id} 
-                        author={post.author} 
-                        content={post.content} 
+                        key={post._id} 
+                        post = {post}
+                        actionLike={actionLike}
                     />
                 ))}
             </View>
