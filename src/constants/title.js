@@ -16,5 +16,6 @@ export const stacks = {
     chatScreen: {name: 'chat', title:'Chat'},
     searchFriend: {name: 'search', title:'Search'},
     messageScreen: {name: 'message', title:'Message'},
+    mediaPicker: {name: 'mediaPicker', title: 'Media picker'},
 };
 

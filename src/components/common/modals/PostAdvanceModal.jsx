@@ -8,6 +8,7 @@ import { types } from '../../../constants/modalTypes';
 const PostAdvanceModal = ({ postId }) => {
     
     const dispatch = useDispatch();
+    const ownPost = false;
     
     const handleHideModal = () => {
         setModalVisible(false);
@@ -40,30 +41,46 @@ const PostAdvanceModal = ({ postId }) => {
         }))
     }
 
-    const functionalities = [
+    const functionalities = ownPost ? [
         {
             title: 'Edit post',
+            subTitle: 'Only text content is editable',
             icon: {
                 type: 'feather',
                 name: 'edit'
             },
             onPress: handleEditPost
         },
-        {
-            title: 'Hide post',
-            icon: {
-                type: 'material-icon',
-                name: 'cancel-presentation'
-            },
-            onPress: handleHidePost
-        },
+      
         {
             title: 'Delete post',
+            subTitle: 'Delete this post',
             icon: {
                 type: 'ant-design',
                 name: 'delete'
             },
             onPress: handleDeletePost
+        },
+    ] : [
+        
+        
+        {
+            title: 'Delete post',
+            subTitle: 'This post will be hidden from your newsfeed',
+            icon: {
+                type: 'ant-design',
+                name: 'delete'
+            },
+            onPress: handleDeletePost
+        },
+        {
+            title: 'Hide all posts from newsfeed',
+            subTitle: 'All posts by this person will be hidden from your newsfeed',
+            icon: {
+                type: 'material-icon',
+                name: 'cancel-presentation'
+            },
+            onPress: handleHidePost
         },
         {
             title: 'Report post',
@@ -95,10 +112,15 @@ const PostAdvanceModal = ({ postId }) => {
                         >
                             <Icon type={func.icon.type} name={func.icon.name} style={{marginRight: 4}}/>
                             <ListItem.Content>
+                                
                                 <ListItem.Title>
                                     {func.title}
                                 </ListItem.Title>
-                                <Divider/>
+                                {func.subTitle && 
+                                    <ListItem.Subtitle>
+                                        {func.subTitle}
+                                    </ListItem.Subtitle> 
+                                }
                             </ListItem.Content>
                         </ListItem>
                     ))

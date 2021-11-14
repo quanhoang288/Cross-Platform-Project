@@ -1,15 +1,40 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { View, ScrollView, StyleSheet } from 'react-native';
 import { PostItem } from '../../components/post';
-import { Divider, Icon, ListItem } from 'react-native-elements';
-import { post, like, comment } from '../../apis';
+import { Divider, Icon, ListItem, LinearProgress } from 'react-native-elements';
 import { useSelector } from 'react-redux';
+import { post } from '../../apis';
+
 
 const PostList = props => {
-    // user
+    const [progressVal, setProgressVal] = useState(0);
+    const uploadStatus = useSelector(state => state.upload);
     const user = useSelector(state => state.auth.user);
-    
+
+    useEffect(() => {
+        if (uploadStatus.uploading) {
+            setProgressVal(Math.max(progressVal + 0.1, 0.95));
+        } else if (uploadStatus.uploadSuccess) {
+            setProgressVal(1);
+        } 
+        
+    }, [uploadStatus]);
+
+    useEffect(() => {
+        let subs = true;
+        if (progressVal < 1 && progressVal !== 0) {
+            setTimeout(() => {
+                if (subs) {
+                    setProgressVal(progressVal + 0.1);
+                }
+            }, 2000);
+        }
+        return () => {
+            subs = false;
+        };
+    }, [progressVal]);
+
     // API getPosts
     const [posts, setPosts] = useState([]);
     useEffect(() => {
@@ -28,7 +53,6 @@ const PostList = props => {
     const actionLike = (postId) => {
         like.actionLike(postId, user.token)
         .then(result => {
-            // console.log(result.data);
             const curLikes = result.data.data.like;  //numLikes
             const curIsLike = result.data.data.isLike;
             setPosts(posts.map(post => {
@@ -46,14 +70,15 @@ const PostList = props => {
             console.log(error);
         })
     }
-        
-    // API getComment
-
 
     return (
         <>
         <ScrollView showsVerticalScrollIndicator={false}>
             <View style={styles.container}>
+                {
+                    uploadStatus.uploading && <LinearProgress value={progressVal} color="white" trackColor="#2eb0fb"/> 
+                }
+                
                 {posts.map(post => (
                     <PostItem 
                         key={post._id} 

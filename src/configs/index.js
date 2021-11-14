@@ -1,2 +1,3 @@
+import { Platform } from "react-native";
 
-export const API_URL = Platform.OS === 'web' ? 'http://localhost:8000' : 'http://192.168.0.103:8000';
+export const API_URL = Platform.OS === 'web' ? "http://localhost:8000" : "http://192.168.1.7:8000";

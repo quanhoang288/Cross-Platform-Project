@@ -2,7 +2,7 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { stacks } from '../constants/title';
 import TabNavigator from './TabNavigator';
-import { CreatePost, PostList, Comment } from '../screens/post';
+import { CreatePost, PostList, Comment, MediaPicker } from '../screens/post';
 import { Profile } from '../screens/account';
 import { Button, Icon } from 'react-native-elements';
 import { ChangePW, PersonalInformation } from '../screens/advance';
@@ -37,19 +37,16 @@ const stackScreens = [
     {
         name: stacks.createPost.name,
         component: CreatePost,
+    },  
+
+    {
+        name: stacks.mediaPicker.name,
+        component: MediaPicker,
         options: {
-            title: stacks.createPost.title,
-            headerRight: () => (
-                <Button
-                    onPress={() => {}}
-                    title="Save"
-                    color="#fff"
-                    buttonStyle={{borderRadius: 10}}
-                    style={{marginRight: 10}}
-              />
-            )
+            headerShown: false,
         }
     },  
+
     {
         name: stacks.comment.name,
         component: Comment,
