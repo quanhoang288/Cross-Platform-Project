@@ -120,15 +120,16 @@ const SignIn = () =>{
   }
 
   const handleSignIn = () =>{
-    if (!isSignInButtonClicked) setSignInButtonClicked(true);
+    // if (!isSignInButtonClicked) setSignInButtonClicked(true);
 
-    const data = {
-      phonenumber: credentials.phoneNumber,
-      password: credentials.password,
-    }
-    if(isValidInput(data)) {
-      login(data);
-    }
+    // const data = {
+    //   phonenumber: credentials.phoneNumber,
+    //   password: credentials.password,
+    // }
+    // if(isValidInput(data)) {
+    //   login(data);
+    // }
+    navigation.navigate("Tabs");
   }
 
   const login = (data) => {

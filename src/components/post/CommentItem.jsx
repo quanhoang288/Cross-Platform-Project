@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { View, StyleSheet } from 'react-native';
 import { Avatar, Icon, Text } from 'react-native-elements';
 
-const CommentItem = props => {
+const CommentItem = ({comment}) => {
     return (
         <View style={styles.container}>
             <Avatar
@@ -13,9 +13,9 @@ const CommentItem = props => {
                 }}   
             />
             <View style={styles.commentContainer}>
-                <Text style={{fontWeight: 'bold'}}>Quan Hoang</Text>
-                <Text>This is post comment This is post comment This is post comment This is post comment </Text>
-                <Text>2h</Text>
+                <Text style={{fontWeight: 'bold'}}>{comment.user.username}</Text>
+                <Text>{comment.content}</Text>
+                <Text>{comment.createdAt}</Text>
             </View>
             <Icon type='font-awesome' name='heart-o' size={28} iconStyle={{marginRight: 6}}/>
         </View>

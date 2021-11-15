@@ -9,7 +9,7 @@ import { useDispatch } from 'react-redux';
 import { showModal } from '../../redux/reducers/modalReducer';
 import { types } from '../../constants/modalTypes';
 
-const PostItem = ({author, content, handleShowMore}) => {
+const PostItem = ({post, actionLike, handleShowMore}) => {
     const navigation = useNavigation();
     const dispatch = useDispatch();
 
@@ -20,12 +20,12 @@ const PostItem = ({author, content, handleShowMore}) => {
                     <Avatar
                         rounded
                         source={{
-                            uri: author.profileURI,
+                            uri: post.author.avatar.fileName,
                         }}
                     />
                     <View style={styles.nameTimeLine}>
-                        <Text style={{fontWeight: 'bold'}}>{author.name}</Text>
-                        <Text>{content.timestamp}</Text>
+                        <Text style={{fontWeight: 'bold'}}>{post.author.username}</Text>
+                        <Text>{post.createdAt}</Text>
                     </View>
                 </View>
                 <Icon 
@@ -47,7 +47,7 @@ const PostItem = ({author, content, handleShowMore}) => {
 
             <View style={styles.postContent}>
                 <Text style={styles.textContent}> 
-                    {content.textContent}
+                    {post.described}
                 </Text>
                 {/* { content.imageURI && <Image
                     source={{
@@ -62,13 +62,26 @@ const PostItem = ({author, content, handleShowMore}) => {
 
             
             <View style={styles.iconGroup}>
-                <View style={styles.icon}>
-                    <Icon type='font-awesome' name='heart-o' size={28}/>
-                    <Text style={styles.count}>{content.numLikes}</Text>
+                <View style={styles.icon} >
+                    <Icon 
+                        type='font-awesome' 
+                        name={post.isLike ? 'heart' : 'heart-o'}
+                        size={28} 
+                        onPress={() => actionLike(post._id)}
+                        color={post.isLike ? 'rgb(255, 0, 0)' : 'rgb(0, 0, 0)'}
+                    />    
+                    <Text style={styles.count}>{post.like.length}</Text>
                 </View>
                 <View style={styles.icon}>
-                    <Icon type='font-awesome' name='comment-o' size={28} onPress={() => navigation.navigate(stacks.comment.name)}/>
-                    <Text style={styles.count}>{content.numComments}</Text>
+                    <Icon 
+                        type='font-awesome' 
+                        name='comment-o' 
+                        size={28} 
+                        onPress={() => navigation.navigate(stacks.comment.name, {
+                            postId: post._id,
+                        })}
+                    />
+                    <Text style={styles.count}>{post.countComments}</Text>
                 </View>
             </View>
         </View>
@@ -115,7 +128,8 @@ const styles = StyleSheet.create({
         marginRight: 20,
         flexDirection: 'row',
         alignItems: 'center', 
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        
     },
     count: {
         marginLeft: 4
