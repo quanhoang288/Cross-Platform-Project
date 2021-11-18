@@ -5,129 +5,82 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {io} from 'socket.io-client';
 import axios from 'axios';
+import { message } from '../../apis';
+import { set } from 'react-native-reanimated';
+
 const ChatScreen = () => {
   const socket = useRef();
-  const [currentChat, setCurrent, ] = useState(null);
-  const [Chatmessages, setChatmessages] = useState(null);
-  const [chatList, setChatList] = useState([]);
   const [messages, setMessages] = useState([]);
   const [arrivalMessage, setArrivalMessage] = useState(null);
   
-  const chatId ="619526c2cc375b3fb8d08717";
-  const fetchMessage = async () => {
-    try {
-        const res = await axios.get(`http://localhost:8000/api/v1/chats/getMessages/${chatId}/`,);
-        setChatList(res.data);
-    } catch (err) {
-        console.log(err);
-    }
-  }
+  const chatId = "619526c2cc375b3fb8d08717";
+  const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRydW5ndnVob2FuZyIsImlkIjoiNjE4ZTk3NTg3NDU1MGEyMmE0Y2IyYTkwIiwiaWF0IjoxNjM2NzM0ODA5fQ.NwBPkKkhl8IHr64k-4EwTPMhtzY2IM0J6TXqm8c-DNk";
+  const receiverId = '618e992874550a22a4cb2a98';
+  const senderId = '618e975874550a22a4cb2a90';
 
-
-  const sendMessage = async (content) => {
-    const newMessage = {
-      "receivedId":"618e992874550a22a4cb2a98",
-      "chatId": "619526c2cc375b3fb8d08717",
-      "member": [
-          {"_id":"618e992874550a22a4cb2a98"},
-          {"_id":"618e975874550a22a4cb2a90"}
-      ],
-      "content": content,
-       "type": "PRIVATE_CHAT"
-    };
-
-    try {
-        const res = await axios.post(`http://localhost:8000/api/v1/chats/send/`,newMessage);
-        return res.data;
-    } catch (err) {
-        console.log(err);
-    }
-  }
-
-  const handleSubmit = async () => {
-
-    let receiverId = "618e992874550a22a4cb2a98";
-  
-    if (messages !== '') {
-
-        // if (currentChat) {
-            await sendMessage(messages);
-            socket.current.emit('sendMessage', {
-              senderId: "618e975874550a22a4cb2a90",
-              receivedId: receiverId,
-              member: [
-                  {_id:"618e992874550a22a4cb2a98"},
-                  {_id:"618e975874550a22a4cb2a90"}
-              ],
-              content: newMassage,
-              type: "PRIVATE_CHAT",
-            });
-            // addNewMessage();
-        // }
-        // else {
-        //     const newConversation = await initializeConversation(user._id, newUserId)
-        //     await saveMessage(receiverId, content);
-
-        //     setCurrentChat(newConversation);
-        //     setNewUserId(null);
-        // }
-    }
-
-  }
-  // const [messages, setMessages] = useState([]);
-  <Button
-        title={'React Native Elements'}
-        containerStyle={{
-            width: 200,
-            marginHorizontal: 50,
-            marginVertical: 10,
-        }}
-  />
-  useEffect(() =>{
-    socket.current = io('ws://localhost:3000');
-    fetchMessage();
-    socket.current.on('getMessage', async (data) => {
-      //if receivedID !== current.User._Id
-      setArrivalMessage({
-          sender: data.senderId,
-          content: data.content, 
-          createdAt: Date.now(),
-      });
-    
-  });
-  })
   useEffect(() => {
-    
-    setMessages([
-      {
-        _id: 1,
-        text: 'Hello',
-        createdAt: new Date(),
+    const initialize = async () => {
+      const newMessages = await fetchMessages();
+      setMessages(newMessages.map(msg => ({
+        _id: msg._id,
+        text: msg.content,
+        createdAt: msg.createdAt,
         user: {
-          _id: 2,
-          name: 'Quan',
-          avatar: require('../../../assets/avatar.jpg'),
+          _id: msg.user._id,
+          name: msg.user.username,
         },
-      },
-      
-      {
-        _id: 2,
-        text: require('../../../assets/avatar.jpg'),
-        createdAt: new Date(),
-        user: {
-          _id: 1,
-          name: 'Trung',
-          avatar: require('../../../assets/avatar.jpg'),
-        },
-      },
-    ]);
+      })).reverse());
+
+      socket.current = io('ws://localhost:3000');
+      socket.current.on('getMessage', async (data) => {
+        //if receivedID !== current.User._Id
+        setArrivalMessage({
+            sender: data.senderId,
+            content: data.content, 
+            createdAt: Date.now(),
+        });
+      });
+    }
+    initialize();
   }, []);
 
-  const onSend = useCallback((messages = []) => {
-    setMessages((previousMessages) =>
-      GiftedChat.append(previousMessages, messages),
-      
-    );
+  const fetchMessages = async () => {
+    try {
+        const res = await message.getMessages(chatId, token);
+        return res.data.data;
+    } catch (err) {
+        console.log(err);
+    }
+  }
+
+  const onSend = useCallback(async (messages = []) => {
+    if (messages.length > 0) {
+      const newMsgObj = messages[0];
+        // if (currentChat) {
+      try {
+        const sendResult = await message.sendMessage(chatId, senderId, receiverId, newMsgObj.text, token);
+        //TODO: gui socket + update mang messages
+        // socket.current.emit('sendMessage', {
+        //   senderId: "618e975874550a22a4cb2a90",
+        //   receivedId: receiverId,
+        //   member: [
+        //       {_id:"618e992874550a22a4cb2a98"},
+        //       {_id:"618e975874550a22a4cb2a90"}
+        //   ],
+        //   content: newMsg,
+        //   type: "PRIVATE_CHAT",
+        // });
+        
+      } catch (err) {
+        console.log(err)
+      }
+
+      setMessages((previousMessages) =>
+        GiftedChat.append(previousMessages, messages),
+      );
+  
+    }
+   
   }, []);
 
   const renderSend = (props) => {
@@ -172,13 +125,10 @@ const ChatScreen = () => {
   return (
     <GiftedChat
       messages={messages}
-      handleSubmit={handleSubmit}
-      onSend={(messages) => onSend(messages)}
-      
+      onSend={onSend}
       user={{
-        _id: 1,
-      }}
-      
+        _id: senderId,
+      }}      
       renderBubble={renderBubble}
       alwaysShowSend
       renderSend={renderSend}

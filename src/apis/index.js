@@ -1,3 +1,4 @@
 import * as auth from './auth';
+import * as message from './message'
 
-export { auth };
+export { auth, message };
