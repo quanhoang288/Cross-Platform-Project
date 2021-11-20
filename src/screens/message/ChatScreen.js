@@ -1,17 +1,18 @@
 import React, {useState, useEffect, useCallback, useRef} from 'react';
-import {View, ScrollView, Text, Button, StyleSheet} from 'react-native';
-import {Bubble, GiftedChat, Send} from 'react-native-gifted-chat';
+import {View, StyleSheet} from 'react-native';
+import {Bubble, GiftedChat, Send,InputToolbar} from 'react-native-gifted-chat';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {io} from 'socket.io-client';
 import axios from 'axios';
 import { message } from '../../apis';
 import { set } from 'react-native-reanimated';
+import { margin, marginBottom, paddingBottom } from 'styled-system';
 
 const ChatScreen = () => {
   const socket = useRef();
   const [messages, setMessages] = useState([]);
-  const [arrivalMessage, setArrivalMessage] = useState(null);
+  const [arrivalMessage, setArrivalMessage] = useState([]);
   
   const chatId = "619526c2cc375b3fb8d08717";
   const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRydW5ndnVob2FuZyIsImlkIjoiNjE4ZTk3NTg3NDU1MGEyMmE0Y2IyYTkwIiwiaWF0IjoxNjM2NzM0ODA5fQ.NwBPkKkhl8IHr64k-4EwTPMhtzY2IM0J6TXqm8c-DNk";
@@ -33,13 +34,20 @@ const ChatScreen = () => {
 
       socket.current = io('ws://localhost:3000');
       socket.current.on('getMessage', async (data) => {
-        //if receivedID !== current.User._Id
-        setArrivalMessage({
-            sender: data.senderId,
-            content: data.content, 
+        setArrivalMessage([{
+            _id: data.senderId,
+            text: data.content, 
             createdAt: Date.now(),
-        });
+            user: {
+              _id: data.receivedId,
+              name: 'trung',
+            },
+        },]);
+        setMessages((arrivalMessage) =>
+        GiftedChat.append(arrivalMessage, messages),
+      );
       });
+      
     }
     initialize();
   }, []);
@@ -48,6 +56,7 @@ const ChatScreen = () => {
     try {
         const res = await message.getMessages(chatId, token);
         return res.data.data;
+        console.log(res.data.data);
     } catch (err) {
         console.log(err);
     }
@@ -60,16 +69,12 @@ const ChatScreen = () => {
       try {
         const sendResult = await message.sendMessage(chatId, senderId, receiverId, newMsgObj.text, token);
         //TODO: gui socket + update mang messages
-        // socket.current.emit('sendMessage', {
-        //   senderId: "618e975874550a22a4cb2a90",
-        //   receivedId: receiverId,
-        //   member: [
-        //       {_id:"618e992874550a22a4cb2a98"},
-        //       {_id:"618e975874550a22a4cb2a90"}
-        //   ],
-        //   content: newMsg,
-        //   type: "PRIVATE_CHAT",
-        // });
+        socket.current.emit('sendMessage', {
+          senderId: senderId,
+          receivedId: receiverId,
+          content: newMsgObj.text,
+          type: "PRIVATE_CHAT",
+        });
         
       } catch (err) {
         console.log(err)
@@ -78,7 +83,7 @@ const ChatScreen = () => {
       setMessages((previousMessages) =>
         GiftedChat.append(previousMessages, messages),
       );
-  
+      
     }
    
   }, []);
@@ -89,8 +94,8 @@ const ChatScreen = () => {
         <View>
           <MaterialCommunityIcons
             name="send-circle"
-            style={{marginBottom: 5, marginRight: 5}}
-            size={32}
+            style={{paddingBottom:-20 , marginRight: 2}}
+            size={40}
             color="#2e64e5"
           />
         </View>
@@ -122,6 +127,23 @@ const ChatScreen = () => {
     );
   }
 
+  // const renderInputToolbar = props => {
+  //   return (
+  //     <InputToolbar
+  //       {...props}
+  //       containerStyle={{
+  //         backgroundColor: "white",
+  //         borderTopColor: "#E8E8E8",
+          
+  //         marginBottom:20,
+  //         paddingTop:2,
+  //         paddingBottom:1,
+  //       }}
+  //     />
+  //   );
+  // };
+  
+
   return (
     <GiftedChat
       messages={messages}
@@ -129,6 +151,8 @@ const ChatScreen = () => {
       user={{
         _id: senderId,
       }}      
+      // renderInputToolbar={props => renderInputToolbar(props)}
+      
       renderBubble={renderBubble}
       alwaysShowSend
       renderSend={renderSend}
@@ -146,4 +170,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  
 });
