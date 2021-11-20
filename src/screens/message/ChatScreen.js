@@ -8,11 +8,11 @@ import axios from 'axios';
 import { message } from '../../apis';
 import { set } from 'react-native-reanimated';
 import { margin, marginBottom, paddingBottom } from 'styled-system';
+import { SOCKET_URL } from '../../configs';
 
 const ChatScreen = () => {
   const socket = useRef();
   const [messages, setMessages] = useState([]);
-  const [arrivalMessage, setArrivalMessage] = useState([]);
   
   const chatId = "619526c2cc375b3fb8d08717";
   const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRydW5ndnVob2FuZyIsImlkIjoiNjE4ZTk3NTg3NDU1MGEyMmE0Y2IyYTkwIiwiaWF0IjoxNjM2NzM0ODA5fQ.NwBPkKkhl8IHr64k-4EwTPMhtzY2IM0J6TXqm8c-DNk";
@@ -32,9 +32,10 @@ const ChatScreen = () => {
         },
       })).reverse());
 
-      socket.current = io('ws://localhost:3000');
+      socket.current = io(SOCKET_URL);
       socket.current.on('getMessage', async (data) => {
-        setArrivalMessage([{
+        if (senderId === data.receivedId) {
+          const newMsg = {
             _id: data.senderId,
             text: data.content, 
             createdAt: Date.now(),
@@ -42,12 +43,11 @@ const ChatScreen = () => {
               _id: data.receivedId,
               name: 'trung',
             },
-        },]);
-        setMessages((arrivalMessage) =>
-        GiftedChat.append(arrivalMessage, messages),
-      );
+          };
+         
+          setMessages((previousMessages) => GiftedChat.append(previousMessages, [newMsg]));
+        } 
       });
-      
     }
     initialize();
   }, []);
@@ -56,7 +56,6 @@ const ChatScreen = () => {
     try {
         const res = await message.getMessages(chatId, token);
         return res.data.data;
-        console.log(res.data.data);
     } catch (err) {
         console.log(err);
     }
@@ -69,7 +68,7 @@ const ChatScreen = () => {
       try {
         const sendResult = await message.sendMessage(chatId, senderId, receiverId, newMsgObj.text, token);
         //TODO: gui socket + update mang messages
-        socket.current.emit('sendMessage', {
+        socket.current?.emit('sendMessage', {
           senderId: senderId,
           receivedId: receiverId,
           content: newMsgObj.text,
