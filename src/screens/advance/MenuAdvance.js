@@ -58,7 +58,7 @@ const MenuAdvance = () => {
         }}
         content="Black list"
         note="Person who you don't wanna see"
-        onPress={() => navigation.navigate(stacks.personalInformation.name)}
+        onPress={() => navigation.navigate(stacks.friendRequest.name)}
 
       />
 

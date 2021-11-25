@@ -6,7 +6,7 @@ import { CreatePost, PostList, Comment } from '../screens/post';
 import { Profile } from '../screens/account';
 import { Button, Icon } from 'react-native-elements';
 import { ChangePW, PersonalInformation } from '../screens/advance';
-import { ListFriend } from '../screens/listFriend';
+import { ListFriend, FriendRequest } from '../screens/listFriend';
 import { ChatScreen, MessageScreen } from '../screens/message';
 import { SignIn, SignUp } from '../screens/signIn-signUp';
 
@@ -20,7 +20,6 @@ const stackScreens = [
             headerShown: false,
         }
     },
-    
     {
         name: stacks.signUp.name,
         component: SignUp,
@@ -28,7 +27,6 @@ const stackScreens = [
             title: stacks.signUp.title,
         }
     },
-
     {
         name: 'Tabs',
         component: TabNavigator,
@@ -77,6 +75,14 @@ const stackScreens = [
         },
         component: ListFriend,
     }, 
+    {
+        name: stacks.friendRequest.name,
+        options: {
+            title: stacks.friendRequest.title,
+        },
+        component: FriendRequest,
+    },
+
     {
         name: stacks.changePW.name,
         options: {
