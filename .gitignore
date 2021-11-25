@@ -14,3 +14,4 @@ web-build/
 *scripts
 package-lock.json
 .env
+.idea
