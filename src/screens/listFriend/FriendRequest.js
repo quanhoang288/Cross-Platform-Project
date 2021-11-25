@@ -3,17 +3,19 @@ import PropTypes from 'prop-types';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import ProfileItem from '../../components/account/ProfileItem.jsx'
 import { friend } from '../../apis';
+import { useSelector } from 'react-redux';
 
 const FriendRequest = () =>{
 
-    let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im54dHVuZyIsImlkIjoiNjE4ZDJiNzQzNjhhZDgzYTk4YzgyMGMwIiwiaWF0IjoxNjM2NzI4NTc2fQ.ZowtOOrPquHHRWKLL_l8fAWdnP1q0Qde8JkiiOsNpu0";
+    // user
+    const user = useSelector(state => state.auth.user);
 
     // API getListFriendRequest
     const [listFriendRequests, setListFriendRequest] = useState([]);
     useEffect(() => { 
-        friend.getListFriendRequests(token)
+        friend.getListFriendRequests(user.token)
         .then(result => {
-            // console.log(result.data);
+            // render
             const curRequest = result.data.data.friends;
             setListFriendRequest(curRequest);
         })
@@ -22,6 +24,20 @@ const FriendRequest = () =>{
         })
     }, [])
 
+    // API respond request
+    const acceptRequest = (userId, is_accept) => {
+        friend.acceptFriendRequest(userId, is_accept, user.token)
+        .then(result => {
+            // notice:
+
+            // render
+            const resultRequest = listFriendRequests.filter(item => item._id !== result.data.data.sender);
+            setListFriendRequest(resultRequest)
+        })
+        .catch(error => {
+            console.log(error)
+        })
+    }
 
   return(
     <>
@@ -36,11 +52,13 @@ const FriendRequest = () =>{
               title={request.username}
               displayButtonGroup={true}
               button={{
+                userId: request._id,
                 buttonAccept: 'accept',
                 buttonDelete: 'delete'
               }}
               displayDescription={true}
               time={request.createdAt}
+              acceptRequest={acceptRequest}
             />
           ))}
         </View>

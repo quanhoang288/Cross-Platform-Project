@@ -4,7 +4,7 @@ import { Avatar, ListItem, Text, Icon, Button } from 'react-native-elements';
 import {View} from 'react-native';
 import { height } from 'styled-system';
 
-const ProfileItem = props => {
+const ProfileItem = (props) => {
   return (
     <ListItem bottomDivider onPress={() => {}}>
       <Avatar
@@ -29,6 +29,7 @@ const ProfileItem = props => {
               <Button
                 title={props.button.buttonAccept}
                 titleStyle={{ fontWeight: 'normal', fontSize:16 }}
+                onPress={() => props.acceptRequest(props.button.userId, "1")}
                 buttonStyle={{
                   backgroundColor: 'rgb(0, 150, 255)',
                   // borderColor: 'transparent',
@@ -49,6 +50,7 @@ const ProfileItem = props => {
               <Button
                 title={props.button.buttonDelete}
                 titleStyle={{ fontWeight: 'normal', fontSize:16 }}
+                onPress={() => props.acceptRequest(props.button.userId, "2")}
                 buttonStyle={{
                   backgroundColor: 'rgb(160, 160, 160)',
                   // borderColor: 'transparent',

@@ -3,19 +3,22 @@ import PropTypes from 'prop-types';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import ProfileItem from '../../components/account/ProfileItem.jsx'
 import { friend } from '../../apis';
+import { useSelector } from 'react-redux';
 
 
 const ListFriend = () =>{
 
-    let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im54dHVuZyIsImlkIjoiNjE4ZDJiNzQzNjhhZDgzYTk4YzgyMGMwIiwiaWF0IjoxNjM2NzI4NTc2fQ.ZowtOOrPquHHRWKLL_l8fAWdnP1q0Qde8JkiiOsNpu0";
+    // user 
+    const user = useSelector(state => state.auth.user);
 
     // API getListFriend
     const [listFriend, setListFriend] = useState([]);
     useEffect(() => {
-        friend.getListFriends(null, token)
+        friend.getListFriends(null, user.token)
         .then(result => {
+            
+            // render
             const curListFr = result.data.data.friends;
-            // console.log(curListFr);
             setListFriend(curListFr);
         })
         .catch(error => {

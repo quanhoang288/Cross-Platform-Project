@@ -4,15 +4,16 @@ import { View, ScrollView, StyleSheet } from 'react-native';
 import { PostItem } from '../../components/post';
 import { Divider, Icon, ListItem } from 'react-native-elements';
 import { post, like, comment } from '../../apis';
+import { useSelector } from 'react-redux';
 
 const PostList = props => {
-    // userId
-    let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im54dHVuZyIsImlkIjoiNjE4ZDJiNzQzNjhhZDgzYTk4YzgyMGMwIiwiaWF0IjoxNjM2NzI4NTc2fQ.ZowtOOrPquHHRWKLL_l8fAWdnP1q0Qde8JkiiOsNpu0";
-
+    // user
+    const user = useSelector(state => state.auth.user);
+    
     // API getPosts
     const [posts, setPosts] = useState([]);
     useEffect(() => {
-        post.getListPost(null, token)
+        post.getListPost(null, user.token)
         .then((result)=> {
             // console.log(result.data);
             const curPosts = result.data.data;
@@ -25,7 +26,7 @@ const PostList = props => {
     
     // API like
     const actionLike = (postId) => {
-        like.actionLike(postId, token)
+        like.actionLike(postId, user.token)
         .then(result => {
             // console.log(result.data);
             const curLikes = result.data.data.like;  //numLikes

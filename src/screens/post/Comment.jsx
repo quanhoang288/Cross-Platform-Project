@@ -6,10 +6,12 @@ import { CommentItem } from '../../components/post';
 import { DEVICE_WIDTH } from '../../constants/dimensions';
 import { comment } from '../../apis';
 import { useRoute } from '@react-navigation/core';
+import { useSelector } from 'react-redux';
 
 const Comment = props => {
 
-    let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im54dHVuZyIsImlkIjoiNjE4ZDJiNzQzNjhhZDgzYTk4YzgyMGMwIiwiaWF0IjoxNjM2NzI4NTc2fQ.ZowtOOrPquHHRWKLL_l8fAWdnP1q0Qde8JkiiOsNpu0";
+    // user
+    const user = useSelector(state => state.auth.user);
 
     const [comments, setComments] = useState([]);
     const route = useRoute();
@@ -17,7 +19,7 @@ const Comment = props => {
     const [inputComment, setInputComment] = useState("");
 
     useEffect(() => {
-        comment.getListComment(postId, token)
+        comment.getListComment(postId, user.token)
         .then(result => {
             // console.log(result.data);
             const curComments = result.data.data;
@@ -29,7 +31,7 @@ const Comment = props => {
     },[route]);
 
     const actionAddComment = (postId, content) => {
-        comment.addComment(postId, content, token)
+        comment.addComment(postId, content, user.token)
         .then(result => {
             const newComment = result.data.data;
             // const curPost = result.data.post;
