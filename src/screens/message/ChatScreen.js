@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useCallback, useRef} from 'react';
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, Clipboard} from 'react-native';
 import {Bubble, GiftedChat, Send,InputToolbar} from 'react-native-gifted-chat';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -22,18 +22,21 @@ const ChatScreen = () => {
   useEffect(() => {
     const initialize = async () => {
       const newMessages = await fetchMessages();
-      setMessages(newMessages.map(msg => ({
-        _id: msg._id,
-        text: msg.content,
-        createdAt: msg.createdAt,
-        user: {
-          _id: msg.user._id,
-          name: msg.user.username,
+      if(newMessages){
+        
+        setMessages(newMessages.map(msg => ({
+          _id: msg._id,
+          text: msg.content,
+          createdAt: msg.createdAt,
+          user: {
+            _id: msg.user._id,
+            name: msg.user.username,
         },
-      })).reverse());
-
+        })).reverse());
+      }
       socket.current = io(SOCKET_URL);
       socket.current.on('getMessage', async (data) => {
+        
         if (senderId === data.receivedId) {
           const newMsg = {
             _id: data.senderId,
@@ -141,8 +144,32 @@ const ChatScreen = () => {
   //     />
   //   );
   // };
+  const onDelete = (message) => {
+    setMessages((previousMessages)=>
+      previousMessages.filter(messages => messages._id !== message )
+    );
+  }
   
+  const onLongPress = (context, message) =>{
+    console.log( message);
+    const options = ['copy','Delete Message', 'Cancel'];
+    const cancelButtonIndex = options.length - 1;
+    context.actionSheet().showActionSheetWithOptions({
+        options,
+        cancelButtonIndex
+    }, (buttonIndex) => {
+        switch (buttonIndex) {
+            case 0:
+                Clipboard.setString(message.text);
+                break;
+            case 1:
+                console.log("delete");
+                onDelete(message._id);
+                break;
+        }
+    });
 
+  }
   return (
     <GiftedChat
       messages={messages}
@@ -151,7 +178,7 @@ const ChatScreen = () => {
         _id: senderId,
       }}      
       // renderInputToolbar={props => renderInputToolbar(props)}
-      
+      onLongPress={onLongPress}
       renderBubble={renderBubble}
       alwaysShowSend
       renderSend={renderSend}
