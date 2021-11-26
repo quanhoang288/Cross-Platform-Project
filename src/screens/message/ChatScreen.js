@@ -35,25 +35,27 @@ const ChatScreen = () => {
         })).reverse());
       }
       socket.current = io(SOCKET_URL);
-      socket.current.on('getMessage', async (data) => {
-        
-        if (senderId === data.receivedId) {
-          const newMsg = {
-            _id: data.senderId,
-            text: data.content, 
-            createdAt: Date.now(),
-            user: {
-              _id: data.receivedId,
-              name: 'trung',
-            },
-          };
-         
-          setMessages((previousMessages) => GiftedChat.append(previousMessages, [newMsg]));
-        } 
-      });
+      
     }
     initialize();
   }, []);
+
+  useEffect(() => {
+    socket.current?.on('getMessage', (data) => {
+      if (senderId === data.receivedId) {
+        const newMsg = {
+          _id: data._id,
+          text: data.content, 
+          createdAt: data.createdAt,
+          user: {
+            _id: data.senderId,
+          },
+        };
+       
+        setMessages((previousMessages) => GiftedChat.append(previousMessages, [newMsg]));
+      } 
+    });
+  }, [socket])
 
   const fetchMessages = async () => {
     try {
@@ -67,15 +69,15 @@ const ChatScreen = () => {
   const onSend = useCallback(async (messages = []) => {
     if (messages.length > 0) {
       const newMsgObj = messages[0];
-        // if (currentChat) {
       try {
         const sendResult = await message.sendMessage(chatId, senderId, receiverId, newMsgObj.text, token);
-        //TODO: gui socket + update mang messages
+        const newMsg = sendResult.data.data;
         socket.current?.emit('sendMessage', {
+          _id: newMsg._id,
           senderId: senderId,
           receivedId: receiverId,
           content: newMsgObj.text,
-          type: "PRIVATE_CHAT",
+          createdAt: newMsg.createdAt
         });
         
       } catch (err) {
