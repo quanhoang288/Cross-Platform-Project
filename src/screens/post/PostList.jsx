@@ -7,7 +7,52 @@ import { useSelector } from "react-redux";
 import { post } from "../../apis";
 
 const PostList = (props) => {
+  // user
   const user = useSelector((state) => state.auth.user);
+  // console.log(user);
+
+  // API getPosts
+  const [posts, setPosts] = useState([]);
+  useEffect(() => {
+    post
+      .getListPost(null, user.token)
+      .then((result) => {
+        // console.log(result.data);
+        const curPosts = result.data.data;
+        setPosts(curPosts);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
+
+  // API like
+  const actionLike = (postId) => {
+    like
+      .actionLike(postId, user.token)
+      .then((result) => {
+        // console.log(result.data);
+        const curLikes = result.data.data.like; //numLikes
+        const curIsLike = result.data.data.isLike;
+        setPosts(
+          posts.map((post) => {
+            if (post._id === postId) {
+              return {
+                ...post,
+                like: curLikes,
+                isLike: curIsLike,
+              };
+            }
+            return post;
+          })
+        );
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  // API getComment
 
   // API getPosts
   const [posts, setPosts] = useState([]);
