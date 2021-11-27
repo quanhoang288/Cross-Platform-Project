@@ -28,9 +28,9 @@ const App = () => {
   return (
       <SafeAreaProvider>
         <NavigationContainer>
-            <StackNavigator/>            
+            <StackNavigator/>      
+            <RootModal/>      
         </NavigationContainer>
-        <RootModal/>
       </SafeAreaProvider>
   );
 }

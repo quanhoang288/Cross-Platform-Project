@@ -2,26 +2,39 @@ import React, { useEffect, useState } from 'react';
 import BottomHalfModal from './BottomHalfModal';
 import { View } from 'react-native';
 import { Divider, Icon, ListItem } from 'react-native-elements';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { hideModal, showModal } from '../../../redux/reducers/modalReducer';
 import { types } from '../../../constants/modalTypes';
-const PostAdvanceModal = ({ postId }) => {
+import { useNavigation } from '@react-navigation/core';
+import { stacks } from '../../../constants/title';
+const PostAdvanceModal = ({ postId, authorId }) => {
     
+    const user = useSelector(state => state.auth.user);
     const dispatch = useDispatch();
-    const ownPost = false;
+
+    const navigation = useNavigation();
+
+    const ownPost = user && user.id === authorId;
+
     
     const handleHideModal = () => {
         setModalVisible(false);
     }
 
     const handleEditPost = () => {
-        console.log(postId);
+        dispatch(hideModal());
+        navigation.navigate(stacks.createPost.name, {
+            postId: postId,
+            title: 'Edit post'
+        });
     }
 
     const handleReportPost = () => {
         dispatch(showModal({
             modalType: types.postReport,
-            propsData: {}
+            propsData: {
+                postId: postId
+            }
         }))
     }
 
@@ -37,6 +50,7 @@ const PostAdvanceModal = ({ postId }) => {
                 title: 'Xóa bài viết',
                 content: 'Bạn có chắc chắn muốn xóa bài viết?',
                 yesOptionTitle: 'XÓA',
+                postId: postId
             }
         }))
     }
@@ -98,7 +112,7 @@ const PostAdvanceModal = ({ postId }) => {
             hideModal={handleHideModal}
         >
             <View style={{
-                height: 250, 
+                height: ownPost ? 200 : 250, 
                 backgroundColor: '#fff',
                 justifyContent: 'center',
                 borderTopStartRadius: 10,

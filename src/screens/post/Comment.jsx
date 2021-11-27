@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { ScrollView, View, StyleSheet } from 'react-native';
+import { ScrollView, View, StyleSheet, Keyboard, FlatList } from 'react-native';
 import { Divider, Icon, Input } from 'react-native-elements';
 import { CommentItem } from '../../components/post';
 import { DEVICE_WIDTH } from '../../constants/dimensions';
@@ -17,6 +17,7 @@ const Comment = props => {
     const route = useRoute();
     const postId = route.params.postId;
     const [inputComment, setInputComment] = useState("");
+    const commentListRef = useRef();
 
     useEffect(() => {
         comment.getListComment(postId, user.token)
@@ -30,6 +31,10 @@ const Comment = props => {
         })
     },[route]);
 
+    useEffect(() => {
+        commentListRef.current.scrollToEnd();
+    }, [comments])
+
     const actionAddComment = (postId, content) => {
         comment.addComment(postId, content, user.token)
         .then(result => {
@@ -39,7 +44,6 @@ const Comment = props => {
                 ...comments,
                 newComment
             ]);
-            setInputComment("");
         })
         .catch(error => {
             console.log(error)
@@ -48,7 +52,23 @@ const Comment = props => {
 
     return (
         <View style={styles.container}>
-            <ScrollView showsVerticalScrollIndicator={false} style={styles.commentList}>
+            <ScrollView 
+                showsVerticalScrollIndicator={false} 
+                style={styles.commentList}
+                ref={commentListRef}
+            >
+                {/* <FlatList
+                    data={comments}
+                    renderItem={({item}) => (
+                        <CommentItem
+                            comment={item}
+                        />    
+                    )}
+                    keyExtractor={item => item._id}
+                    showsVerticalScrollIndicator={false}
+                    style={styles.commentList}
+                    ref={commentListRef}
+                /> */}
                 {comments.map(comment => (
                     <CommentItem
                         key={comment._id}
@@ -56,6 +76,7 @@ const Comment = props => {
                     />
                 ))}
             </ScrollView>
+            
             <View style={styles.commentSection}>
                 <Icon 
                     type='feather' 
@@ -71,14 +92,18 @@ const Comment = props => {
                     value={inputComment}
                     onChangeText={text => setInputComment(text)}
                     rightIcon={
+                        inputComment.length > 0 ?
                         <Icon 
                             name='send' 
                             type='ionicons' 
                             size={28} 
                             iconStyle={{color: 'blue', marginLeft: 6}}
-                            disabled={inputComment.length === 0}
-                            onPress={() => actionAddComment(postId, inputComment)}
-                        />
+                            onPress={() => {
+                                setInputComment("");
+                                Keyboard.dismiss();
+                                actionAddComment(postId, inputComment)}
+                            }
+                        /> : null
                     }
                     // inputStyle={{maxHeight: 60}}
                 />

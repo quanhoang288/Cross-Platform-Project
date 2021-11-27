@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { View, StyleSheet, ScrollView, TouchableOpacity, ImageBackground } from 'react-native';
 import { Avatar, Button, Divider, Icon, Image, ListItem, Text } from 'react-native-elements';
-import { PostList } from '../post';
+import { PostList } from '../../components/post';
 import { DEVICE_WIDTH } from '../../constants/dimensions';
 import { post } from '../../apis'
 

@@ -1,6 +1,6 @@
 const initialState = {
     uploading: false,
-    uploadSuccess: false,
+    data: null,
     err: null,
 };
 
@@ -17,13 +17,13 @@ export default uploadReducer = (state=initialState, action) => {
             return {
                 ...state,
                 uploading: false,
-                uploadSuccess: true
+                data: action.payload
             };
 
         case 'UPLOAD_FAILURE': 
             return {
-                ...state,
                 uploading: false,
+                data: null,
                 err: action.payload
             };
 

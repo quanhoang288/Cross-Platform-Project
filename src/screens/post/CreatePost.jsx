@@ -8,10 +8,9 @@ import { post } from '../../apis'
 import { useNavigation, useRoute } from '@react-navigation/core';
 import { stacks } from '../../constants/title';
 import { ImageHelper } from '../../helpers';
-import { useSelector } from 'react-redux';
 import * as FileSystem from 'expo-file-system';
 import * as ImageManipulator from 'expo-image-manipulator';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { mediaActions, uploadActions } from '../../redux/actions';
 
 
@@ -20,16 +19,20 @@ const CreatePost = ({ navigation }) => {
     const [postContent, setPostContent] = useState('');
     const selectedAssets = useSelector(state => state.media.selectedAssets);
     const dispatch = useDispatch();
-    
 
-    // token = constant
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InR1bmdueCIsImlkIjoiNjE4MTA5NDk2YmRjYzkyZGIwNDU1MDEyIiwiaWF0IjoxNjM2Mzc3ODgyfQ.PERJlxqWua9oaUhed9pywKdrKc-lyVwWCnLitQtvPjY";
+    const user = useSelector(state => state.auth.user);
 
+    useEffect(() => {
+        if (!user) {
+            navigation.navigate(stacks.signIn.name);
+        }
+    }, [user]);
 
+    const route = useRoute();
 
     useEffect(() => {
         navigation.setOptions({ 
-            title: stacks.createPost.title,
+            title: route.params ? route.params.title : stacks.createPost.title,
             headerRight: () => (
                 <Button
                     onPress={handleSave}
@@ -42,6 +45,21 @@ const CreatePost = ({ navigation }) => {
             )
         });
     }, [navigation, postContent, selectedAssets]);
+
+    useEffect(() => {
+        if (route.params) {
+            const { postId, title } = route.params;
+            
+            post.getPost(postId, user.token)
+                .then(res => setPostContent(res.data.data.described))
+                .catch(err => console.log(err));
+            
+            navigation.setOptions({ 
+                title: title,
+            });
+        }
+ 
+    }, [route]);
 
     
 
@@ -80,9 +98,9 @@ const CreatePost = ({ navigation }) => {
 
 
     const handleSave = async () => {
-      
-        dispatch(uploadActions.uploading());
+        console.log('save...');
         navigation.navigate(stacks.newsFeed.name);
+        dispatch(uploadActions.uploading());
 
         const imageAssets = selectedAssets.filter(asset => asset.mediaType === 'photo');
         const videoAssets = selectedAssets.filter(asset => asset.mediaType === 'video');
@@ -98,15 +116,13 @@ const CreatePost = ({ navigation }) => {
         };
         try {
             
-            const createResult = await post.addPost(postData, token);
+            const result = route.params ? await post.editPost(route.params.postId, postData, user.token)
+                :   await post.addPost(postData, user.token);
             dispatch(mediaActions.resetState());
-            dispatch(uploadActions.uploadSuccess());
+            dispatch(uploadActions.uploadSuccess(result.data.data));
         } catch (err) {
-            dispatch(uploadActions.uploadFailure('Error occured!'));
-            if (err.repsonse) {
-                console.log(err.response);
-            }
-            console.log(err);
+            const errMsg = err.response ? err.response.message : 'Error occured!';
+            dispatch(uploadActions.uploadFailure(errMsg));
         }
     }
 

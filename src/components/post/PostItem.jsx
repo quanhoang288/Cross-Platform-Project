@@ -1,17 +1,45 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Modal, View, StyleSheet } from 'react-native';
 import { Avatar, Button, Icon, Image, Text } from 'react-native-elements'
 import { CarouselSwipe, CarouselTest } from '../common';
 import { useNavigation } from '@react-navigation/native';
 import { stacks } from '../../constants/title';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { showModal } from '../../redux/reducers/modalReducer';
 import { types } from '../../constants/modalTypes';
+import { like } from '../../apis';
 
-const PostItem = ({post, actionLike, handleShowMore}) => {
+const PostItem = ({ post }) => {
+    const user = useSelector(state => state.auth.user);
     const navigation = useNavigation();
     const dispatch = useDispatch();
+    const [isLike, setLike] = useState(post.isLike);
+    const [numLikes, setNumLikes] = useState(post.like.length);
+
+    useEffect(() => {
+        if (!user) {
+            navigation.navigate(stacks.signIn.name);
+        }
+    }, [user])
+    
+
+    // API like
+    const actionLike = () => {
+        
+        setNumLikes(isLike ? numLikes - 1 : numLikes + 1);
+        setLike(!isLike);
+
+        like.actionLike(post._id, user.token)
+        .then(result => {
+            const curLikes = result.data.data.like;  //numLikes
+            const curIsLike = result.data.data.isLike;
+         
+        })
+        .catch(error => {
+            console.log(error);
+        });
+    }
 
     return (
         <View style={styles.container}>
@@ -38,7 +66,8 @@ const PostItem = ({post, actionLike, handleShowMore}) => {
                         dispatch(showModal({
                             modalType: types.postAdvance,
                             propsData: {
-                                postId: 1,
+                                postId: post._id,
+                                authorId: post.author._id
                             },
                         }))
                     }}
@@ -65,12 +94,12 @@ const PostItem = ({post, actionLike, handleShowMore}) => {
                 <View style={styles.icon} >
                     <Icon 
                         type='font-awesome' 
-                        name={post.isLike ? 'heart' : 'heart-o'}
+                        name={isLike ? 'heart' : 'heart-o'}
                         size={28} 
                         onPress={() => actionLike(post._id)}
-                        color={post.isLike ? 'rgb(255, 0, 0)' : 'rgb(0, 0, 0)'}
+                        color={isLike ? 'rgb(255, 0, 0)' : 'rgb(0, 0, 0)'}
                     />    
-                    <Text style={styles.count}>{post.like.length}</Text>
+                    <Text style={styles.count}>{numLikes}</Text>
                 </View>
                 <View style={styles.icon}>
                     <Icon 
