@@ -14,13 +14,14 @@ const ChatScreen = () => {
   const socket = useRef();
   const [messages, setMessages] = useState([]);
   
-  const chatId = "619526c2cc375b3fb8d08717";
+  const chatId = "61a44a99130e4922140cd289";
   const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRydW5ndnVob2FuZyIsImlkIjoiNjE4ZTk3NTg3NDU1MGEyMmE0Y2IyYTkwIiwiaWF0IjoxNjM2NzM0ODA5fQ.NwBPkKkhl8IHr64k-4EwTPMhtzY2IM0J6TXqm8c-DNk";
   const receiverId = '618e992874550a22a4cb2a98';
   const senderId = '618e975874550a22a4cb2a90';
 
   useEffect(() => {
     const initialize = async () => {
+      
       const newMessages = await fetchMessages();
       if(newMessages){
         
@@ -62,7 +63,7 @@ const ChatScreen = () => {
         const res = await message.getMessages(chatId, token);
         return res.data.data;
     } catch (err) {
-        console.log(err);
+        console.log(err.message);
     }
   }
 
@@ -146,10 +147,12 @@ const ChatScreen = () => {
   //     />
   //   );
   // };
-  const onDelete = (message) => {
+  const onDelete = async(messageIdToDelete) => {
     setMessages((previousMessages)=>
-      previousMessages.filter(messages => messages._id !== message )
+      previousMessages.filter(messages => messages._id !== messageIdToDelete )
     );
+    const deleteMess = await message.deleteMessage(chatId,messageIdToDelete,token);
+    
   }
   
   const onLongPress = (context, message) =>{

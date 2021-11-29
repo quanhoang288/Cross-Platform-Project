@@ -1,3 +1,4 @@
+import { message } from '.';
 import api from './api';
 
 const getMessages = async (chatId, token) => {
@@ -10,6 +11,33 @@ const getMessages = async (chatId, token) => {
     });
     return getResult;
 }
+
+const getChats = async (userId, token) =>{
+    const getList = await api({
+        method: 'GET',
+        url: `/chats/getChats/${userId}`,
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+    return getList;
+}
+const deleteMessage = async (chatId, messageId, token) =>{
+    const messageDelete = {
+        messageId: messageId,
+        chatId: chatId,
+    };
+    const deleteMess = await api({
+        method: 'POST',
+        url: 'chats/deleteMessage',
+        data: messageDelete,
+        headers: {
+            'Authorization': `Bearer ${token}`
+        },
+       
+    });
+    return deleteMess;
+};
 
 const sendMessage = async (chatId, senderId, receiverId, msg, token) => {
     const newMessage = {
@@ -36,6 +64,6 @@ const sendMessage = async (chatId, senderId, receiverId, msg, token) => {
     return sendResult;
 }
 
-export { getMessages, sendMessage };
+export { getMessages, sendMessage, getChats, deleteMessage};
 
 

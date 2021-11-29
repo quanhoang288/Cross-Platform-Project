@@ -1,141 +1,75 @@
-import React from 'react';
+import React,{useEffect, useState} from 'react';
 import {
   View,
-  ScrollView,
   StyleSheet,
-  SafeAreaView,
-  Dimensions,
   TouchableOpacity,
   FlatList,
-  Button,
 } from 'react-native';
 import {
   Avatar,
-  FAB,
-  Icon,
   ListItem,
   Text,
   Badge,
-  Tab,
 } from 'react-native-elements';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { stacks } from '../../constants/title';
-// import { ConversationItem } from '../components/chat';
-
-// const ScreenWidth = Dimensions.get('window').width;
-const Messages = [
-  {
-    id: '1',
-    userName: 'Quan Hoang',
-    userImg: require('../../../assets/avatar2.jpg'),
-    unreadMessages: 20,
-    messageText:
-      'Hom nay toi co don qua',
-  },
-  {
-    id: '2',
-    userName: 'TungNX',
-    userImg: require('../../../assets/avatar3.jpg'),
-    unreadMessages: 4,
-    messageText:
-      'Nho Khanh Van',
-  },
-  {
-    id: '3',
-    userName: 'Trung',
-    userImg: require('../../../assets/avatar.jpg'),
-    unreadMessages: 5,
-    messageText:
-      'xin chao',
-  },
-  {
-    id: '4',
-    userName: 'MessiThanh',
-    userImg: require('../../../assets/avatar3.jpg'),
-    unreadMessages: 2,
-    messageText:
-      'hom nay toi buon',
-  },
-  {
-    id: '5',
-    userName: 'Duong',
-    userImg: require('../../../assets/avatar3.jpg'),
-    unreadMessages: 10,
-    messageText:
-      'ai nhan tin minh ik',
-  },
-  {
-    id: '6',
-    userName: 'Truong',
-    userImg: require('../../../assets/avatar3.jpg'),
-    unreadMessages: 5,
-    messageText:
-      'hello',
-  },
-  {
-    id: '7',
-    userName: 'Vanh',
-    userImg: require('../../../assets/avatar3.jpg'),
-    unreadMessages: 5,
-    messageText:
-      'choi game ko',
-  },
-  {
-    id: '8',
-    userName: 'Quan Hoang',
-    userImg: require('../../../assets/avatar2.jpg'),
-    unreadMessages: 20,
-    messageText:
-      'Hom nay toi co don qua',
-  },
-  {
-    id: '9',
-    userName: 'TungNX',
-    userImg: require('../../../assets/avatar3.jpg'),
-    unreadMessages: 4,
-    messageText:
-      'Nho Khanh Van',
-  },
-  {
-    id: '10',
-    userName: 'Trung',
-    userImg: require('../../../assets/avatar.jpg'),
-    unreadMessages: 5,
-    messageText:
-      'xin chao',
-  },
-  {
-    id: '11',
-    userName: 'MessiThanh',
-    userImg: require('../../../assets/avatar3.jpg'),
-    unreadMessages: 2,
-    messageText:
-      'hom nay toi buon',
-  },
-  {
-    id: '12',
-    userName: 'Duong',
-    userImg: require('../../../assets/avatar3.jpg'),
-    unreadMessages: 10,
-    messageText:
-      'ai nhan tin minh ik',
-  },
-  {
-    id: '13',
-    userName: 'Truong',
-    userImg: require('../../../assets/avatar3.jpg'),
-    unreadMessages: 5,
-    messageText:
-      'hello',
-  },
-];
+import { message } from '../../apis';
+// const messages = [
+//   {
+//     id: '1',
+//     userName: 'Quan Hoang',
+//     userImg: require('../../../assets/avatar2.jpg'),
+//     unreadMessages: 20,
+//     messageText:
+//       'Hom nay toi co don qua',
+//   },
+  
+// ];
 const MessageScreen = ({ navigation }) => {
+  const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRydW5ndnVob2FuZyIsImlkIjoiNjE4ZTk3NTg3NDU1MGEyMmE0Y2IyYTkwIiwiaWF0IjoxNjM2NzM0ODA5fQ.NwBPkKkhl8IHr64k-4EwTPMhtzY2IM0J6TXqm8c-DNk";
+  const userId = '618e975874550a22a4cb2a90';
+  const [ChatList, setChatList] = useState([]);
+  const fetchChats = async () => {
+    try {
+        const res = await message.getChats(userId, token);
+        return res.data.data;
+        
+    } catch (err) {
+        console.log(err.message);
+    }
+  }
+  useEffect(()=>{
+    const initialize = async () => {
+      const newChatList = await fetchChats()
+      console.log(newChatList[0])
+      // setChatList([
+      //   {
+      //     id: '1',
+      //     userName: 'Quan Hoang',
+      //     userImg: require('../../../assets/avatar2.jpg'),
+      //     unreadMessages: 20,
+      //     messageText:
+      //       'Hom nay toi co don qua',
+      //   },
+      // ]);
+      if(newChatList){
+        setChatList(newChatList.map(chat =>({
+          id: chat._id,
+          userName: chat.member[1].username,
+          userImg: require('../../../assets/avatar2.jpg'),
+          unreadMessages: 20,
+          messageText: chat.latestMessage.content,
+        }))
+        );
+      };
+      
+    }
+    initialize();
+  }, []);
     return (
-        // <View>
-            // <ScrollView>
-                <FlatList data={Messages}
+                <FlatList data={ChatList}
                           keyExtractor={item=>item.id}
                           renderItem={({item}) =>(
                           <TouchableOpacity onPress={() => navigation.navigate(stacks.chatScreen.name)}>
@@ -157,9 +91,6 @@ const MessageScreen = ({ navigation }) => {
                           </TouchableOpacity>
                           )}
                 />
-
-            // </ScrollView>
-        // </View>
     );
 };
 
