@@ -1,4 +1,3 @@
-import { message } from '.';
 import api from './api';
 
 const getMessages = async (chatId, token) => {

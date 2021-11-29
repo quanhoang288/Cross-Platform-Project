@@ -43,7 +43,6 @@ const MessageScreen = ({ navigation }) => {
   useEffect(()=>{
     const initialize = async () => {
       const newChatList = await fetchChats()
-      console.log(newChatList[0])
       // setChatList([
       //   {
       //     id: '1',
@@ -64,7 +63,7 @@ const MessageScreen = ({ navigation }) => {
         }))
         );
       };
-      
+
     }
     initialize();
   }, []);

@@ -57,6 +57,15 @@ const ChatScreen = () => {
       } 
     });
   }, [socket])
+  useEffect(() => {
+    socket.current?.on('removeMess', (data) => {
+      if (receiverId === data.userId) {
+        setMessages((previousMessages)=>
+        previousMessages.filter(messages => messages._id !== data._id )
+      );   
+      } 
+    });
+  }, [socket])
 
   const fetchMessages = async () => {
     try {
@@ -152,7 +161,12 @@ const ChatScreen = () => {
       previousMessages.filter(messages => messages._id !== messageIdToDelete )
     );
     const deleteMess = await message.deleteMessage(chatId,messageIdToDelete,token);
-    
+    console.log(deleteMess.data.data);
+    const messDelete = deleteMess.data.data;
+    socket.current?.emit('deleteMessage', {
+      _id: messDelete._id,
+      userId: messDelete.user,
+    });
   }
   
   const onLongPress = (context, message) =>{
