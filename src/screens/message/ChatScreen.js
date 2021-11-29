@@ -9,15 +9,21 @@ import { message } from '../../apis';
 import { set } from 'react-native-reanimated';
 import { margin, marginBottom, paddingBottom } from 'styled-system';
 import { SOCKET_URL } from '../../configs';
+import { useRoute } from '@react-navigation/native';
 
 const ChatScreen = () => {
   const socket = useRef();
   const [messages, setMessages] = useState([]);
   
-  const chatId = "61a44a99130e4922140cd289";
-  const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRydW5ndnVob2FuZyIsImlkIjoiNjE4ZTk3NTg3NDU1MGEyMmE0Y2IyYTkwIiwiaWF0IjoxNjM2NzM0ODA5fQ.NwBPkKkhl8IHr64k-4EwTPMhtzY2IM0J6TXqm8c-DNk";
-  const receiverId = '618e992874550a22a4cb2a98';
-  const senderId = '618e975874550a22a4cb2a90';
+  const route = useRoute();
+  const {chatId, member} = route.params;
+
+  const user = useSelector(state => state.auth.user);
+
+  const senderId = user._id;
+  const receiverId = member.find(member => member._id !== senderId);
+
+  const token = user.token;
 
   useEffect(() => {
     const initialize = async () => {
