@@ -1,38 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
-  ScrollView,
   StatusBar,
   StyleSheet,
   SafeAreaView,
-  Dimensions,
   TouchableOpacity,
   FlatList,
   Platform,
-  TextInput,
 } from 'react-native';
 import {
   Avatar,
-  FAB,
-  Icon,
   ListItem,
   Text,
-  Badge,
-  Tab,
   SearchBar,
   Button,
+  Icon,
 } from 'react-native-elements';
 
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { friend, search } from '../../apis';
 import { useSelector } from 'react-redux';
-import { error } from 'react-native-gifted-chat/lib/utils';
-// const InputFieldsStyle = {
-//     borderWidth: 0,
-    
-//   };
-
 
 const SearchFriend = () =>{
 
@@ -44,7 +30,11 @@ const SearchFriend = () =>{
     const [listSuggestFriend, setListSuggestFriend] = useState([]);
 
     // API search
-    const resultSearch = (keyword) => {
+    const handleSearch = (keyword) => {
+        if(keyword === ""){
+            setListSuggestFriend([]);
+            return;
+        }
         search.searchFriend(keyword, user.token)
         .then(result => {
             const curList = result.data.data;
@@ -55,23 +45,19 @@ const SearchFriend = () =>{
         })
     }
 
-    const actionSearch = (keyword) => {
-        if(keyword){
-            resultSearch(keyword);
-            setValue(keyword);
-        }
-        else{
-            setValue("");
-            setListSuggestFriend([]);
-        }
-    }
+    useEffect(() => {
+        handleSearch(value);
+    }, [value]);
 
     // status of friend
-    const [status, setStatus] = useState("");
+    const [status, setStatus] = useState(false);
+
     // API send friendRequest
     const sendRequest = (userId) => {
+        // console.log("true");
         friend.sendFriendRequest(userId, user.token)
         .then(result => {
+            setStatus(true);
             console.log(result.data);
         })
         .catch(error => {
@@ -79,13 +65,15 @@ const SearchFriend = () =>{
         })
     }
 
+
+
     return(
         <SafeAreaView style={styles.container}>
             <SearchBar
                 platform={Platform.OS}
                 searchIcon={{ size: 24 }}
-                onChangeText={(text) => actionSearch(text)}
-                onClear={() => actionSearch("")}
+                onChangeText={(text) => setValue(text)}
+                onClear={() => setValue("")}
                 placeholder="Type Here..."
                 value={value}
             />
@@ -96,7 +84,7 @@ const SearchFriend = () =>{
                         <ListItem>
                             <Avatar 
                                 rounded size={40} 
-                                source={require('../../../assets/avatar.jpg')} 
+                                source={require('../../../assets/avatar2.jpg')} 
                             />
                             
                             <ListItem.Content>
@@ -105,9 +93,16 @@ const SearchFriend = () =>{
                                 </ListItem.Title>
                             </ListItem.Content>
                             <TouchableOpacity>
-                                <Button 
+                                {/* <Button 
                                     title="Send request" 
-                                    onPress = {() => {}}
+                                    onPress = {() => sendRequest(item._id)}
+                                /> */}
+                                <Icon
+                                    name={status ? "checkcircleo": "adduser"}
+                                    type="antdesign"
+                                    size={32}
+                                    color={status ? "green": "black"}
+                                    onPress = {() => sendRequest(item._id)}
                                 />
                             </TouchableOpacity>
                         </ListItem>
