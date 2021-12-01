@@ -9,30 +9,26 @@ import { message } from '../../apis';
 import { set } from 'react-native-reanimated';
 import { margin, marginBottom, paddingBottom } from 'styled-system';
 import { SOCKET_URL } from '../../configs';
-import { useRoute } from '@react-navigation/native';
-
+import { useRoute, useNavigation } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
+import { Icon } from 'react-native-elements';
+import { stacks } from '../../constants/title';
 const ChatScreen = () => {
   const socket = useRef();
   const [messages, setMessages] = useState([]);
-  
   const route = useRoute();
-  const {chatId, member} = route.params;
-
+  const {chatId, receivedId} = route.params;
   const user = useSelector(state => state.auth.user);
-
   const senderId = user._id;
-  const receiverId = member.find(member => member._id !== senderId);
-
   const token = user.token;
-
+  const navigation = useNavigation();
   useEffect(() => {
     const initialize = async () => {
-      
       const newMessages = await fetchMessages();
       if(newMessages){
-        
+        console.log(newMessages);
         setMessages(newMessages.map(msg => ({
-          _id: msg._id,
+          _id: msg.user._id !== senderId ? senderId : receivedId,
           text: msg.content,
           createdAt: msg.createdAt,
           user: {
@@ -46,6 +42,21 @@ const ChatScreen = () => {
     }
     initialize();
   }, []);
+  useEffect(() => {
+    navigation.setOptions({ 
+        headerRight: () => (
+          <Icon 
+            type='feather' 
+            name='more-horizontal' 
+            size={32}  
+            style={{marginRight: 10}}
+            onPress={() => navigation.navigate(stacks.chatSetting.name, {
+              chatId: chatId,
+            })}
+          />
+        )
+    });
+}, [navigation]);
 
   useEffect(() => {
     socket.current?.on('getMessage', (data) => {
@@ -62,8 +73,6 @@ const ChatScreen = () => {
         setMessages((previousMessages) => GiftedChat.append(previousMessages, [newMsg]));
       } 
     });
-  }, [socket])
-  useEffect(() => {
     socket.current?.on('removeMess', (data) => {
       if (receiverId === data.userId) {
         setMessages((previousMessages)=>
@@ -73,10 +82,12 @@ const ChatScreen = () => {
     });
   }, [socket])
 
+
   const fetchMessages = async () => {
     try {
         const res = await message.getMessages(chatId, token);
         return res.data.data;
+        console.log(res.data.data)
     } catch (err) {
         console.log(err.message);
     }
@@ -86,12 +97,13 @@ const ChatScreen = () => {
     if (messages.length > 0) {
       const newMsgObj = messages[0];
       try {
-        const sendResult = await message.sendMessage(chatId, senderId, receiverId, newMsgObj.text, token);
+        const sendResult = await message.sendMessage(chatId, senderId, receivedId, newMsgObj.text, token);
         const newMsg = sendResult.data.data;
         socket.current?.emit('sendMessage', {
+          chatId: chatId,
           _id: newMsg._id,
           senderId: senderId,
-          receivedId: receiverId,
+          receivedId: receivedId,
           content: newMsgObj.text,
           createdAt: newMsg.createdAt
         });

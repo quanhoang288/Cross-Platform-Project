@@ -1,94 +1,45 @@
 import React from 'react';
 import {
-  View,
   ScrollView,
   StyleSheet,
-  SafeAreaView,
-  Dimensions,
   TouchableOpacity,
-  FlatList,
-  Button,
-  Image
 } from 'react-native';
 import {
-  Avatar,
-  FAB,
   Icon,
   ListItem,
-  Text,
-  Badge,
-  Tab,
 } from 'react-native-elements';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-const ChatSetting = ({ navigation })  => {
+import { message } from '../../apis';
+import { useRoute } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
+const ChatSetting = ()  => {
+    const route = useRoute();
+    const {chatId} = route.params;
+    const user = useSelector(state => state.auth.user);
+    const token = user.token;
+    const onPress = async() =>{
+        const deleteC = await message.deleteChat(chatId, token);
+        console.log(deleteC.data.data);
+    }
     return(
-        <View>
+        
         <ScrollView style={styles.ScrollView}>
-            <Avatar 
-            style={styles.Avatar}
-            rounded
-            size={100}
-            
-            source={require('../../../assets/avatar.jpg')} 
-            />
-            <TouchableOpacity>
+
+            <TouchableOpacity onPress = {onPress}>
             <ListItem>
-                <Image source={require('../../../assets/findicon.png')} rounded/>
-                <ListItem.Title>Find Message</ListItem.Title>
+                <Icon
+                   type='feather' 
+                   name='trash-2' 
+                   size={32} 
+                />
+                <ListItem.Title>Delete Chat </ListItem.Title>
             </ListItem>
             </TouchableOpacity>
-            <TouchableOpacity>
-            <ListItem>
-                <Image source={require('../../../assets/profileicon.jpg')} rounded/>
-                <ListItem.Title>Profile</ListItem.Title>
-            </ListItem>
-            </TouchableOpacity>
-            <TouchableOpacity>
-            <ListItem>
-                <Image source={require('../../../assets/notificationicon.png')} rounded/>
-                <ListItem.Title>Notification</ListItem.Title>
-            </ListItem>
-            </TouchableOpacity>
-            <TouchableOpacity>
-            <ListItem>
-                <Image source={require('../../../assets/notificationicon.png')} rounded/>
-                <ListItem.Title>Nickname</ListItem.Title>
-            </ListItem>
-            </TouchableOpacity>
-            <TouchableOpacity>
-            <ListItem>
-                <Image source={require('../../../assets/notificationicon.png')} rounded/>
-                <ListItem.Title>Group</ListItem.Title>
-            </ListItem>
-            </TouchableOpacity>
-            <TouchableOpacity>
-            <ListItem>
-                <Image source={require('../../../assets/notificationicon.png')} rounded/>
-                <ListItem.Title>Report</ListItem.Title>
-            </ListItem>
-            </TouchableOpacity>
-            <TouchableOpacity>
-            <ListItem>
-                <Image source={require('../../../assets/notificationicon.png')} rounded/>
-                <ListItem.Title>Block</ListItem.Title>
-            </ListItem>
-            </TouchableOpacity>
-        <TouchableOpacity>
-            <ListItem>
-                <Image source={require('../../../assets/notificationicon.png')} rounded/>
-                <ListItem.Title>Delete</ListItem.Title>
-            </ListItem>
-        </TouchableOpacity>
         </ScrollView>
-        </View>
+     
     )
 }
 export default ChatSetting;
 const styles = StyleSheet.create({
-    Avatar:{
-        
-    },
     ScrollView:{
         flex: 1
     }

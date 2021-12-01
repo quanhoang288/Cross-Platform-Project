@@ -38,6 +38,21 @@ const deleteMessage = async (chatId, messageId, token) =>{
     return deleteMess;
 };
 
+const deleteChat = async(chatId, token) =>{
+    const chatDelete ={
+        chatId: chatId,
+    }
+    const deleteC = await api({
+        method: 'POST',
+        url: 'chats/deleteChat',
+        data: chatDelete,
+        headers: {
+            'Authorization': `Bearer ${token}`
+        },
+    })
+    return deleteC;
+}
+
 const sendMessage = async (chatId, senderId, receiverId, msg, token) => {
     const newMessage = {
         receivedId: receiverId,
@@ -63,6 +78,6 @@ const sendMessage = async (chatId, senderId, receiverId, msg, token) => {
     return sendResult;
 }
 
-export { getMessages, sendMessage, getChats, deleteMessage};
+export { getMessages, sendMessage, getChats, deleteMessage, deleteChat};
 
 

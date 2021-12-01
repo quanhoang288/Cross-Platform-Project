@@ -1,4 +1,4 @@
-import React,{useEffect, useState} from 'react';
+import React,{useEffect, useState, useRef} from 'react';
 import {
   View,
   StyleSheet,
@@ -17,15 +17,18 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { stacks } from '../../constants/title';
 import { message } from '../../apis';
 import { useSelector } from 'react-redux';
-
+import { SOCKET_URL } from '../../configs';
+import {io} from 'socket.io-client';
 const MessageScreen = ({ navigation }) => {
 
   const user = useSelector(state => state.auth.user);
-  const [ChatList, setChatList] = useState([]);
+  const [chatList, setChatList] = useState([]);
+  const socket = useRef();
   const fetchChats = async () => {
     try {
-        const res = await message.getChats(user._id, user.token);
+        const res = await message.getChats(user.id, user.token);
         return res.data.data;
+        
         
     } catch (err) {
         console.log(err.message);
@@ -37,24 +40,40 @@ const MessageScreen = ({ navigation }) => {
       if(newChatList){
         setChatList(newChatList.map(chat =>({
           id: chat._id,
-          userName: chat.member.find(u => u._id !== user._id).username,
+          userName: chat.member.find(u => u.id !== user.id).username,
           userImg: require('../../../assets/avatar2.jpg'),
           unreadMessages: 20,
           messageText: chat.latestMessage.content,
+          userId: user.id
         }))
         );
       };
+      socket.current = io(SOCKET_URL);
     }
     initialize();
   }, []);
+  useEffect(() => {
+    socket.current?.on('refreshLatestMessage', (data) =>{
+      setChatList(chatList.map(chat => {
+        if(chat.id !== data.chatId){
+          return chat;
+        }
+        return{
+          ...chat,
+          messageText: data.content,
+        }
+      }))
+    })
+    
+  }, [socket])
     return (
       <FlatList 
-        data={ChatList}
+        data={chatList}
         keyExtractor={item=>item.id}
         renderItem={({item}) =>(
           <TouchableOpacity onPress={() => navigation.navigate(stacks.chatScreen.name, {
-            chatId: item._id,
-            member: item.member
+            chatId: item.id,
+            receivedId: item.userId,
           })}>
           <View>
               <ListItem>

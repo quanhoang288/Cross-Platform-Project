@@ -7,8 +7,9 @@ import { Profile } from '../screens/account';
 import { Button, Icon } from 'react-native-elements';
 import { ChangePW, PersonalInformation } from '../screens/advance';
 import { ListFriend } from '../screens/listFriend';
-import { ChatScreen, MessageScreen } from '../screens/message';
+import { ChatScreen, MessageScreen, ChatSetting } from '../screens/message';
 import { SignIn, SignUp } from '../screens/signIn-signUp';
+import { ChatSettingButton } from '../components/headers/post';
 
 const Stack = createNativeStackNavigator();
 
@@ -98,18 +99,15 @@ const stackScreens = [
         component: ChatScreen,
         options:{
             title: stacks.chatScreen.title,
-            headerRight: () => (
-                <Icon 
-                    type='feather' 
-                    name='more-horizontal' 
-                    size={32} 
-                />
-            ),
         }
     },
     {
-        name: 'message',
+        name: stacks.messageScreen.name,
         component: MessageScreen,
+    },
+    {
+        name: stacks.chatSetting.name,
+        component: ChatSetting,
     }
 
 ]
