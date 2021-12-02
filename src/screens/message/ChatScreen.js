@@ -19,16 +19,17 @@ const ChatScreen = () => {
   const route = useRoute();
   const {chatId, receivedId} = route.params;
   const user = useSelector(state => state.auth.user);
-  const senderId = user._id;
+  const senderId = user.id;
   const token = user.token;
   const navigation = useNavigation();
+
   useEffect(() => {
     const initialize = async () => {
+      console.log('user: ', user);
       const newMessages = await fetchMessages();
       if(newMessages){
-        console.log(newMessages);
         setMessages(newMessages.map(msg => ({
-          _id: msg.user._id !== senderId ? senderId : receivedId,
+          _id: msg._id,
           text: msg.content,
           createdAt: msg.createdAt,
           user: {
@@ -38,10 +39,11 @@ const ChatScreen = () => {
         })).reverse());
       }
       socket.current = io(SOCKET_URL);
-      
     }
     initialize();
   }, []);
+
+
   useEffect(() => {
     navigation.setOptions({ 
         headerRight: () => (
@@ -87,7 +89,6 @@ const ChatScreen = () => {
     try {
         const res = await message.getMessages(chatId, token);
         return res.data.data;
-        console.log(res.data.data)
     } catch (err) {
         console.log(err.message);
     }
@@ -159,21 +160,6 @@ const ChatScreen = () => {
     );
   }
 
-  // const renderInputToolbar = props => {
-  //   return (
-  //     <InputToolbar
-  //       {...props}
-  //       containerStyle={{
-  //         backgroundColor: "white",
-  //         borderTopColor: "#E8E8E8",
-          
-  //         marginBottom:20,
-  //         paddingTop:2,
-  //         paddingBottom:1,
-  //       }}
-  //     />
-  //   );
-  // };
   const onDelete = async(messageIdToDelete) => {
     setMessages((previousMessages)=>
       previousMessages.filter(messages => messages._id !== messageIdToDelete )
@@ -213,8 +199,8 @@ const ChatScreen = () => {
       onSend={onSend}
       user={{
         _id: senderId,
+        name: user.username
       }}      
-      // renderInputToolbar={props => renderInputToolbar(props)}
       onLongPress={onLongPress}
       renderBubble={renderBubble}
       alwaysShowSend
