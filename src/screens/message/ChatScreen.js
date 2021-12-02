@@ -1,48 +1,124 @@
-import React, {useState, useEffect, useCallback} from 'react';
-import {View, ScrollView, Text, Button, StyleSheet} from 'react-native';
-import {Bubble, GiftedChat, Send} from 'react-native-gifted-chat';
+import React, {useState, useEffect, useCallback, useRef} from 'react';
+import {View, StyleSheet, Clipboard} from 'react-native';
+import {Bubble, GiftedChat, Send,InputToolbar} from 'react-native-gifted-chat';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-
+import {io} from 'socket.io-client';
+import axios from 'axios';
+import { message } from '../../apis';
+import { set } from 'react-native-reanimated';
+import { margin, marginBottom, paddingBottom } from 'styled-system';
+import { SOCKET_URL } from '../../configs';
+import { useRoute, useNavigation } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
+import { Icon } from 'react-native-elements';
+import { stacks } from '../../constants/title';
 const ChatScreen = () => {
+  const socket = useRef();
   const [messages, setMessages] = useState([]);
-  <Button
-        title={'React Native Elements'}
-        containerStyle={{
-            width: 200,
-            marginHorizontal: 50,
-            marginVertical: 10,
-        }}
-  />
+  const route = useRoute();
+  const {chatId, receivedId} = route.params;
+  const user = useSelector(state => state.auth.user);
+  const senderId = user.id;
+  const token = user.token;
+  const navigation = useNavigation();
+
   useEffect(() => {
-    setMessages([
-      {
-        _id: 1,
-        text: 'Hello',
-        createdAt: new Date(),
-        user: {
-          _id: 2,
-          name: 'Quan',
-          avatar: require('../../../assets/avatar.jpg'),
+    const initialize = async () => {
+      console.log('user: ', user);
+      const newMessages = await fetchMessages();
+      if(newMessages){
+        setMessages(newMessages.map(msg => ({
+          _id: msg._id,
+          text: msg.content,
+          createdAt: msg.createdAt,
+          user: {
+            _id: msg.user._id,
+            name: msg.user.username,
         },
-      },
-      {
-        _id: 2,
-        text: require('../../../assets/avatar.jpg'),
-        createdAt: new Date(),
-        user: {
-          _id: 1,
-          name: 'Trung',
-          avatar: require('../../../assets/avatar.jpg'),
-        },
-      },
-    ]);
+        })).reverse());
+      }
+      socket.current = io(SOCKET_URL);
+    }
+    initialize();
   }, []);
 
-  const onSend = useCallback((messages = []) => {
-    setMessages((previousMessages) =>
-      GiftedChat.append(previousMessages, messages),
-    );
+
+  useEffect(() => {
+    navigation.setOptions({ 
+        headerRight: () => (
+          <Icon 
+            type='feather' 
+            name='more-horizontal' 
+            size={32}  
+            style={{marginRight: 10}}
+            onPress={() => navigation.navigate(stacks.chatSetting.name, {
+              chatId: chatId,
+            })}
+          />
+        )
+    });
+}, [navigation]);
+
+  useEffect(() => {
+    socket.current?.on('getMessage', (data) => {
+      if (senderId === data.receivedId) {
+        const newMsg = {
+          _id: data._id,
+          text: data.content, 
+          createdAt: data.createdAt,
+          user: {
+            _id: data.senderId,
+          },
+        };
+       
+        setMessages((previousMessages) => GiftedChat.append(previousMessages, [newMsg]));
+      } 
+    });
+    socket.current?.on('removeMess', (data) => {
+      if (receiverId === data.userId) {
+        setMessages((previousMessages)=>
+        previousMessages.filter(messages => messages._id !== data._id )
+      );   
+      } 
+    });
+  }, [socket])
+
+
+  const fetchMessages = async () => {
+    try {
+        const res = await message.getMessages(chatId, token);
+        return res.data.data;
+    } catch (err) {
+        console.log(err.message);
+    }
+  }
+
+  const onSend = useCallback(async (messages = []) => {
+    if (messages.length > 0) {
+      const newMsgObj = messages[0];
+      try {
+        const sendResult = await message.sendMessage(chatId, senderId, receivedId, newMsgObj.text, token);
+        const newMsg = sendResult.data.data;
+        socket.current?.emit('sendMessage', {
+          chatId: chatId,
+          _id: newMsg._id,
+          senderId: senderId,
+          receivedId: receivedId,
+          content: newMsgObj.text,
+          createdAt: newMsg.createdAt
+        });
+        
+      } catch (err) {
+        console.log(err)
+      }
+
+      setMessages((previousMessages) =>
+        GiftedChat.append(previousMessages, messages),
+      );
+      
+    }
+   
   }, []);
 
   const renderSend = (props) => {
@@ -51,8 +127,8 @@ const ChatScreen = () => {
         <View>
           <MaterialCommunityIcons
             name="send-circle"
-            style={{marginBottom: 5, marginRight: 5}}
-            size={32}
+            style={{paddingBottom:-20 , marginRight: 2}}
+            size={40}
             color="#2e64e5"
           />
         </View>
@@ -84,13 +160,48 @@ const ChatScreen = () => {
     );
   }
 
+  const onDelete = async(messageIdToDelete) => {
+    setMessages((previousMessages)=>
+      previousMessages.filter(messages => messages._id !== messageIdToDelete )
+    );
+    const deleteMess = await message.deleteMessage(chatId,messageIdToDelete,token);
+    console.log(deleteMess.data.data);
+    const messDelete = deleteMess.data.data;
+    socket.current?.emit('deleteMessage', {
+      _id: messDelete._id,
+      userId: messDelete.user,
+    });
+  }
+  
+  const onLongPress = (context, message) =>{
+    console.log( message);
+    const options = ['copy','Delete Message', 'Cancel'];
+    const cancelButtonIndex = options.length - 1;
+    context.actionSheet().showActionSheetWithOptions({
+        options,
+        cancelButtonIndex
+    }, (buttonIndex) => {
+        switch (buttonIndex) {
+            case 0:
+                Clipboard.setString(message.text);
+                break;
+            case 1:
+                console.log("delete");
+                onDelete(message._id);
+                break;
+        }
+    });
+
+  }
   return (
     <GiftedChat
       messages={messages}
-      onSend={(messages) => onSend(messages)}
+      onSend={onSend}
       user={{
-        _id: 1,
-      }}
+        _id: senderId,
+        name: user.username
+      }}      
+      onLongPress={onLongPress}
       renderBubble={renderBubble}
       alwaysShowSend
       renderSend={renderSend}
@@ -108,4 +219,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  
 });
