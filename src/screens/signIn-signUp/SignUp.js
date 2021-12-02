@@ -11,7 +11,7 @@ import { registerActions } from '../../redux/actions';
 import { auth } from '../../apis';
 import { stacks } from '../../constants/title';
 import Toast from 'react-native-root-toast';
-
+import {API_URL} from '../../configs';
 const SignUp = () => {
   const navigation = useNavigation();
   const route = useRoute();
@@ -161,7 +161,7 @@ const SignUp = () => {
     } = data;
     
     dispatch(registerActions.registerRequest());
-
+    console.log(API_URL);
     auth.register(phonenumber, username, password)
         .then(user => {
             console.log(user);
