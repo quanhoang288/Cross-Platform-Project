@@ -1,6 +1,6 @@
 const uploading = () => {
     return {
-        type: 'UPLOADING'
+        type: 'UPLOADING',
     };
 };
 

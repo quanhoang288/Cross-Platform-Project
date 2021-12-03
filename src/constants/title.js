@@ -1,4 +1,5 @@
 export const stacks = {
+    tabs: {name: 'Tabs'},
     home: {name: 'Home', title: 'Home'},
     createPost: {name: 'CreatePost', title: 'Add a new post'},
     newsFeed: {name: 'Newsfeed', title: 'Newsfeed'},

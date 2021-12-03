@@ -5,25 +5,24 @@ const initialState = {
 };
 
 
-export default uploadReducer = (state=initialState, action) => {
+export default uploadReducer = (state = initialState, action) => {
     switch (action.type) {
         case 'UPLOADING':
+            console.log('uploading');
             return {
-                ...state,
+                ...initialState, 
                 uploading: true
-            };
+            }
 
         case 'UPLOAD_SUCCESS':
             return {
-                ...state,
-                uploading: false,
+                ...initialState,
                 data: action.payload
             };
 
         case 'UPLOAD_FAILURE': 
             return {
-                uploading: false,
-                data: null,
+                ...initialState,
                 err: action.payload
             };
 

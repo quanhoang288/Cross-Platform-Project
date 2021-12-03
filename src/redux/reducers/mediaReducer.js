@@ -18,6 +18,7 @@ const removeAsset = (removedAsset, state) => {
 export default mediaReducer = (state = initialState, action) => {
     switch (action.type) {
         case 'ADD_ASSET':
+            console.log('adding');
             return {
                 ...state,
                 selectedAssets: addAsset(action.payload, state),

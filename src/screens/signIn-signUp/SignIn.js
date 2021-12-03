@@ -120,7 +120,7 @@ const SignIn = () =>{
                 token: userInfo.data.token
             }
             dispatch(authActions.loginSuccess(user));
-            navigation.navigate('Tabs');
+            navigation.navigate(stacks.tabs.name);
         })
         .catch(error => {
             if (error.response) {
