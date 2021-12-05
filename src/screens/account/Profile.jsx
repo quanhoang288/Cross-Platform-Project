@@ -58,69 +58,67 @@ const Profile = (props) => {
   }, [userId]);
 
   return (
-    <ScrollView showsHorizontalScrollIndicator={false}>
-      <View>
-        <ImageBackground
-          source={{
-            uri: "https://wallpaperaccess.com/full/317501.jpg",
-          }}
-          alt='This is cover image'
-          style={styles.cover}
-        >
-          <Icon
-            type='feather'
-            name='more-horizontal'
-            size={32}
-            style={{ marginRight: 6, marginTop: 6 }}
+    <View>
+      <ImageBackground
+        source={{
+          uri: "https://wallpaperaccess.com/full/317501.jpg",
+        }}
+        alt='This is cover image'
+        style={styles.cover}
+      >
+        <Icon
+          type='feather'
+          name='more-horizontal'
+          size={32}
+          style={{ marginRight: 6, marginTop: 6 }}
+        />
+      </ImageBackground>
+      <View style={styles.profileOutterContainer}>
+        <View style={styles.profileInnerContainer}>
+          <Avatar
+            rounded
+            size='large'
+            source={{
+              uri: "https://i.etsystatic.com/29282700/r/il/e3aae5/3152845862/il_340x270.3152845862_q44u.jpg",
+            }}
+            onPress={() => console.log("Pressed on avatar!")}
           />
-        </ImageBackground>
-        <View style={styles.profileOutterContainer}>
-          <View style={styles.profileInnerContainer}>
-            <Avatar
-              rounded
-              size='large'
-              source={{
-                uri: "https://i.etsystatic.com/29282700/r/il/e3aae5/3152845862/il_340x270.3152845862_q44u.jpg",
-              }}
-              onPress={() => console.log("Pressed on avatar!")}
-            />
-          </View>
         </View>
-        <Text style={styles.name}> Quân Hoàng </Text>
-
-        <View style={styles.buttonGroupContainer}>
-          <View style={styles.buttonGroup}>
-            <Button
-              title='Add friend'
-              icon={{
-                type: "ionicons",
-                name: "person-add",
-              }}
-            />
-            <Button
-              title='Message'
-              icon={{
-                type: "ant-design",
-                name: "message1",
-              }}
-            />
-          </View>
-        </View>
-
-        <TouchableOpacity>
-          <ListItem>
-            <Icon type='font-awesome-5' name='user-friends' />
-            <ListItem.Content>
-              <ListItem.Title>Friends</ListItem.Title>
-              <ListItem.Subtitle>177 friends</ListItem.Subtitle>
-            </ListItem.Content>
-            <ListItem.Chevron color='black' />
-          </ListItem>
-        </TouchableOpacity>
-
-        <PostList posts={posts} />
       </View>
-    </ScrollView>
+      <Text style={styles.name}> Quân Hoàng </Text>
+
+      <View style={styles.buttonGroupContainer}>
+        <View style={styles.buttonGroup}>
+          <Button
+            title='Add friend'
+            icon={{
+              type: "ionicons",
+              name: "person-add",
+            }}
+          />
+          <Button
+            title='Message'
+            icon={{
+              type: "ant-design",
+              name: "message1",
+            }}
+          />
+        </View>
+      </View>
+
+      <TouchableOpacity>
+        <ListItem>
+          <Icon type='font-awesome-5' name='user-friends' />
+          <ListItem.Content>
+            <ListItem.Title>Friends</ListItem.Title>
+            <ListItem.Subtitle>177 friends</ListItem.Subtitle>
+          </ListItem.Content>
+          <ListItem.Chevron color='black' />
+        </ListItem>
+      </TouchableOpacity>
+
+      <PostList posts={posts} />
+    </View>
   );
 };
 
