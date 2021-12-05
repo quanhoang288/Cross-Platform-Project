@@ -4,5 +4,5 @@ import * as like from './like';
 import * as comment from './comment';
 import * as friend from './friend';
 import * as message from './message';
-
-export { auth, post, like, comment, friend, message };
+import * as search from './search';
+export { auth, post, like, comment, friend, message, search };

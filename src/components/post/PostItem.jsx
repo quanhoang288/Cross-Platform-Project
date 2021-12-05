@@ -95,7 +95,7 @@ const PostItem = ({ post }) => {
             type='font-awesome'
             name={isLike ? "heart" : "heart-o"}
             size={28}
-            onPress={() => actionLike(post._id)}
+            onPress={actionLike}
             color={isLike ? "rgb(255, 0, 0)" : "rgb(0, 0, 0)"}
           />
           <Text style={styles.count}>{numLikes}</Text>

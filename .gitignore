@@ -15,3 +15,4 @@ web-build/
 package-lock.json
 .env
 .idea
+*files*
