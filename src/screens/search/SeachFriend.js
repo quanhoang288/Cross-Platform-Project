@@ -19,11 +19,15 @@ import {
 
 import { friend, search } from '../../apis';
 import { useSelector } from 'react-redux';
+import { useNavigation } from '@react-navigation/core';
+import { stacks } from '../../constants/title';
 
 const SearchFriend = () =>{
 
     // user
     const user = useSelector(state => state.auth.user);
+
+    const navigation = useNavigation();
 
     // valueInput and resultSearch
     const [value, setValue] = useState("");
@@ -49,23 +53,22 @@ const SearchFriend = () =>{
         handleSearch(value);
     }, [value]);
 
-    // status of friend
-    const [status, setStatus] = useState(false);
-
-    // API send friendRequest
-    const sendRequest = (userId) => {
-        // console.log("true");
-        friend.sendFriendRequest(userId, user.token)
-        .then(result => {
-            setStatus(true);
-            console.log(result.data);
-        })
-        .catch(error => {
-            console.log(error);
-        })
-    }
-
-
+    const _renderItem = ({item}) => (
+        <View>
+            <ListItem onPress={() => navigation.navigate(stacks.profile.name, {userId: item._id})}>
+                <Avatar 
+                    rounded size={40} 
+                    source={require('../../../assets/avatar2.jpg')} 
+                />
+                
+                <ListItem.Content>
+                    <ListItem.Title>
+                        <Text>{item.username}</Text>
+                    </ListItem.Title>
+                </ListItem.Content>
+            </ListItem>
+        </View>
+    )
 
     return(
         <SafeAreaView style={styles.container}>
@@ -79,35 +82,7 @@ const SearchFriend = () =>{
             />
             <FlatList data={listSuggestFriend}
                 keyExtractor={item => item._id}
-                renderItem={({item}) =>(
-                    <View>
-                        <ListItem>
-                            <Avatar 
-                                rounded size={40} 
-                                source={require('../../../assets/avatar2.jpg')} 
-                            />
-                            
-                            <ListItem.Content>
-                                <ListItem.Title>
-                                    <Text>{item.username}</Text>
-                                </ListItem.Title>
-                            </ListItem.Content>
-                            <TouchableOpacity>
-                                {/* <Button 
-                                    title="Send request" 
-                                    onPress = {() => sendRequest(item._id)}
-                                /> */}
-                                <Icon
-                                    name={status ? "checkcircleo": "adduser"}
-                                    type="antdesign"
-                                    size={32}
-                                    color={status ? "green": "black"}
-                                    onPress = {() => sendRequest(item._id)}
-                                />
-                            </TouchableOpacity>
-                        </ListItem>
-                    </View>
-                )}
+                renderItem={_renderItem}
             />
         </SafeAreaView>
     )
