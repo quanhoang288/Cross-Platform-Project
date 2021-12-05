@@ -88,7 +88,7 @@ InputText.propTypes = {
 };
 
 InputText.defaultProps = {
-    type: 'name'
+    type: 'name',
 };
 
 export default InputText;

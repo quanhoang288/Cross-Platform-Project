@@ -2,14 +2,12 @@ import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { stacks } from "../constants/title";
 import TabNavigator from "./TabNavigator";
-import { CreatePost, PostList, Comment } from "../screens/post";
+import { CreatePost, Comment, MediaPicker } from "../screens/post";
 import { Profile } from "../screens/account";
-import { Button, Icon } from "react-native-elements";
 import { ChangePW, PersonalInformation } from "../screens/advance";
 import { ListFriend, FriendRequest } from "../screens/listFriend";
 import { ChatScreen, MessageScreen, ChatSetting } from "../screens/message";
 import { SignIn, SignUp } from "../screens/signIn-signUp";
-import { ChatSettingButton } from "../components/headers/post";
 
 const Stack = createNativeStackNavigator();
 
@@ -38,19 +36,16 @@ const stackScreens = [
   {
     name: stacks.createPost.name,
     component: CreatePost,
+  },
+
+  {
+    name: stacks.mediaPicker.name,
+    component: MediaPicker,
     options: {
-      title: stacks.createPost.title,
-      headerRight: () => (
-        <Button
-          onPress={() => {}}
-          title="Save"
-          color="#fff"
-          buttonStyle={{ borderRadius: 10 }}
-          style={{ marginRight: 10 }}
-        />
-      ),
+      headerShown: false,
     },
   },
+
   {
     name: stacks.comment.name,
     component: Comment,

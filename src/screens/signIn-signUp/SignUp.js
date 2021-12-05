@@ -147,7 +147,6 @@ const SignUp = () => {
         phonenumber: credentials.phoneNumber,
         password: credentials.password,
       }
-
       register(data);
     }
 

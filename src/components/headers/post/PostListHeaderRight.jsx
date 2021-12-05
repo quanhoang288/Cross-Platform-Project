@@ -1,21 +1,21 @@
-import React from 'react';
-import { useNavigation } from '@react-navigation/native';
-import { stacks } from '../../../constants/title';
-import { Icon } from 'react-native-elements';
+import React from "react";
+import { useNavigation } from "@react-navigation/native";
+import { stacks } from "../../../constants/title";
+import { Icon } from "react-native-elements";
+import { TouchableOpacity } from "react-native";
 
-const PostListHeaderRight = props => {
-    const navigation = useNavigation();
+const PostListHeaderRight = (props) => {
+  const navigation = useNavigation();
 
-    return (
-        <Icon 
-            type='font-awesome' 
-            name='plus-square-o' 
-            size={36} 
-            style={{marginRight: 10}}
-            onPress={() => navigation.navigate(stacks.createPost.name)}
-        />
-    )
+  return (
+    <Icon
+      type='font-awesome'
+      name='plus-square-o'
+      size={36}
+      style={{ marginRight: 10 }}
+      onPress={() => navigation.navigate(stacks.createPost.name)}
+    />
+  );
 };
-
 
 export default PostListHeaderRight;

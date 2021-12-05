@@ -1,6 +1,6 @@
 import api from './api';
 
-const addPost = async(postData, token) => {
+const addPost = async (postData, token) => {
     const createResult = await api({
         method: 'POST',
         url: '/posts/create',
@@ -10,7 +10,7 @@ const addPost = async(postData, token) => {
     return createResult;
 }
 
-const getListPost = async(userId=null, token) => {
+const getListPost = async (userId = null, token) => {
     const url = userId ? `/posts/list?userId=${userId}` : '/posts/list';
     const listPost = await api({
         method: 'GET',
@@ -20,4 +20,23 @@ const getListPost = async(userId=null, token) => {
     return listPost;
 }
 
-export {addPost, getListPost};
+const getPost = async (postId, token) => {
+    const getResult = await api({
+        method: 'GET',
+        url: `/posts/show/${postId}`,
+        headers: { Authorization: `Bearer ${token}` }
+    });
+    return getResult;
+}
+
+const editPost = async (postId, postData, token) => {
+    const editResult = await api({
+        method: 'POST',
+        url: `/posts/edit/${postId}`,
+        data: postData,
+        headers: { Authorization: `Bearer ${token}` }
+    });
+    return editResult;
+}
+
+export {addPost, editPost, getListPost, getPost};
