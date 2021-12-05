@@ -47,7 +47,7 @@ const MenuAdvance = () => {
         }}
         content="Friends"
         note="See your friends"
-        onPress={() => navigation.navigate(stacks.listFriend.name)}
+        onPress={() => navigation.navigate(stacks.friendTabs.name)}
 
       />
 

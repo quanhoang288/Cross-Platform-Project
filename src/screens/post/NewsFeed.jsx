@@ -17,12 +17,10 @@ import { DEVICE_HEIGHT, DEVICE_WIDTH } from "../../constants/dimensions";
 const NewsFeed = (props) => {
   const [progressVal, setProgressVal] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
-  const uploadStatus = useSelector((state) => {
-    console.log("upload status");
-    return state.upload;
-  });
+  const uploadStatus = useSelector((state) => state.upload);
   const user = useSelector((state) => state.auth.user);
 
+  const dispatch = useDispatch();
   const navigation = useNavigation();
 
   // API getPosts

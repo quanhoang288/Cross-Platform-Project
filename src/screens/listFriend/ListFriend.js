@@ -37,6 +37,7 @@ const ListFriend = () =>{
               avatar={{
                 source:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWx8bMzJMOdeGAEPuEkV3SVhHS6LwUaxVpCy7f3D95lDl8WVRlOewHb3_2QwnNUbPJFDY&usqp=CAU",
               }}
+              userId={friend._id}
               title={friend.username}
               displayButtonAdvance={true}
             />
