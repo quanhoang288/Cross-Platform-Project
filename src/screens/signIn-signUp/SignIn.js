@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Image, Text } from 'react-native-elements';
 import { View, StyleSheet, StatusBar, Platform } from 'react-native';
@@ -10,7 +10,7 @@ import { useNavigation, useRoute } from '@react-navigation/core';
 import { useDispatch, useSelector } from 'react-redux';
 import { authActions } from '../../redux/actions';
 import { auth } from '../../apis';
-import Toast from 'react-native-root-toast';
+import { Toast } from '../../helpers';
 
 const SignIn = () =>{
   const navigation = useNavigation();
@@ -20,28 +20,16 @@ const SignIn = () =>{
   const register = useSelector(state => state.register);
   const authState = useSelector(state => state.auth);
 
+  const passwordRef = useRef();
+
   useEffect(() => {
     if (register.registered && route.name === stacks.signIn.name) {
 
       if (Platform.OS === 'web') {
         window.alert('Registered successfully!');
       } else {
-        const toast = Toast.show('Registered successfully!', {
-          duration: Toast.durations.LONG,
-          position: Toast.positions.TOP + 10,
-          backgroundColor: '#12D687',
-          shadow: true,
-          animation: true,
-          hideOnPress: true,
-          delay: 0,
-        });
-    
-        setTimeout(() => {
-          Toast.hide(toast);
-        }, 2000);
+        Toast.showSucessMessage('Registered successfully!');
       }
-  
-  
     }
   }, [register]);
 
@@ -50,19 +38,7 @@ const SignIn = () =>{
       if (Platform.OS === 'web') {
         window.alert(authState.error.message);
       } else {
-        const toast = Toast.show(authState.error.message, {
-          duration: Toast.durations.LONG,
-          position: Toast.positions.TOP + 10,
-          backgroundColor: '#F2353B',
-          shadow: true,
-          animation: true,
-          hideOnPress: true,
-          delay: 0,
-        });
-    
-        setTimeout(() => {
-          Toast.hide(toast);
-        }, 2000);
+        Toast.showFailureMessage(authState.error.message);
       }
       
       dispatch(authActions.resetState());
@@ -129,7 +105,6 @@ const SignIn = () =>{
     if(isValidInput(data)) {
       login(data);
     }
-    // navigation.navigate("Tabs");
   }
 
   const login = (data) => {
@@ -145,7 +120,7 @@ const SignIn = () =>{
                 token: userInfo.data.token
             }
             dispatch(authActions.loginSuccess(user));
-            navigation.navigate('Tabs');
+            navigation.navigate(stacks.tabs.name);
         })
         .catch(error => {
             if (error.response) {
@@ -160,16 +135,15 @@ const SignIn = () =>{
         source={require('../../../assets/favicon.png')}
         style={{
           width: DEVICE_WIDTH*7/10,
-          height: DEVICE_HEIGHT*3/5,
+          height: DEVICE_HEIGHT/5,
           minHeight: 100,
           minWidth: 100,
           maxHeight: 200,
           maxWidth: 200,
-          margin: 16,
+          resizeMode: 'contain'
         }}
         containerStyle={{
-          // marginVertical: '15%',
-          // marginHorizontal: '20%',
+          marginBottom: 20
         }}
       />
       <InputText 

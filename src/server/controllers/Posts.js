@@ -232,7 +232,9 @@ postsController.list = async (req, res, next) => {
             // get Post of one user
             posts = await PostModel.find({
                 author: req.query.userId
-            }).populate('images', ['fileName']).populate('videos', ['fileName']).populate({
+            })
+            .sort({createdAt: 'desc'})
+            .populate('images', ['fileName']).populate('videos', ['fileName']).populate({
                 path: 'author',
                 select: '_id username phonenumber avatar',
                 model: 'Users',
@@ -264,11 +266,12 @@ postsController.list = async (req, res, next) => {
                 }
             }
             listIdFriends.push(userId);
-            console.log(listIdFriends);
             // get post of friends of 1 user
             posts = await PostModel.find({
                 "author": listIdFriends
-            }).populate('images', ['fileName']).populate('videos', ['fileName']).populate({
+            })
+            .sort({createdAt: 'desc'})
+            .populate('images', ['fileName']).populate('videos', ['fileName']).populate({
                 path: 'author',
                 select: '_id username phonenumber avatar',
                 model: 'Users',

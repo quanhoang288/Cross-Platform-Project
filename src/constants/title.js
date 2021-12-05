@@ -1,4 +1,5 @@
 export const stacks = {
+    tabs: {name: 'Tabs'},
     home: {name: 'Home', title: 'Home'},
     createPost: {name: 'CreatePost', title: 'Add a new post'},
     newsFeed: {name: 'Newsfeed', title: 'Newsfeed'},
@@ -17,5 +18,6 @@ export const stacks = {
     searchFriend: {name: 'search', title:'Search'},
     messageScreen: {name: 'message', title:'Message'},
     chatSetting: {name: 'setting', title:'Chat Setting'},
+    mediaPicker: {name: 'mediaPicker', title: 'Media picker'},
 };
 
