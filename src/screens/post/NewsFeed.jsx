@@ -15,16 +15,15 @@ import ContentLoader, { Rect, Circle, Path } from "react-content-loader/native";
 import { DEVICE_HEIGHT, DEVICE_WIDTH } from "../../constants/dimensions";
 
 const NewsFeed = (props) => {
-  console.log("rerendering");
-
   const [progressVal, setProgressVal] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
-  const uploadStatus = useSelector((state) => state.upload);
+  const uploadStatus = useSelector((state) => {
+    console.log("upload status");
+    return state.upload;
+  });
   const user = useSelector((state) => state.auth.user);
 
   const navigation = useNavigation();
-
-  const dispatch = useDispatch();
 
   // API getPosts
   const [posts, setPosts] = useState([]);
@@ -39,6 +38,7 @@ const NewsFeed = (props) => {
   };
 
   useEffect(() => {
+    console.log("fetching posts");
     fetchPosts();
   }, []);
 
@@ -48,35 +48,35 @@ const NewsFeed = (props) => {
     }
   }, [user]);
 
-  // useEffect(() => {
-  //   if (uploadStatus.uploading) {
-  //     setProgressVal(progressVal + 0.1);
-  //   }
-  //   if (uploadStatus.data) {
-  //     setProgressVal(1);
+  useEffect(() => {
+    if (uploadStatus.uploading) {
+      setProgressVal(progressVal + 0.1);
+    }
+    if (uploadStatus.data) {
+      setProgressVal(1);
 
-  //     const postData = uploadStatus.data;
-  //     if (posts.findIndex((post) => post._id === postData._id) !== -1) {
-  //       Toast.showSucessMessage(successMessages.updatePostSuccess);
-  //       setPosts(
-  //         posts.map((post) => (post._id === postData._id ? postData : post))
-  //       );
-  //     } else {
-  //       Toast.showSucessMessage(successMessages.createPostSuccess);
-  //       setPosts([postData, ...posts]);
-  //       dispatch(uploadActions.resetState());
-  //     }
+      const postData = uploadStatus.data;
+      if (posts.findIndex((post) => post._id === postData._id) !== -1) {
+        Toast.showSucessMessage(successMessages.updatePostSuccess);
+        setPosts(
+          posts.map((post) => (post._id === postData._id ? postData : post))
+        );
+      } else {
+        Toast.showSucessMessage(successMessages.createPostSuccess);
+        setPosts([postData, ...posts]);
+        dispatch(uploadActions.resetState());
+      }
 
-  //     dispatch(uploadActions.resetState());
-  //   } else if (uploadStatus.err) {
-  //     Toast.showFailureMessage(uploadStatus.err);
-  //   }
-  // }, [uploadStatus]);
+      dispatch(uploadActions.resetState());
+    } else if (uploadStatus.err) {
+      Toast.showFailureMessage(uploadStatus.err);
+    }
+  }, [uploadStatus]);
 
   useEffect(() => {
     if (progressVal > 0 && progressVal < 1) {
       setTimeout(() => {
-        setProgressVal(Math.max(progressVal + 0.1, 0.9));
+        setProgressVal((prev) => Math.max(prev + 0.1, 0.9));
       }, 1000);
     }
   }, [progressVal]);
@@ -127,13 +127,13 @@ const NewsFeed = (props) => {
 
   return (
     <View>
-      {/* {uploadStatus.uploading && (
+      {uploadStatus.uploading && (
         <LinearProgress
           value={progressVal}
           color='white'
           trackColor='#2eb0fb'
         />
-      )} */}
+      )}
       <PostList
         refreshing={refreshing}
         handleRefresh={handleRefresh}

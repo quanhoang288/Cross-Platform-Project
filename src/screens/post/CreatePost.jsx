@@ -24,14 +24,13 @@ const CreatePost = () => {
 
   const user = useSelector((state) => state.auth.user);
   const navigation = useNavigation();
+  const route = useRoute();
 
   useEffect(() => {
     if (!user) {
       navigation.navigate(stacks.signIn.name);
     }
   }, [user]);
-
-  const route = useRoute();
 
   useEffect(() => {
     navigation.setOptions({
@@ -107,10 +106,8 @@ const CreatePost = () => {
   };
 
   const handleSave = async () => {
-    console.log("saving");
-    dispatch(uploadActions.resetState());
+    dispatch(uploadActions.uploading());
     dispatch(mediaActions.resetState());
-
     navigation.navigate(stacks.tabs.name);
 
     const now = new Date().getTime() / 1000;

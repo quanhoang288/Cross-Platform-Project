@@ -8,11 +8,10 @@ const initialState = {
 export default uploadReducer = (state = initialState, action) => {
     switch (action.type) {
         case 'UPLOADING':
-            console.log('uploading');
             return {
                 ...initialState, 
                 uploading: true
-            }
+            };
 
         case 'UPLOAD_SUCCESS':
             return {
