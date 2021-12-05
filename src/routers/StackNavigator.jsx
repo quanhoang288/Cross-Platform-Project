@@ -5,9 +5,14 @@ import TabNavigator from "./TabNavigator";
 import { CreatePost, Comment, MediaPicker } from "../screens/post";
 import { Profile } from "../screens/account";
 import { ChangePW, PersonalInformation } from "../screens/advance";
-import { ListFriend, FriendRequest } from "../screens/listFriend";
+import {
+  ListFriend,
+  FriendRequest,
+  FriendTabView,
+} from "../screens/listFriend";
 import { ChatScreen, MessageScreen, ChatSetting } from "../screens/message";
 import { SignIn, SignUp } from "../screens/signIn-signUp";
+import { CustomTabView } from "../components/common";
 
 const Stack = createNativeStackNavigator();
 
@@ -107,6 +112,13 @@ const stackScreens = [
   {
     name: stacks.chatSetting.name,
     component: ChatSetting,
+  },
+  {
+    name: stacks.friendTabs.name,
+    component: FriendTabView,
+    options: {
+      title: stacks.friendTabs.title,
+    },
   },
 ];
 

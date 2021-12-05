@@ -19,5 +19,6 @@ export const stacks = {
     messageScreen: {name: 'message', title:'Message'},
     chatSetting: {name: 'setting', title:'Chat Setting'},
     mediaPicker: {name: 'mediaPicker', title: 'Media picker'},
+    friendTabs: {name: 'friendTabs', title: 'Friends'},
 };
 
