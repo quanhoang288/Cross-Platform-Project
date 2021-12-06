@@ -120,7 +120,8 @@ const SignIn = () =>{
                 token: userInfo.data.token
             }
             dispatch(authActions.loginSuccess(user));
-            navigation.navigate(stacks.tabs.name);
+            setCredential({phoneNumber: "", password: ""})
+            navigation.navigate('Tabs');
         })
         .catch(error => {
             if (error.response) {

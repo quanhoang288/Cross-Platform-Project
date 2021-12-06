@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { View, StyleSheet, ScrollView } from 'react-native';
-import ProfileItem from '../../components/account/ProfileItem.jsx'
+import ProfileItem from '../../components/account/ProfileItem.jsx';
 import { friend } from '../../apis';
 import { useSelector } from 'react-redux';
 
 
 const ListFriend = () =>{
-
     // user 
     const user = useSelector(state => state.auth.user);
 
@@ -40,6 +39,7 @@ const ListFriend = () =>{
               userId={friend._id}
               title={friend.username}
               displayButtonAdvance={true}
+
             />
           ))}
         </View>

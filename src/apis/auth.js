@@ -18,4 +18,34 @@ const register = async (phonenumber, username, password) => {
     return registerInfo
 }
 
-export { login, register };
+const changePassword = async(currentPassword, newPassword,token) => {
+  const password = await api({
+    method: "POST",
+    url: 'users/change-password',
+    data: {currentPassword, newPassword},
+    headers: { Authorization: `Bearer ${token}` }
+  })
+  return password;
+}
+
+const editInformation = async(userInfo, token) =>{
+
+  // const {
+  //   username,
+  //   gender,
+  //   birthday,
+  //   address,
+  // } = userInfo;
+
+  const newInformation = await api({
+    method: "POST",
+    url: 'users/edit',
+    data: userInfo,
+    headers: { Authorization: `Bearer ${token}` }
+  })
+  return newInformation;
+}
+
+export { login, register, changePassword };
+
+
