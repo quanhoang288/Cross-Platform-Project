@@ -7,8 +7,6 @@ import { errorMessages } from '../../constants/message';
 import { auth } from '../../apis';
 import { useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/core';
-import { stacks } from '../../constants/title';
-// import { stacks } from '../constants/title';
 
 const ChangePW = () =>{
 

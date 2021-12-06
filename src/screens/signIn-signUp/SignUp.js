@@ -31,7 +31,7 @@ const SignUp = () => {
     phoneNumber: null, 
     password: null,
     confirmPassword: null,
-  })
+  });
 
   const [isSignUpButtonClicked, setSignUpButtonClicked] = useState(false);
   const registerState = useSelector(state => state.register);
@@ -126,7 +126,7 @@ const SignUp = () => {
     const checkPassword = isValidPassword(data.password);
     const checkConfirmPassword = isValidConfirmPassword(data.confirmPassword);
 
-    console.log(checkUserName);
+    // console.log(checkUserName);
 
     setErrors({
       ...errors,

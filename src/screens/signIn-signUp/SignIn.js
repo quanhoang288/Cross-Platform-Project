@@ -120,7 +120,8 @@ const SignIn = () =>{
                 token: userInfo.data.token
             }
             dispatch(authActions.loginSuccess(user));
-            setCredential({phoneNumber: "", password: ""})
+            setCredential({phoneNumber: "", password: ""});
+            setSignInButtonClicked(false);
             navigation.navigate('Tabs');
         })
         .catch(error => {

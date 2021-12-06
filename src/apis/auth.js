@@ -18,6 +18,16 @@ const register = async (phonenumber, username, password) => {
     return registerInfo
 }
 
+const showInfo = async(userId=null, token) => {
+  const url = userId ? `/users/show/${userId}` : '/users/show';
+  const userInfo = await api({
+    method: 'GET',
+    url: url,
+    headers: { Authorization: `Bearer ${token}` }
+  })
+  return userInfo;
+}
+
 const changePassword = async(currentPassword, newPassword,token) => {
   const password = await api({
     method: "POST",
@@ -28,7 +38,7 @@ const changePassword = async(currentPassword, newPassword,token) => {
   return password;
 }
 
-const editInformation = async(userInfo, token) =>{
+const editInfo = async(userInfo, token) =>{
 
   // const {
   //   username,
@@ -37,15 +47,15 @@ const editInformation = async(userInfo, token) =>{
   //   address,
   // } = userInfo;
 
-  const newInformation = await api({
+  const newInfo = await api({
     method: "POST",
     url: 'users/edit',
     data: userInfo,
     headers: { Authorization: `Bearer ${token}` }
   })
-  return newInformation;
+  return newInfo;
 }
 
-export { login, register, changePassword };
+export { login, register, showInfo, changePassword, editInfo };
 
 

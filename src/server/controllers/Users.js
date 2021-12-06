@@ -177,6 +177,7 @@ usersController.edit = async (req, res, next) => {
             }
         }
 
+        console.log(dataUserUpdate);
 
         user = await UserModel.findOneAndUpdate({_id: userId}, dataUserUpdate, {
             new: true,
@@ -191,6 +192,7 @@ usersController.edit = async (req, res, next) => {
             data: user
         });
     } catch (e) {
+        console.log(e);
         return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
             message: e.message
         });
@@ -258,7 +260,7 @@ usersController.show = async (req, res, next) => {
             userId = req.userId;
         }
 
-        let user = await UserModel.findById(userId).select('phonenumber username gender birthday avatar cover_image blocked_inbox blocked_diary').populate('avatar').populate('cover_image');
+        let user = await UserModel.findById(userId).select('phonenumber username gender birthday avatar address cover_image blocked_inbox blocked_diary').populate('avatar').populate('cover_image');
         if (user == null) {
             return res.status(httpStatus.NOT_FOUND).json({message: "Can not find user"});
         }
