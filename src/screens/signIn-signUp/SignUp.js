@@ -12,6 +12,7 @@ import { auth } from '../../apis';
 import { stacks } from '../../constants/title';
 import Toast from 'react-native-root-toast';
 import {API_URL} from '../../configs';
+import { showFailureMessage } from '../../helpers/Toast';
 const SignUp = () => {
   const navigation = useNavigation();
   const route = useRoute();
@@ -48,19 +49,7 @@ const SignUp = () => {
       if (Platform.OS === 'web') {
         window.alert(registerState.error.message);
       } else {
-        const toast = Toast.show(registerState.error.message, {
-          duration: Toast.durations.LONG,
-          position: Toast.positions.TOP + 10,
-          backgroundColor: '#F2353B',
-          shadow: true,
-          animation: true,
-          hideOnPress: true,
-          delay: 0,
-        });
-    
-        setTimeout(() => {
-          Toast.hide(toast);
-        }, 2000);
+        showFailureMessage(registerState.error.message);
       }
       
       dispatch(registerActions.resetState());
@@ -163,7 +152,7 @@ const SignUp = () => {
     console.log(API_URL);
     auth.register(phonenumber, username, password)
         .then(user => {
-            console.log(user);
+            // console.log(user);
             dispatch(registerActions.registerSuccess());
             navigation.navigate(stacks.signIn.name);
         })

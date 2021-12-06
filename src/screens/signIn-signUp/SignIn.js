@@ -28,7 +28,7 @@ const SignIn = () =>{
       if (Platform.OS === 'web') {
         window.alert('Registered successfully!');
       } else {
-        Toast.showSucessMessage('Registered successfully!');
+        Toast.showSuccessMessage('Registered successfully!');
       }
     }
   }, [register]);
