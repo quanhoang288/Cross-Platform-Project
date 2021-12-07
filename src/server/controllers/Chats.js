@@ -10,78 +10,52 @@ const { isValidId } = require("../utils/validateIdString");
 const chatController = {};
 chatController.send = async (req, res, next) => {
     try {
-        let userId = req.userId;
+        const userId = req.userId;
         const {
-            name,
-            chatId,
-            receivedId,
-            member,
-            type,
+            receivedId,           
             content
         } = req.body;
-        let chatIdSend = null;
-        let chat;
-        if (type === PRIVATE_CHAT) {
-            if (chatId) {
-                console.log(chatId);
-                chat = await ChatModel.findById(chatId);
-                if (chat !== null) {
-                    chatIdSend = chat._id;
-                }
-            } else {
-                chat = new ChatModel({
-                   type: PRIVATE_CHAT,
-                   member: [
-                       receivedId,
-                       userId
-                   ]
-                });
-                await chat.save();
-                chatIdSend = chat._id;
-            }
-        } else if (type === GROUP_CHAT) {
-            if (chatId) {
-                chat = await ChatModel.findById(chatId);
-                if (chat !== null) {
-                    chatIdSend = chat._id;
-                }
-            } else {
-                chat = new ChatModel({
-                    type: GROUP_CHAT,
-                    member: member
-                });
-                await chat.save();
-                chatIdSend = chat._id;
-            }
-        }
-        if (chatIdSend) {
-            if (content) {
-                let message = new MessagesModel({
-                    chat: chatIdSend,
-                    user: userId,
-                    content: content
-                });
-                await message.save();
-                let messageNew = await MessagesModel.findById(message._id).populate('chat').populate('user');
-                return res.status(httpStatus.OK).json({
-                    data: messageNew
-                });
-            } else {
-                return res.status(httpStatus.OK).json({
-                    data: chat,
-                    message: 'Create chat success',
-                    response: 'CREATE_CHAT_SUCCESS'
-                });
-            }
+
+        let chatId;
+        
+        const existingChat = await ChatModel.findOne({member: [userId, receivedId]});
+
+        if (existingChat) {
+            chatId = existingChat._id;
         } else {
-            return res.status(httpStatus.BAD_REQUEST).json({
-                message: 'Not chat'
-            });
+            const newChat = new ChatModel({
+                type: PRIVATE_CHAT,
+                member: [
+                    userId, 
+                    receivedId
+                ]
+             });
+            const savedChat = await newChat.save();
+            chatId = savedChat._id;
         }
 
+        if (content) {
+            let message = new MessagesModel({
+                chat: chatId,
+                user: userId,
+                content: content
+            });
+            await message.save();
+            const savedMessage = await MessagesModel.findById(message._id).populate('chat').populate('user');
+            console.log(savedMessage);
+
+            return res.status(httpStatus.CREATED).json({
+                data: savedMessage
+            });
+        } else {
+            return res.status(httpStatus.BAD_REQUEST).json({
+                message: 'Content must not be empty'
+            });
+        }
     } catch (e) {
+        console.error(e.message)
         return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-            message: e.message
+            message: 'Error sending message'
         });
     }
 }
@@ -117,8 +91,8 @@ chatController.getChats = async (req, res, next) => {
             return {
                 ...chat.toObject(),
                 latestMessage: {
-                    content: latestMessage.content,
-                    createdAt: latestMessage.createdAt
+                    content: latestMessage ? latestMessage.content : null,
+                    createdAt: latestMessage ? latestMessage.createdAt : null
                 }
             };
         });
@@ -127,23 +101,62 @@ chatController.getChats = async (req, res, next) => {
             data: chatsWithLatestMessage
         });
     } catch (e) {
+        console.error(e.message)
         return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-            message: e.message
+            message: 'Error getting chats'
         });
     }
 }
 
 chatController.getMessages = async (req, res, next) => {
+    let queryChatId, messages;
+    const userId = req.userId;
+
+    const {otherUserId, chatId} = req.query;
+
+    
+    if (!otherUserId && !chatId) {
+        return res.status(httpStatus.BAD_REQUEST).json({
+            message: 'Other user id or chat id must be provided'
+        });
+    }
+
+    if (otherUserId && !isValidId(otherUserId)) {
+        return res.status(httpStatus.BAD_REQUEST).json({
+            message: 'Invalid other user id provided'
+        })
+    }
+
+    if (chatId && !isValidId(chatId)) {
+        return res.status(httpStatus.BAD_REQUEST).json({
+            message: 'Invalid chat id provided'
+        })
+    }
+
     try {
-        let messages = await MessagesModel.find({
-            chat: req.params.chatId
+        if (otherUserId) {
+            const existingChat = await ChatModel.findOne({member: [userId, otherUserId]});
+            if (!existingChat) {
+                return res.status(httpStatus.NOT_FOUND).json({
+                    message: 'Chat does not exist between 2 users'
+                });
+            }
+            queryChatId = existingChat._id;
+        } else if (chatId) {
+            queryChatId = req.params.chatId;
+        }
+
+        messages = await MessagesModel.find({
+            chat: queryChatId
         }).populate('user');
+
         return res.status(httpStatus.OK).json({
             data: messages
         });
     } catch (e) {
+        console.error(e.message)
         return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-            message: e.message
+            message: 'Error getting messages'
         });
     }
 }
@@ -179,12 +192,19 @@ chatController.deleteMessage = async (req, res, next) => {
         }
 
         const deletedMessage = await MessagesModel.findByIdAndDelete(messageId);
+        
+        const numOfMessages = await MessagesModel.find({chat: chat._id}).count();
+        if (numOfMessages === 0) {
+            await ChatModel.findByIdAndDelete(chat._id);
+        }
+
         return res.status(httpStatus.OK).json({
             data: deletedMessage
         });
     } catch (e) {
+        console.error(e.message);
         return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-            message: e.message
+            message: 'Error deleting message'
         });
     }
 }
@@ -223,8 +243,9 @@ chatController.deleteChat = async (req, res, next) => {
             data: deletedChat
         });
     } catch (e) {
+        console.error(e.message);
         return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-            message: e.message
+            message: 'Error deleting chat'
         });
     }
 } 
