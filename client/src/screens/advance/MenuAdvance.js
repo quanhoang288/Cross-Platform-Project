@@ -5,10 +5,13 @@ import { View, StyleSheet } from 'react-native';
 import { FunctionalityItem } from '../../components/block';
 import { useNavigation } from '@react-navigation/core';
 import { stacks } from '../../constants/title';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { authActions } from '../../redux/actions';
 
 const MenuAdvance = () => {
+  // user
+  const user = useSelector(state => state.auth.user);
+  // console.log(user);
 
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -27,7 +30,9 @@ const MenuAdvance = () => {
         }}
         content="User profile"
         note="View your personal posts and images"
-        onPress={() => navigation.navigate(stacks.profile.name)}
+        onPress={() => navigation.navigate(stacks.profile.name, {
+          userId: user.id,
+        })}
       />
 
       <FunctionalityItem
@@ -47,7 +52,9 @@ const MenuAdvance = () => {
         }}
         content="Friends"
         note="See your friends"
-        onPress={() => navigation.navigate(stacks.friendTabs.name)}
+        onPress={() => navigation.navigate(stacks.friendTabs.name, {
+          userId: user.id,
+        })}
 
       />
 

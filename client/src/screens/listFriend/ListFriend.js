@@ -4,16 +4,22 @@ import { View, StyleSheet, ScrollView } from 'react-native';
 import ProfileItem from '../../components/account/ProfileItem.jsx';
 import { friend } from '../../apis';
 import { useSelector } from 'react-redux';
+import { useRoute } from '@react-navigation/native';
 
 
 const ListFriend = () =>{
     // user 
     const user = useSelector(state => state.auth.user);
+    
+
+    const route = useRoute();
+    const [userId, setUserId] = useState(null);
+    if(route.params.userId !== user.id) setUserId(route.params.userId);
 
     // API getListFriend
     const [listFriend, setListFriend] = useState([]);
     useEffect(() => {
-        friend.getListFriends(null, user.token)
+        friend.getListFriends(userId, user.token)
         .then(result => {
             
             // render
