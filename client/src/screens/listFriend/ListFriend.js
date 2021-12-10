@@ -4,32 +4,33 @@ import { View, StyleSheet, ScrollView } from 'react-native';
 import ProfileItem from '../../components/account/ProfileItem.jsx';
 import { friend } from '../../apis';
 import { useSelector } from 'react-redux';
-import { useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { stacks } from '../../constants/title.js';
 
 
 const ListFriend = () =>{
     // user 
     const user = useSelector(state => state.auth.user);
-    
+    const navigation = useNavigation();
 
     const route = useRoute();
-    const [userId, setUserId] = useState(null);
-    if(route.params.userId !== user.id) setUserId(route.params.userId);
+    const [userId, setUserId] = useState((route.params && route.params.userId) ? route.params.userId : null);
 
     // API getListFriend
     const [listFriend, setListFriend] = useState([]);
-    useEffect(() => {
+    useEffect( () => {
         friend.getListFriends(userId, user.token)
         .then(result => {
-            
             // render
             const curListFr = result.data.data.friends;
             setListFriend(curListFr);
         })
-        .catch(error => {
-          console.log(error);
-        })
-    }, [])
+        .catch(error => {console.log(error);})
+    }, [userId]);
+
+    const navigate = (userId) => navigation.navigate(stacks.profile.name, {
+      userId: userId,
+    });
 
   return(
     <>
@@ -45,7 +46,7 @@ const ListFriend = () =>{
               userId={friend._id}
               title={friend.username}
               displayButtonAdvance={true}
-
+              navigate={navigate}
             />
           ))}
         </View>

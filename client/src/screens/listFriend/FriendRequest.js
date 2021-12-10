@@ -4,11 +4,14 @@ import { View, StyleSheet, ScrollView } from 'react-native';
 import ProfileItem from '../../components/account/ProfileItem.jsx'
 import { friend } from '../../apis';
 import { useSelector } from 'react-redux';
+import { useNavigation } from '@react-navigation/native';
+import { stacks } from '../../constants/title.js';
 
 const FriendRequest = () =>{
 
     // user
     const user = useSelector(state => state.auth.user);
+    const navigation = useNavigation();
 
     // API getListFriendRequest
     const [listFriendRequests, setListFriendRequest] = useState([]);
@@ -23,6 +26,10 @@ const FriendRequest = () =>{
             console.log(error);
         })
     }, [])
+
+    const navigate = (userId) => navigation.navigate(stacks.profile.name, {
+      userId: userId,
+    });
 
     // API respond request
     const acceptRequest = (userId, is_accept) => {
@@ -59,6 +66,8 @@ const FriendRequest = () =>{
               displayDescription={true}
               time={request.createdAt}
               acceptRequest={acceptRequest}
+              userId={request._id}
+              navigate={navigate}
             />
           ))}
         </View>

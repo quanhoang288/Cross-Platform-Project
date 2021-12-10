@@ -28,129 +28,154 @@ const Profile = (props) => {
   const user = useSelector(state => state.auth.user);
   const route = useRoute();
   const [posts, setPosts] = useState([]);
-  const [userId, setUserId] = useState(route.params.userId);
   const [userInfo, setUserInfo] = useState({});
   const navigation = useNavigation();
 
-  // useEffect(() => {
-  //   if (route.params && route.params.userId) {
-  //     setUserId(route.params.userId);
-  //   }
-  // }, [route]);
+  // console.log("first");
+
+  const [isOwnProfile, setOwnProfile] = useState(true);
+
+  const fetchUserData = async (userId) => {
+    try {
+      const infoResult = await auth.showInfo(userId, user.token);
+      const postListResult = await post.getListPost(userId, user.token);
+
+      setUserInfo(infoResult.data.data); 
+      setPosts(postListResult.data.data);
+      
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   useEffect(() => {
-    auth.showInfo(userId, user.token)
-    .then(result => {
-      setUserInfo(result.data.data);
-    })
-    .catch(error => console.log(error))
-  }, [userId])
+    if (route.params && route.params.userId ){
+      setOwnProfile(false);
+    }
+  }, [route]);
 
-  useEffect(() => {
-    post
-      .getListPost(userId, user.token)
-      .then((result) => {
-        // console.log(result.data);
-        setPosts(result.data.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, [userId]);
+  useEffect(()=> {
+    const usedId = isOwnProfile ? user.id : route.params.userId;
+    fetchUserData(usedId);
+  }, [isOwnProfile])
 
-  return (
-    <ScrollView>
-      <ImageBackground
-        source={{
-          uri: "https://mondaycareer.com/wp-content/uploads/2020/11/background-%C4%91%E1%BA%B9p-2-1024x585.jpg",
-        }}
-        alt='This is cover image'
-        style={styles.cover}
-      />
-      <View style={styles.profileOutterContainer}>
-        <View style={styles.profileInnerContainer}>
-          <Avatar
-            rounded
-            size={100}
-            source={{
-              uri: "https://i.etsystatic.com/29282700/r/il/e3aae5/3152845862/il_340x270.3152845862_q44u.jpg",
-            }}
-            onPress={() => console.log("Pressed on avatar!")}
-          />
+  const getDate = (value) => {
+    let result = "";
+    let date = new Date(value);
+    result += `${ date.getDate()}/${date.getMonth()+1}/${date.getFullYear()} `
+    return result;
+  }
+
+  const ProfileHeader = () => {
+    return (
+      <>
+        <ImageBackground
+          source={{
+            uri: "https://mondaycareer.com/wp-content/uploads/2020/11/background-%C4%91%E1%BA%B9p-2-1024x585.jpg",
+          }}
+          alt='This is cover image'
+          style={styles.cover}
+        />
+        <View style={styles.profileOutterContainer}>
+          <View style={styles.profileInnerContainer}>
+            <Avatar
+              rounded
+              size={88}
+              source={{
+                uri: "https://i.etsystatic.com/29282700/r/il/e3aae5/3152845862/il_340x270.3152845862_q44u.jpg",
+              }}
+              onPress={() => console.log("Pressed on avatar!")}
+            />
+          </View>
         </View>
-      </View>
-      <Text style={styles.name}> {userInfo.username} </Text>
+        <Text style={styles.name}> {userInfo.username} </Text>
 
-      <View style={styles.buttonGroupContainer}>
-        <View style={styles.buttonGroup}>
-          <Button
-            buttonStyle={{
-              backgroundColor: user.id === userId ? "rgb(51, 133, 255)" : "rgb(230, 230, 230)",
-              borderRadius: 10,
-              width: "75%",
-              minWidth: 150,
-              marginHorizontal: 6
-            }}
-            
-            title= {user.id === userId ? "Add story" : 'Add friend'}
-            icon={{
-              type: user.id === userId ? "antdesign" : "ionicons",
-              name: user.id === userId ? "pluscircle" : "person-add",
-              color: user.id === userId ? "rgb(255,255,255)" : "rgb(0,0,0)",
-              size: 18,
-            }}
-            titleStyle={{
-              fontWeight: '200',
-              color: user.id === userId ? "rgb(255,255,255)" : "rgb(0,0,0)",
-            }}
-          />
+        <View style={styles.buttonGroupContainer}>
+          <View style={styles.buttonGroup}>
+            <Button
+              buttonStyle={{
+                backgroundColor: isOwnProfile ? "rgb(51, 133, 255)" : "rgb(230, 230, 230)",
+                borderRadius: 8,
+                width: "75%",
+                minWidth: 150,
+                padding: 6,
+                marginHorizontal: 6
+              }}
+              
+              title= {isOwnProfile ? "Add story" : 'Add friend'}
+              icon={{
+                type: isOwnProfile ? "antdesign" : "ionicons",
+                name: isOwnProfile ? "pluscircle" : "person-add",
+                color: isOwnProfile ? "rgb(255,255,255)" : "rgb(0,0,0)",
+                size: 18,
+              }}
+              titleStyle={{
+                fontWeight: '100',
+                color: isOwnProfile ? "rgb(255,255,255)" : "rgb(0,0,0)",
+              }}
+            />
 
-          <Button
-            buttonStyle={{
-              backgroundColor: user.id === userId ? "rgb(230, 230, 230)" : "rgb(51, 133, 255)",
-              borderRadius: 10,
-              minWidth: 150,
-              width: "75%",
-              marginHorizontal: 6
-            }}
-            title={ user.id === userId ? "Update Avatar " : 'Message'}
-            icon={{
-              type: user.id === userId ? "material-community" : "fontisto",
-              name: user.id === userId ? "update" : "messenger",
-              color: user.id === userId ? "rgb(0,0,0)" : "rgb(255,255,255)",
-              size: 18,
-            }}
-            titleStyle={{
-              fontWeight: '200',
-              color: user.id === userId ? "rgb(0,0,0)" : "rgb(255,255,255)",
-            }}
-          />
-          <Icon
-            type='feather'
-            name='more-horizontal'
-            size={32}
-            style={{ marginHorizontal: 6, marginTop: 6 }}
-            onPress={() => {}}
-          />
+            <Button
+              buttonStyle={{
+                backgroundColor: isOwnProfile ? "rgb(230, 230, 230)" : "rgb(51, 133, 255)",
+                borderRadius: 8,
+                minWidth: 150,
+                width: "75%",
+                padding: 6,
+                marginHorizontal: 6
+              }}
+              title={ isOwnProfile ? "Update Avatar " : 'Message'}
+              icon={{
+                type: isOwnProfile ? "material-community" : "fontisto",
+                name: isOwnProfile ? "update" : "messenger",
+                color: isOwnProfile ? "rgb(0,0,0)" : "rgb(255,255,255)",
+                size: 18,
+              }}
+              titleStyle={{
+                fontWeight: '100',
+                color: isOwnProfile ? "rgb(0,0,0)" : "rgb(255,255,255)",
+              }}
+            />
+            <Icon
+              type='feather'
+              name='more-horizontal'
+              size={16}
+              // style={{ marginHorizontal: 6, marginTop: 6, }}
+              containerStyle={{
+                backgroundColor: "rgb(230, 230, 230)", 
+                borderRadius: 8, 
+                justifyContent: "center", 
+                width: 40,
+                marginLeft: 6,
+                // padding: 6,
+              }}
+              onPress={() => {}}
+            />
+          </View>
         </View>
-      </View>
 
-      <View>
-        <ListItem containerStyle={{paddingVertical: 4}}>
-          <Icon type='antdesign' name='contacts' color="rgb(100,100,100)" size={26}/>
-          <ListItem.Content>
-            <ListItem.Title>{`Contact: ${userInfo.phonenumber}`}</ListItem.Title>
-          </ListItem.Content>
-        </ListItem>
+        <View>
+          <ListItem containerStyle={{paddingVertical: 6}}>
+            <Icon type='antdesign' name='contacts' color="rgb(100,100,100)" size={24}/>
+            <ListItem.Content>
+              <ListItem.Title>{`Contact: ${userInfo.phonenumber}`}</ListItem.Title>
+            </ListItem.Content>
+          </ListItem>
 
-        {userId === user.id &&
+          <ListItem containerStyle={{paddingVertical: 6}}>
+            <Icon type='font-awesome' name='birthday-cake' color="rgb(100,100,100)" size={24}/>
+            <ListItem.Content>
+              <ListItem.Title>{`Birthday: ${userInfo.birthday ? getDate(userInfo.birthday) : ""}`}</ListItem.Title>
+            </ListItem.Content>
+          </ListItem>
+
           <TouchableOpacity 
-            onPress={() => navigation.navigate(stacks.friendTabs.name, {
-              userId: userId,
+            onPress={() => navigation.navigate( isOwnProfile ? stacks.friendTabs.name : stacks.listFriend.name, {
+              userId: isOwnProfile ? userInfo.id : route.params.userId,
             })}
           >
-            <ListItem containerStyle={{paddingVertical: 4}}>
-              <Icon type='font-awesome-5' name='user-friends' color="rgb(100,100,100)" size={24}/>
+            <ListItem containerStyle={{paddingVertical: 6, marginBottom: 20}}>
+              <Icon type='font-awesome-5' name='user-friends' color="rgb(100,100,100)" size={20}/>
               <ListItem.Content>
                 <ListItem.Title >Friends</ListItem.Title>
                 <ListItem.Subtitle>{`20 friends`}</ListItem.Subtitle>
@@ -158,11 +183,13 @@ const Profile = (props) => {
               <ListItem.Chevron color='black' />
             </ListItem>
           </TouchableOpacity>
-        }
-      </View>
+        </View>
+      </>
+    )
+  }
 
-      <PostList posts={posts} />
-    </ScrollView>
+  return (
+      <PostList posts={posts} header={ProfileHeader}/>
   );
 };
 
@@ -172,7 +199,7 @@ const styles = StyleSheet.create({
   },
   cover: {
     width: DEVICE_WIDTH,
-    height: 256,
+    height: 180,
     alignItems: "flex-end",
   },
   profileOutterContainer: {
@@ -205,6 +232,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     // alignItems: 'center',
   },
+
 });
 
 Profile.propTypes = {};

@@ -20,7 +20,7 @@ const ProfileItem = (props) => {
   };
 
   return (
-    <ListItem bottomDivider onPress={() => {}}>
+    <ListItem bottomDivider onPress={() => props.navigate(props.userId)}>
       <Avatar rounded size={48} source={{ uri: props.avatar.source }}>
         {/* <Avatar.Accessory
           iconProps={{ name: 'add' }}
