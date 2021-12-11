@@ -1,83 +1,99 @@
-import api from './api';
+import api from "./api";
 
-const getMessages = async (chatId, token) => {
-    const getResult = await api({
-        method: 'GET',
-        url: `/chats/getMessages/${chatId}`,
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
-    });
-    return getResult;
-}
-
-const getChats = async (userId, token) =>{
-    const getList = await api({
-        method: 'GET',
-        url: `/chats/getChats/${userId}`,
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
-    });
-    return getList;
-}
-const deleteMessage = async (chatId, messageId, token) =>{
-    const messageDelete = {
-        messageId: messageId,
-        chatId: chatId,
-    };
-    const deleteMess = await api({
-        method: 'POST',
-        url: 'chats/deleteMessage',
-        data: messageDelete,
-        headers: {
-            'Authorization': `Bearer ${token}`
-        },
-       
-    });
-    return deleteMess;
+const getMessageByOtherUserId = async (receivedId, token) => {
+  const getResult = await api({
+    method: "GET",
+    url: `/chats/getMessages?otherUserId=${receivedId}`,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return getResult;
 };
 
-const deleteChat = async(chatId, token) =>{
-    const chatDelete ={
-        chatId: chatId,
-    }
-    const deleteC = await api({
-        method: 'POST',
-        url: 'chats/deleteChat',
-        data: chatDelete,
-        headers: {
-            'Authorization': `Bearer ${token}`
-        },
-    })
-    return deleteC;
-}
+const getChats = async ( token) => {
+  const getList = await api({
+    method: "GET",
+    url: `/chats/list`,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return getList;
+};
+const deleteMessage = async (chatId, messageId, token) => {
+  const messageDelete = {
+    messageId: messageId,
+    chatId: chatId,
+  };
+  console.log(messageDelete);
+  const deleteMess = await api({
+    method: "POST",
+    url: "chats/deleteMessage",
+    data: messageDelete,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return deleteMess;
+};
 
-const sendMessage = async (chatId, senderId, receiverId, msg, token) => {
-    const newMessage = {
-        receivedId: receiverId,
-        chatId: chatId,
-        member: [
-            {_id: senderId},
-            {_id: receiverId}
-        ],
-        content: msg,
-        type: "PRIVATE_CHAT"
-      };
+const deleteChat = async (chatId, token) => {
+  const chatDelete = {
+    chatId: chatId,
+  };
+  const deleteC = await api({
+    method: "POST",
+    url: "chats/deleteChat",
+    data: chatDelete,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return deleteC;
+};
 
-    
-    const sendResult = await api({
-        method: 'POST',
-        url: '/chats/send/',
-        data: newMessage,
-        headers: {
-        'Authorization': `Bearer ${token}`
-        }
-    });
+const sendMessage = async (receiverId, msg, token) => {
+  const newMessage = {
+    receivedId: receiverId,
+    content: msg,
+  };
 
-    return sendResult;
-}
+  const sendResult = await api({
+    method: "POST",
+    url: "/chats/send/",
+    data: newMessage,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
-export { getMessages, sendMessage, getChats, deleteMessage, deleteChat};
+  return sendResult;
+};
+const sendNewMessage = async (senderId, receiverId, msg, token) => {
+  const newMessage = {
+    receivedId: receiverId,
+    member: [{ _id: senderId }, { _id: receiverId }],
+    content: msg,
+    type: "PRIVATE_CHAT",
+  };
 
+  const sendResult = await api({
+    method: "POST",
+    url: "/chats/send/",
+    data: newMessage,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
+  return sendResult;
+};
+export {
+  getMessageByOtherUserId,
+  sendMessage,
+  getChats,
+  deleteMessage,
+  deleteChat,
+  sendNewMessage,
+};

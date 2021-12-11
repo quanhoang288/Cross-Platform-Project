@@ -10,7 +10,12 @@ import {
   FriendRequest,
   FriendTabView,
 } from "../screens/listFriend";
-import { ChatScreen, MessageScreen, ChatSetting } from "../screens/message";
+import {
+  ChatScreen,
+  MessageScreen,
+  ChatSetting,
+  NewMessage,
+} from "../screens/message";
 import { SignIn, SignUp } from "../screens/signIn-signUp";
 import { CustomTabView } from "../components/common";
 
@@ -118,6 +123,13 @@ const stackScreens = [
     component: FriendTabView,
     options: {
       title: stacks.friendTabs.title,
+    },
+  },
+  {
+    name: stacks.newMessage.name,
+    component: NewMessage,
+    options: {
+      headerShown: false,
     },
   },
 ];
