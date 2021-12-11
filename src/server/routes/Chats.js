@@ -11,7 +11,7 @@ chatsRoutes.post(
 );
 
 chatsRoutes.get(
-    "/getMessages/:chatId",
+    "/getMessages",
     auth,
     asyncWrapper(chatController.getMessages),
 );
