@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import { Modal, View, StyleSheet } from "react-native";
+import { Modal, View, StyleSheet, TouchableOpacity } from "react-native";
 import { Avatar, Button, Icon, Image, Text } from "react-native-elements";
 import { CarouselSwipe, CarouselTest } from "../common";
 import { useNavigation } from "@react-navigation/native";
@@ -10,6 +10,8 @@ import { showModal } from "../../redux/reducers/modalReducer";
 import { types } from "../../constants/modalTypes";
 import { like } from "../../apis";
 import { uploadActions } from "../../redux/actions";
+import { formatDate } from "../../helpers";
+import { MoreOrLessText } from "../common";
 
 const PostItem = ({ post }) => {
   const user = useSelector((state) => state.auth.user);
@@ -49,10 +51,23 @@ const PostItem = ({ post }) => {
             source={{
               uri: post.author.avatar.fileName,
             }}
+            onPress={() =>
+              navigation.navigate(stacks.profile.name, {
+                userId: post.author._id,
+              })
+            }
           />
           <View style={styles.nameTimeLine}>
-            <Text style={{ fontWeight: "bold" }}>{post.author.username}</Text>
-            <Text>{post.createdAt}</Text>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate(stacks.profile.name, {
+                  userId: post.author._id,
+                })
+              }
+            >
+              <Text style={{ fontWeight: "bold" }}>{post.author.username}</Text>
+            </TouchableOpacity>
+            <Text>{formatDate(post.createdAt)}</Text>
           </View>
         </View>
         <Icon
@@ -77,16 +92,11 @@ const PostItem = ({ post }) => {
       </View>
 
       <View style={styles.postContent}>
-        <Text style={styles.textContent}>{post.described}</Text>
-        {/* { content.imageURI && <Image
-                    source={{
-                        uri: content.imageURI,
-                    }}    
-                    alt="Post image"
-                    style={{height: 256, maxHeight: 256, width: '100%'}}
-                />
-                } */}
-        <CarouselSwipe />
+        <MoreOrLessText
+          content={post.described}
+          textStyle={styles.textContent}
+        />
+        <CarouselSwipe images={post.images} />
       </View>
 
       <View style={styles.iconGroup}>
@@ -149,8 +159,6 @@ const styles = StyleSheet.create({
   },
   iconGroup: {
     marginLeft: 6,
-    // width: "40%",
-    // justifyContent: "space-between",
     flexDirection: "row",
     marginBottom: 10,
   },

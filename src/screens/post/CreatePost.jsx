@@ -78,7 +78,7 @@ const CreatePost = () => {
     const assetPromises = assets.map((asset) => {
       const actions = [{ resize: { width: 200, height: 200 } }];
       const saveOptions = {
-        compress: 0.5,
+        compress: 0.9,
         base64: true,
       };
       return ImageManipulator.manipulateAsync(asset.uri, actions, saveOptions);
