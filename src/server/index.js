@@ -1,48 +1,54 @@
-require('dotenv').config();
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const mainRouter = require("./routes/index");
-const {PORT} = require("./constants/constants");
-const {MONGO_URI} = require("./constants/constants");
-const bodyParser = require('body-parser');
-const io = require('socket.io')(3000)
-const path = require('path');
+const { PORT } = require("./constants/constants");
+const { MONGO_URI } = require("./constants/constants");
+const bodyParser = require("body-parser");
+const io = require("socket.io")(3000);
+const path = require("path");
 
 // const MessageModel = require("../models/Messages");
 
 // connect to mongodb
-mongoose.connect(MONGO_URI, {
+mongoose
+  .connect(MONGO_URI, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
-})
-    .then(res => {
+  })
+  .then((res) => {
     console.log("connected to mongodb");
-})
-    .catch(err => {
-        console.log(err);
-    })
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 const app = express();
 // use middleware to parse body req to json
 // app.use(express.json());
 
-// app.use('/public/', express.static(path.join(__dirname, 'files')));
+app.use("/public/", express.static(path.join(__dirname, "files")));
 
 // use middleware to enable cors
 app.use(cors());
-app.use(bodyParser.json({limit: "50mb"}));
-app.use(bodyParser.urlencoded({limit: "50mb", extended: true, parameterLimit:50000}));
+app.use(bodyParser.json({ limit: "50mb" }));
+app.use(
+  bodyParser.urlencoded({
+    limit: "50mb",
+    extended: true,
+    parameterLimit: 50000,
+  })
+);
 // route middleware
 app.use("/", mainRouter);
 
-app.get('/settings', function (req, res) {
-    res.send('Settings Page');
+app.get("/settings", function (req, res) {
+  res.send("Settings Page");
 });
 
-
 app.listen(PORT, () => {
-    console.log("server start - " + PORT);
-})
+  console.log("server start - " + PORT);
+});
 
 // Socket.io chat realtime
 // io.on('connection', (socket) => {
@@ -62,16 +68,16 @@ app.listen(PORT, () => {
 //     })
 // });
 
-io.on('connection', (socket) => {
-    console.log('a user connected', socket.id);
+io.on("connection", (socket) => {
+  console.log("a user connected", socket.id);
 
-    socket.on('disconnect', () => {
-        console.log('user disconnected');
-    });
+  socket.on("disconnect", () => {
+    console.log("user disconnected");
+  });
 
-    socket.on('sendMessage', msg => {
-        console.log('from socket id: ', socket.id);
-        console.log(msg);
-        socket.broadcast.emit('getMessage',msg);
-    });
+  socket.on("sendMessage", (msg) => {
+    console.log("from socket id: ", socket.id);
+    console.log(msg);
+    socket.broadcast.emit("getMessage", msg);
+  });
 });
