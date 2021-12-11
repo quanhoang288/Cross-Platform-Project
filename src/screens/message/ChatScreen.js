@@ -16,16 +16,31 @@ import { stacks } from '../../constants/title';
 const ChatScreen = () => {
   const socket = useRef();
   const [messages, setMessages] = useState([]);
+  const [chatList, setChatList] = useState([]);
   const route = useRoute();
-  const {chatId, receivedId} = route.params;
+  const {receivedId} = route.params;
   const user = useSelector(state => state.auth.user);
   const senderId = user.id;
   const token = user.token;
   const navigation = useNavigation();
+  const fetchChats = async () => {
+    try {
+        const res = await message.getChats(user.id, user.token);
+        return res.data.data;
+    } catch (err) {
+        console.log(err.message);
+    }
+  }
 
   useEffect(() => {
     const initialize = async () => {
       console.log('user: ', user);
+      const newChatList = await fetchChats();
+      setChatList(newChatList.map(chat =>({
+        user1_id: chat.member[0],
+        user2_id: chat.member[1],
+      })))
+      if(chatId){
       const newMessages = await fetchMessages();
       if(newMessages){
         setMessages(newMessages.map(msg => ({
@@ -38,6 +53,7 @@ const ChatScreen = () => {
         },
         })).reverse());
       }
+    }
       socket.current = io(SOCKET_URL);
     }
     initialize();
@@ -97,26 +113,34 @@ const ChatScreen = () => {
   const onSend = useCallback(async (messages = []) => {
     if (messages.length > 0) {
       const newMsgObj = messages[0];
+      if(chatId){
       try {
         const sendResult = await message.sendMessage(chatId, senderId, receivedId, newMsgObj.text, token);
         const newMsg = sendResult.data.data;
-        socket.current?.emit('sendMessage', {
-          chatId: chatId,
-          _id: newMsg._id,
-          senderId: senderId,
-          receivedId: receivedId,
-          content: newMsgObj.text,
-          createdAt: newMsg.createdAt
-        });
+        
         
       } catch (err) {
         console.log(err)
       }
 
-      setMessages((previousMessages) =>
+      
+    }
+    else{
+      const sendResult = await message.sendNewMessage( senderId, receivedId, newMsgObj.text, token)
+      const newMsg = sendResult.data.data;
+      chatId = newMsg.chat._id;
+    }
+    socket.current?.emit('sendMessage', {
+      chatId: chatId,
+      _id: newMsg._id,
+      senderId: senderId,
+      receivedId: receivedId,
+      content: newMsgObj.text,
+      createdAt: newMsg.createdAt
+    });
+    setMessages((previousMessages) =>
         GiftedChat.append(previousMessages, messages),
       );
-      
     }
    
   }, []);

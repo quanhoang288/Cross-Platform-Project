@@ -20,5 +20,6 @@ export const stacks = {
     chatSetting: {name: 'setting', title:'Chat Setting'},
     mediaPicker: {name: 'mediaPicker', title: 'Media picker'},
     friendTabs: {name: 'friendTabs', title: 'Friends'},
+    searchMessage: {name: 'searchMessage', title: 'Search Message'},
 };
 

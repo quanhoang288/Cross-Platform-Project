@@ -10,20 +10,23 @@ import {
   ListItem,
   Text,
   Badge,
+  Icon,
 } from 'react-native-elements';
 
-import { NavigationContainer } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { stacks } from '../../constants/title';
 import { message } from '../../apis';
 import { useSelector } from 'react-redux';
 import { SOCKET_URL } from '../../configs';
 import {io} from 'socket.io-client';
-const MessageScreen = ({ navigation }) => {
+const MessageScreen = () => {
 
+  const navigation = useNavigation();
   const user = useSelector(state => state.auth.user);
   const [chatList, setChatList] = useState([]);
   const socket = useRef();
+
   const fetchChats = async () => {
     try {
         const res = await message.getChats(user.id, user.token);
@@ -34,6 +37,7 @@ const MessageScreen = ({ navigation }) => {
         console.log(err.message);
     }
   }
+
   useEffect(()=>{
     const initialize = async () => {
       const newChatList = await fetchChats()
@@ -52,6 +56,7 @@ const MessageScreen = ({ navigation }) => {
     }
     initialize();
   }, []);
+
   useEffect(() => {
     socket.current?.on('refreshLatestMessage', (data) =>{
       setChatList(chatList.map(chat => {
@@ -64,8 +69,21 @@ const MessageScreen = ({ navigation }) => {
         }
       }))
     })
-    
   }, [socket])
+
+  useEffect(() => {
+    navigation.setOptions({ 
+        headerRight: () => (
+          <Icon 
+            type='entypo' 
+            name='new-message' 
+            size={32}  
+            style={{marginRight: 10}}
+            onPress={() => navigation.navigate(stacks.searchMessage.name)}
+          />
+        )
+    });
+}, [navigation]);
     return (
       <FlatList 
         data={chatList}

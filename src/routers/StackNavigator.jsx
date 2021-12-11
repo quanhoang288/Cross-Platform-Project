@@ -10,7 +10,7 @@ import {
   FriendRequest,
   FriendTabView,
 } from "../screens/listFriend";
-import { ChatScreen, MessageScreen, ChatSetting } from "../screens/message";
+import { ChatScreen, MessageScreen, ChatSetting, SearchMessage } from "../screens/message";
 import { SignIn, SignUp } from "../screens/signIn-signUp";
 import { CustomTabView } from "../components/common";
 
@@ -120,6 +120,13 @@ const stackScreens = [
       title: stacks.friendTabs.title,
     },
   },
+  {
+    name: stacks.searchMessage.name,
+    component: SearchMessage,
+    options: {
+      headerShown: false,
+  },
+  }
 ];
 
 const StackNavigator = (props) => {

@@ -77,7 +77,29 @@ const sendMessage = async (chatId, senderId, receiverId, msg, token) => {
 
     return sendResult;
 }
+const sendNewMessage = async ( senderId, receiverId, msg, token) => {
+    const newMessage = {
+        receivedId: receiverId,
+        member: [
+            {_id: senderId},
+            {_id: receiverId}
+        ],
+        content: msg,
+        type: "PRIVATE_CHAT"
+      };
 
-export { getMessages, sendMessage, getChats, deleteMessage, deleteChat};
+    
+    const sendResult = await api({
+        method: 'POST',
+        url: '/chats/send/',
+        data: newMessage,
+        headers: {
+        'Authorization': `Bearer ${token}`
+        }
+    });
+
+    return sendResult;
+}
+export { getMessages, sendMessage, getChats, deleteMessage, deleteChat, sendNewMessage};
 
 
