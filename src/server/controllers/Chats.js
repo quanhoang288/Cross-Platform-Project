@@ -1,6 +1,7 @@
 const { PRIVATE_CHAT, GROUP_CHAT } = require('../constants/constants');
 const ChatModel = require('../models/Chats');
 const MessagesModel = require('../models/Messages');
+const getPaginationParams = require('../utils/getPaginationParams');
 const httpStatus = require('../utils/httpStatus');
 const { isValidId } = require('../utils/validateIdString');
 
@@ -57,16 +58,25 @@ chatController.send = async (req, res, next) => {
 
 chatController.getChats = async (req, res, next) => {
   try {
-    let chats = await ChatModel.find({ member: req.userId }).populate({
-      path: 'member',
-      select: '_id username phonenumber avatar',
-      model: 'Users',
-      populate: {
-        path: 'avatar',
-        select: '_id fileName',
-        model: 'Documents',
-      },
-    });
+    const query = { member: req.userId };
+    const { curPage, offset, limit, numOfPages } = await getPaginationParams(
+      req,
+      ChatModel,
+      query,
+    );
+    let chats = await ChatModel.find(query)
+      .skip(offset)
+      .limit(limit)
+      .populate({
+        path: 'member',
+        select: '_id username phonenumber avatar',
+        model: 'Users',
+        populate: {
+          path: 'avatar',
+          select: '_id fileName',
+          model: 'Documents',
+        },
+      });
 
     const latestMessagePromises = chats.map((chat) => {
       const chatId = chat._id;
@@ -89,6 +99,11 @@ chatController.getChats = async (req, res, next) => {
     });
 
     return res.status(httpStatus.OK).json({
+      metadata: {
+        curPage,
+        perPage: limit,
+        numOfPages,
+      },
       data: chatsWithLatestMessage,
     });
   } catch (e) {
@@ -138,11 +153,24 @@ chatController.getMessages = async (req, res, next) => {
       queryChatId = req.params.chatId;
     }
 
-    messages = await MessagesModel.find({
-      chat: queryChatId,
-    }).populate('user');
+    const query = { chat: queryChatId };
+    const { curPage, offset, limit, numOfPages } = await getPaginationParams(
+      req,
+      MessagesModel,
+      query,
+    );
+
+    messages = await MessagesModel.find(query)
+      .skip(offset)
+      .limit(limit)
+      .populate('user');
 
     return res.status(httpStatus.OK).json({
+      metadata: {
+        curPage,
+        perPage: limit,
+        numOfPages,
+      },
       data: messages,
     });
   } catch (e) {
