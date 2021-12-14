@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   View,
   StatusBar,
@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   FlatList,
   Platform,
-} from "react-native";
+} from 'react-native';
 import {
   Avatar,
   ListItem,
@@ -15,13 +15,12 @@ import {
   SearchBar,
   Button,
   Icon,
-} from "react-native-elements";
+} from 'react-native-elements';
 
-import { friend, search } from "../../apis";
-import { useSelector } from "react-redux";
-import { useNavigation } from "@react-navigation/core";
-import { stacks } from "../../constants/title";
-import { findOneAndDelete } from "../../server/models/Chats";
+import { friend, search } from '../../apis';
+import { useSelector } from 'react-redux';
+import { useNavigation } from '@react-navigation/core';
+import { stacks } from '../../constants/title';
 
 const NewMessage = () => {
   // user
@@ -30,7 +29,7 @@ const NewMessage = () => {
   const navigation = useNavigation();
 
   // valueInput and resultSearch
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState('');
   const [listFriend, setListFriend] = useState([]);
 
   const fetchFriendList = async () => {
@@ -43,12 +42,12 @@ const NewMessage = () => {
   };
   // API search
   const handleSearch = (keyword, newListFriend) => {
-    if (keyword === "") {
+    if (keyword === '') {
       setListFriend([]);
       return;
     } else {
       setListFriend(
-        newListFriend.filter((item) => item.username.includes(keyword))
+        newListFriend.filter((item) => item.username.includes(keyword)),
       );
     }
   };
@@ -75,7 +74,7 @@ const NewMessage = () => {
             <Avatar
               rounded
               size={40}
-              source={require("../../../assets/avatar2.jpg")}
+              source={require('../../../assets/avatar2.jpg')}
             />
             <ListItem.Content>
               <ListItem.Title>
@@ -93,7 +92,7 @@ const NewMessage = () => {
         platform={Platform.OS}
         searchIcon={{ size: 24 }}
         onChangeText={(text) => setValue(text)}
-        onClear={() => setValue("")}
+        onClear={() => setValue('')}
         placeholder="Type Here..."
         value={value}
       />
