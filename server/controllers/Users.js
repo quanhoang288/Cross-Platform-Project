@@ -286,7 +286,7 @@ usersController.show = async (req, res, next) => {
 
     let user = await UserModel.findById(userId)
       .select(
-        "phonenumber username gender birthday avatar cover_image blocked_inbox blocked_diary"
+        "phonenumber username gender address birthday avatar cover_image blocked_inbox blocked_diary"
       )
       .populate("avatar")
       .populate("cover_image");

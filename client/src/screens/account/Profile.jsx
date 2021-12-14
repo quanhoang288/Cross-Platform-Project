@@ -23,12 +23,13 @@ import { auth, post } from "../../apis";
 import { useSelector } from "react-redux";
 import { useRoute } from "@react-navigation/core";
 import { stacks } from "../../constants/title";
-import { style } from "styled-system";
+import { ASSET_API_URL } from "../../configs";
 
 const Profile = (props) => {
   const user = useSelector((state) => state.auth.user);
   const route = useRoute();
   const [userData, setUserData] = useState({ info: {}, posts: [] });
+  // console.log(userData.info.avatar);
   const [userId, setUserId] = useState(null);
   const navigation = useNavigation();
 
@@ -166,6 +167,7 @@ const Profile = (props) => {
               rounded
               size={88}
               source={{
+                // uri: `${ASSET_API_URL}/${userData.info.avatar.fileName}`,
                 uri: "https://i.etsystatic.com/29282700/r/il/e3aae5/3152845862/il_340x270.3152845862_q44u.jpg",
               }}
               onPress={() => console.log("Pressed on avatar!")}

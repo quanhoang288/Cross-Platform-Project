@@ -77,6 +77,13 @@ const personalInformation = () =>{
         }
     }
 
+    const getDate = (value) => {
+      let result = "";
+      let date = new Date(value);
+      result += `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} `;
+      return result;
+    };
+
     const isValidInput = (data) => {
         // update state
         const checkUserName = isValidUserName(data.username);
@@ -167,7 +174,7 @@ const personalInformation = () =>{
 
       <DatePicker
         title="Birthday: "
-        content={userInfo.birthday}
+        content={getDate(userInfo.birthday)}
         handlePress={showDatePicker}
         isDatePickerVisible={isDatePickerVisible}
         handleConfirm={handleConfirm}

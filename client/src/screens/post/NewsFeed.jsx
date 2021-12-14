@@ -22,6 +22,7 @@ const NewsFeed = (props) => {
 
   const uploadStatus = useSelector((state) => state.upload);
   const user = useSelector((state) => state.auth.user);
+  console.log(user);
 
   const dispatch = useDispatch();
   const navigation = useNavigation();

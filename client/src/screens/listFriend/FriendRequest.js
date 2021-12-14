@@ -6,6 +6,7 @@ import { friend } from '../../apis';
 import { useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import { stacks } from '../../constants/title.js';
+import formatDate from '../../helpers/DateFormater.js';
 
 const FriendRequest = () =>{
 
@@ -64,7 +65,7 @@ const FriendRequest = () =>{
                 buttonDelete: 'delete'
               }}
               displayDescription={true}
-              time={request.createdAt}
+              time={formatDate(request.createdAt)}
               acceptRequest={acceptRequest}
               userId={request._id}
               navigate={navigate}
