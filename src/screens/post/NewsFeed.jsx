@@ -55,12 +55,12 @@ const NewsFeed = (props) => {
 
       const postData = uploadStatus.data;
       if (posts.findIndex((post) => post._id === postData._id) !== -1) {
-        Toast.showSucessMessage(successMessages.updatePostSuccess);
+        Toast.showSuccessMessage(successMessages.updatePostSuccess);
         setPosts(
           posts.map((post) => (post._id === postData._id ? postData : post))
         );
       } else {
-        Toast.showSucessMessage(successMessages.createPostSuccess);
+        Toast.showSuccessMessage(successMessages.createPostSuccess);
         setPosts([postData, ...posts]);
         dispatch(uploadActions.resetState());
       }

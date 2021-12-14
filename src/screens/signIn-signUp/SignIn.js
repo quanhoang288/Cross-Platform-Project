@@ -28,7 +28,7 @@ const SignIn = () =>{
       if (Platform.OS === 'web') {
         window.alert('Registered successfully!');
       } else {
-        Toast.showSucessMessage('Registered successfully!');
+        Toast.showSuccessMessage('Registered successfully!');
       }
     }
   }, [register]);
@@ -120,7 +120,9 @@ const SignIn = () =>{
                 token: userInfo.data.token
             }
             dispatch(authActions.loginSuccess(user));
-            navigation.navigate(stacks.tabs.name);
+            setCredential({phoneNumber: "", password: ""});
+            setSignInButtonClicked(false);
+            navigation.navigate('Tabs');
         })
         .catch(error => {
             if (error.response) {

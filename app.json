@@ -9,6 +9,7 @@
         }
       ]
     ],
+    "userInterfaceStyle": "automatic",
     "name": "zalo_fe",
     "slug": "zalo_fe",
     "version": "1.0.0",

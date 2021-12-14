@@ -1,6 +1,6 @@
 import Toast from 'react-native-root-toast';
 
-const showSucessMessage = msg => {
+const showSuccessMessage = msg => {
     Toast.show(msg, {
         duration: Toast.durations.SHORT,
         position: Toast.positions.TOP + 10,
@@ -25,4 +25,4 @@ const showFailureMessage = msg => {
     });
 }
 
-export { showFailureMessage, showSucessMessage };
+export { showFailureMessage, showSuccessMessage };
