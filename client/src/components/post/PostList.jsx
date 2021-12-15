@@ -1,29 +1,27 @@
-import React, { useEffect, useState } from "react";
-import PropTypes from "prop-types";
-import { FlatList, StyleSheet, RefreshControl } from "react-native";
-import PostItem from "./PostItem";
+import React from 'react';
+import PostItem from './PostItem';
+import { LazyFlatList } from '../common';
 
-const PostList = ({ posts, refreshing, handleRefresh }) => {
+const PostList = ({
+  posts,
+  refreshing,
+  handleRefresh,
+  handleEndReached,
+  isFetchingNextPage,
+}) => {
+  const renderItem = ({ item }) => <PostItem post={item} postList={posts} />;
+
   return (
-    <FlatList
+    <LazyFlatList
       data={posts}
-      renderItem={({ item }) => {
-        return <PostItem key={item._id} post={item} />;
-      }}
-      keyExtractor={(item) => item._id}
-      showsVerticalScrollIndicator={false}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-      }
+      renderItem={renderItem}
+      refreshing={refreshing}
+      handleRefresh={handleRefresh}
+      isFetchingNextPage={isFetchingNextPage}
+      handleEndReached={handleEndReached}
     />
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
 
 PostList.propTypes = {};
 

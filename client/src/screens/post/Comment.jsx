@@ -7,139 +7,153 @@ import { DEVICE_WIDTH } from '../../constants/dimensions';
 import { comment } from '../../apis';
 import { useRoute } from '@react-navigation/core';
 import { useSelector } from 'react-redux';
+import { LazyFlatList } from '../../components/common';
 
-const Comment = props => {
+const Comment = (props) => {
+  // user
+  const user = useSelector((state) => state.auth.user);
 
-    // user
-    const user = useSelector(state => state.auth.user);
+  const [comments, setComments] = useState([]);
+  const [isRefreshing, setRefreshing] = useState(false);
+  const [isLoadingMore, setLoadingMore] = useState(false);
+  const [inputComment, setInputComment] = useState('');
+  const route = useRoute();
+  const postId = route.params.postId;
 
-    const [comments, setComments] = useState([]);
-    const route = useRoute();
-    const postId = route.params.postId;
-    const [inputComment, setInputComment] = useState("");
-    const commentListRef = useRef();
-
-    useEffect(() => {
-        comment.getListComment(postId, user.token)
-        .then(result => {
-            // console.log(result.data);
-            const curComments = result.data.data;
-            setComments(curComments);
-        })
-        .catch(error => {
-            console.log(error)
-        })
-    },[route]);
-
-    useEffect(() => {
-        commentListRef.current.scrollToEnd();
-    }, [comments])
-
-    const actionAddComment = (postId, content) => {
-        comment.addComment(postId, content, user.token)
-        .then(result => {
-            const newComment = result.data.data;
-            // const curPost = result.data.post;
-            setComments([
-                ...comments,
-                newComment
-            ]);
-        })
-        .catch(error => {
-            console.log(error)
-        })
+  const fetchComments = async () => {
+    try {
+      const commentListRes = await comment.getListComment(postId, user.token);
+      setComments(commentListRes.data.data);
+    } catch (error) {
+      console.log(error);
     }
+  };
 
-    return (
-        <View style={styles.container}>
-            <ScrollView 
-                showsVerticalScrollIndicator={false} 
-                style={styles.commentList}
-                ref={commentListRef}
-            >
-                {/* <FlatList
-                    data={comments}
-                    renderItem={({item}) => (
-                        <CommentItem
-                            comment={item}
-                        />    
-                    )}
-                    keyExtractor={item => item._id}
-                    showsVerticalScrollIndicator={false}
-                    style={styles.commentList}
-                    ref={commentListRef}
-                /> */}
-                {comments.map(comment => (
-                    <CommentItem
-                        key={comment._id}
-                        comment={comment}
-                    />
-                ))}
-            </ScrollView>
-            
-            <View style={styles.commentSection}>
-                <Icon 
-                    type='feather' 
-                    name='camera'
-                    size={28}
-                    containerStyle={{alignSelf: 'center'}} 
-                    iconStyle={styles.cameraIcon}/>
-                <Input 
-                    placeholder="Enter your comment" 
-                    multiline
-                    inputContainerStyle={styles.commentInputContainer} 
-                    numberOfLines={3}
-                    value={inputComment}
-                    onChangeText={text => setInputComment(text)}
-                    rightIcon={
-                        inputComment.length > 0 ?
-                        <Icon 
-                            name='send' 
-                            type='ionicons' 
-                            size={28} 
-                            iconStyle={{color: 'blue', marginLeft: 6}}
-                            onPress={() => {
-                                setInputComment("");
-                                Keyboard.dismiss();
-                                actionAddComment(postId, inputComment)}
-                            }
-                        /> : null
-                    }
-                    // inputStyle={{maxHeight: 60}}
-                />
-            </View>
-        </View>
-    );
+  const actionAddComment = async (postId, content) => {
+    try {
+      const addResult = await comment.addComment(postId, content, user.token);
+      const newComment = addResult.data.data;
+      setComments([newComment, ...comments]);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleLoadMore = async () => {
+    try {
+      const offset = comments.length;
+      const start = Date.now();
+      const newCommentList = await comment.getListComment(
+        postId,
+        user.token,
+        offset,
+      );
+      const newComments = newCommentList.data.data;
+      if (newComments.length > 0) {
+        setComments(comments.concat(newComments));
+      }
+      setLoadingMore(false);
+      console.log(`Finished in ${(Date.now() - start) / 1000}s`);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleRefresh = async () => {
+    await fetchComments();
+    setRefreshing(false);
+  };
+
+  const renderItem = ({ item }) => (
+    <CommentItem comment={item} commentList={comments} />
+  );
+
+  useEffect(() => {
+    fetchComments();
+  }, [route]);
+
+  useEffect(() => {
+    if (isRefreshing) {
+      handleRefresh();
+    }
+    if (isLoadingMore) {
+      handleLoadMore();
+    }
+  }, [isRefreshing, isLoadingMore]);
+
+  return (
+    <View style={styles.container}>
+      <LazyFlatList
+        data={comments}
+        renderItem={renderItem}
+        refreshing={isRefreshing}
+        isFetchingNextPage={isLoadingMore}
+        handleRefresh={() => setRefreshing(true)}
+        handleEndReached={() => setLoadingMore(true)}
+        listStyle={styles.commentList}
+      />
+
+      <View style={styles.commentSection}>
+        <Icon
+          type="feather"
+          name="camera"
+          size={28}
+          containerStyle={{ alignSelf: 'center' }}
+          iconStyle={styles.cameraIcon}
+        />
+        <Input
+          placeholder="Enter your comment"
+          multiline
+          inputContainerStyle={styles.commentInputContainer}
+          numberOfLines={3}
+          value={inputComment}
+          onChangeText={(text) => setInputComment(text)}
+          rightIcon={
+            inputComment.length > 0 ? (
+              <Icon
+                name="send"
+                type="ionicons"
+                size={28}
+                iconStyle={{ color: 'blue', marginLeft: 6 }}
+                onPress={() => {
+                  setInputComment('');
+                  Keyboard.dismiss();
+                  actionAddComment(postId, inputComment);
+                }}
+              />
+            ) : null
+          }
+        />
+      </View>
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    commentList: {
-        marginBottom: 6
-    }, 
-    commentSection: {
-        marginBottom: 6,
-        maxHeight: 50,
-        flexDirection: 'row',
-    }, 
-    commentInputContainer: {
-        borderRadius: 20,
-        borderColor: 'rgba(110, 120, 170, 1)',
-        borderWidth: 1,
-        width: '90%',
-        paddingLeft: 10,
-    },
-    cameraIcon: {
-        marginLeft: 6, 
-        alignSelf: 'center'
-    }
-    
-})
+  container: {
+    flex: 1,
+  },
+  commentList: {
+    marginBottom: 6,
+  },
+  commentSection: {
+    marginBottom: 6,
+    maxHeight: 50,
+    flexDirection: 'row',
+  },
+  commentInputContainer: {
+    borderRadius: 20,
+    borderColor: 'rgba(110, 120, 170, 1)',
+    borderWidth: 1,
+    width: '90%',
+    paddingLeft: 10,
+  },
+  cameraIcon: {
+    marginLeft: 6,
+    alignSelf: 'center',
+  },
+});
 
-Comment.propTypes = {
-    
-};
+Comment.propTypes = {};
 
 export default Comment;

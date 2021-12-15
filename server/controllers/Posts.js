@@ -1,15 +1,15 @@
-const jwt = require('jsonwebtoken');
-const UserModel = require('../models/Users');
-const PostModel = require('../models/Posts');
-const FriendModel = require('../models/Friends');
-const DocumentModel = require('../models/Documents');
-var url = require('url');
-const httpStatus = require('../utils/httpStatus');
-const bcrypt = require('bcrypt');
-const { JWT_SECRET, DEFAULT_PAGE_SIZE } = require('../constants/constants');
-const { ROLE_CUSTOMER } = require('../constants/constants');
-const uploadFile = require('../functions/uploadFile');
-const getPaginationParams = require('../utils/getPaginationParams');
+const jwt = require("jsonwebtoken");
+const UserModel = require("../models/Users");
+const PostModel = require("../models/Posts");
+const FriendModel = require("../models/Friends");
+const DocumentModel = require("../models/Documents");
+var url = require("url");
+const httpStatus = require("../utils/httpStatus");
+const bcrypt = require("bcrypt");
+const { JWT_SECRET, DEFAULT_PAGE_SIZE } = require("../constants/constants");
+const { ROLE_CUSTOMER } = require("../constants/constants");
+const uploadFile = require("../functions/uploadFile");
+const getPaginationParams = require("../utils/getPaginationParams");
 
 const postsController = {};
 postsController.create = async (req, res, next) => {
@@ -64,18 +64,18 @@ postsController.create = async (req, res, next) => {
       videos: dataVideos,
       countComments: 0,
     });
-    let postSaved = (await post.save()).populate('images').populate('videos');
+    let postSaved = (await post.save()).populate("images").populate("videos");
     postSaved = await PostModel.findById(postSaved._id)
-      .populate('images', ['fileName'])
-      .populate('videos', ['fileName'])
+      .populate("images", ["fileName"])
+      .populate("videos", ["fileName"])
       .populate({
-        path: 'author',
-        select: '_id username phonenumber avatar',
-        model: 'Users',
+        path: "author",
+        select: "_id username phonenumber avatar",
+        model: "Users",
         populate: {
-          path: 'avatar',
-          select: '_id fileName',
-          model: 'Documents',
+          path: "avatar",
+          select: "_id fileName",
+          model: "Documents",
         },
       });
     return res.status(httpStatus.OK).json({
@@ -98,12 +98,12 @@ postsController.edit = async (req, res, next) => {
     if (postFind == null) {
       return res
         .status(httpStatus.NOT_FOUND)
-        .json({ message: 'Can not find post' });
+        .json({ message: "Can not find post" });
     }
     if (postFind.author.toString() !== userId) {
       return res
         .status(httpStatus.FORBIDDEN)
-        .json({ message: 'Can not edit this post' });
+        .json({ message: "Can not edit this post" });
     }
 
     const { described, images, videos } = req.body;
@@ -112,7 +112,7 @@ postsController.edit = async (req, res, next) => {
       for (const image of images) {
         // check is old file
         if (image) {
-          let imageFile = !image.includes('data:')
+          let imageFile = !image.includes("data:")
             ? await DocumentModel.findById(image)
             : null;
           if (imageFile == null) {
@@ -142,7 +142,7 @@ postsController.edit = async (req, res, next) => {
       for (const video of videos) {
         // check is old file
         if (video) {
-          let videoFile = !video.includes('data:')
+          let videoFile = !video.includes("data:")
             ? await DocumentModel.findById(video)
             : null;
           if (videoFile == null) {
@@ -171,16 +171,16 @@ postsController.edit = async (req, res, next) => {
       videos: dataVideos,
     });
     postSaved = await PostModel.findById(postSaved._id)
-      .populate('images', ['fileName'])
-      .populate('videos', ['fileName'])
+      .populate("images", ["fileName"])
+      .populate("videos", ["fileName"])
       .populate({
-        path: 'author',
-        select: '_id username phonenumber avatar',
-        model: 'Users',
+        path: "author",
+        select: "_id username phonenumber avatar",
+        model: "Users",
         populate: {
-          path: 'avatar',
-          select: '_id fileName',
-          model: 'Documents',
+          path: "avatar",
+          select: "_id fileName",
+          model: "Documents",
         },
       });
     return res.status(httpStatus.OK).json({
@@ -196,22 +196,22 @@ postsController.edit = async (req, res, next) => {
 postsController.show = async (req, res, next) => {
   try {
     let post = await PostModel.findById(req.params.id)
-      .populate('images', ['fileName'])
-      .populate('videos', ['fileName'])
+      .populate("images", ["fileName"])
+      .populate("videos", ["fileName"])
       .populate({
-        path: 'author',
-        select: '_id username phonenumber avatar',
-        model: 'Users',
+        path: "author",
+        select: "_id username phonenumber avatar",
+        model: "Users",
         populate: {
-          path: 'avatar',
-          select: '_id fileName',
-          model: 'Documents',
+          path: "avatar",
+          select: "_id fileName",
+          model: "Documents",
         },
       });
     if (post == null) {
       return res
         .status(httpStatus.NOT_FOUND)
-        .json({ message: 'Can not find post' });
+        .json({ message: "Can not find post" });
     }
     post.isLike = post.like.includes(req.userId);
     return res.status(httpStatus.OK).json({
@@ -229,10 +229,10 @@ postsController.delete = async (req, res, next) => {
     if (post == null) {
       return res
         .status(httpStatus.NOT_FOUND)
-        .json({ message: 'Can not find post' });
+        .json({ message: "Can not find post" });
     }
     return res.status(httpStatus.OK).json({
-      message: 'Delete post done',
+      message: "Delete post done",
     });
   } catch (error) {
     return res
@@ -253,7 +253,7 @@ postsController.list = async (req, res, next) => {
     } else {
       // get list friend of 1 user
       let friends = await FriendModel.find({
-        status: '1',
+        status: "1",
       }).or([
         {
           sender: userId,
@@ -276,26 +276,22 @@ postsController.list = async (req, res, next) => {
       query = { author: listIdFriends };
     }
 
-    const { curPage, offset, limit, numOfPages } = await getPaginationParams(
-      req,
-      PostModel,
-      query,
-    );
+    const { offset, limit } = await getPaginationParams(req);
 
     posts = await PostModel.find(query)
       .skip(offset)
       .limit(limit)
-      .sort({ createdAt: 'desc' })
-      .populate('images', ['fileName'])
-      .populate('videos', ['fileName'])
+      .sort({ createdAt: "desc" })
+      .populate("images", ["fileName"])
+      .populate("videos", ["fileName"])
       .populate({
-        path: 'author',
-        select: '_id username phonenumber avatar',
-        model: 'Users',
+        path: "author",
+        select: "_id username phonenumber avatar",
+        model: "Users",
         populate: {
-          path: 'avatar',
-          select: '_id fileName',
-          model: 'Documents',
+          path: "avatar",
+          select: "_id fileName",
+          model: "Documents",
         },
       });
 
@@ -306,14 +302,10 @@ postsController.list = async (req, res, next) => {
       postWithIsLike.push(postItem);
     }
     return res.status(httpStatus.OK).json({
-      metadata: {
-        curPage,
-        perPage: limit,
-        numOfPages,
-      },
       data: postWithIsLike,
     });
   } catch (error) {
+    console.error(error.message);
     return res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json({ message: error.message });

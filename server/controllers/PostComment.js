@@ -1,6 +1,7 @@
-const PostModel = require('../models/Posts');
-const PostCommentModel = require('../models/PostComment');
-const httpStatus = require('../utils/httpStatus');
+const PostModel = require("../models/Posts");
+const PostCommentModel = require("../models/PostComment");
+const httpStatus = require("../utils/httpStatus");
+const getPaginationParams = require("../utils/getPaginationParams");
 const postCommentController = {};
 postCommentController.create = async (req, res, next) => {
   try {
@@ -11,7 +12,7 @@ postCommentController.create = async (req, res, next) => {
       if (post == null) {
         return res
           .status(httpStatus.NOT_FOUND)
-          .json({ message: 'Can not find post' });
+          .json({ message: "Can not find post" });
       }
     } catch (error) {
       return res
@@ -35,8 +36,8 @@ postCommentController.create = async (req, res, next) => {
       countComments: post.countComments ? post.countComments + 1 : 1,
     });
     postCommentSaved = await PostCommentModel.findById(
-      postCommentSaved._id,
-    ).populate('user', ['username', 'phonenumber']);
+      postCommentSaved._id
+    ).populate("user", ["username", "phonenumber"]);
     return res.status(httpStatus.OK).json({
       data: postCommentSaved,
       post: postSaved,
@@ -50,26 +51,19 @@ postCommentController.create = async (req, res, next) => {
 
 postCommentController.list = async (req, res, next) => {
   try {
-    const query = { post: request.params.postId };
+    const query = { post: req.params.postId };
 
-    const { curPage, offset, limit, numOfPages } = await getPaginationParams(
-      req,
-      PostCommentModel,
-      query,
-    );
+    const { offset, limit } = await getPaginationParams(req);
     let postComments = await PostCommentModel.find(query)
       .skip(offset)
       .limit(limit)
-      .populate('user', ['username', 'phonenumber']);
+      .sort({ createdAt: "desc" })
+      .populate("user", ["username", "phonenumber"]);
     return res.status(httpStatus.OK).json({
-      metadata: {
-        curPage,
-        perPage: limit,
-        numOfPages,
-      },
       data: postComments,
     });
   } catch (error) {
+    console.error(error);
     return res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json({ message: error.message });
