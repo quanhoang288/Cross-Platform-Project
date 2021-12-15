@@ -1,16 +1,18 @@
-const { DEFAULT_PAGE_SIZE } = require('../constants/constants');
+const { DEFAULT_PAGE_SIZE } = require("../constants/constants");
 
-const getPaginationParams = async (req, model, query) => {
-  const limit = req.query.limit || DEFAULT_PAGE_SIZE;
-  const pageToQuery = req.query.page || 1;
-  const offset = (pageToQuery - 1) * limit;
-  const totalCount = await model.countDocuments(query);
-  const numOfPages = Math.ceil(totalCount / limit);
+const getPaginationParams = async (req) => {
+  let limit = DEFAULT_PAGE_SIZE,
+    offset = 0;
+  if (req.query.page) {
+    limit = DEFAULT_PAGE_SIZE;
+    offset = (req.query.page - 1) * limit;
+  } else if (req.query.offset && req.query.limit) {
+    limit = req.query.limit;
+    offset = req.query.offset;
+  }
   return {
-    curPage: pageToQuery,
     limit,
     offset,
-    numOfPages,
   };
 };
 

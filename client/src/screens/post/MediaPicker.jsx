@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from "react";
-import PropTypes from "prop-types";
-import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native";
-import { Button, Text, Image, Icon } from "react-native-elements";
-import { useDispatch } from "react-redux";
-import { mediaActions } from "../../redux/actions";
-import { mediaReducer } from "../../redux/reducers";
-import { ImageHelper } from "../../helpers";
-import { useSelector } from "react-redux";
-import { DEVICE_WIDTH } from "../../constants/dimensions";
-import { Picker } from "@react-native-picker/picker";
-import { StatusBar } from "react-native";
+import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
+import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Button, Text, Image, Icon } from 'react-native-elements';
+import { useDispatch } from 'react-redux';
+import { mediaActions } from '../../redux/actions';
+import { mediaReducer } from '../../redux/reducers';
+import { ImageHelper } from '../../helpers';
+import { useSelector } from 'react-redux';
+import { DEVICE_WIDTH } from '../../constants/dimensions';
+import { Picker } from '@react-native-picker/picker';
+import { StatusBar } from 'react-native';
 
 const Header = (props) => {
   const Item = Picker.Item;
@@ -17,8 +17,8 @@ const Header = (props) => {
   return (
     <View
       style={{
-        flexDirection: "row",
-        justifyContent: "space-between",
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         marginBottom: 10,
       }}
     >
@@ -73,10 +73,10 @@ const areEqual = (prevProps, nextProps) => {
   }
 
   const selectedIndex = selectedAssets.findIndex(
-    (asset) => asset.uri === item.uri
+    (asset) => asset.uri === item.uri,
   );
   const prevSelectedIndex = prevSelectedAssets.findIndex(
-    (asset) => asset.uri === item.uri
+    (asset) => asset.uri === item.uri,
   );
 
   return selectedIndex === prevSelectedIndex;
@@ -96,7 +96,7 @@ const MediaItem = React.memo((props) => {
 
   return (
     <TouchableOpacity
-      style={{ position: "relative" }}
+      style={{ position: 'relative' }}
       onPress={() => props.handleItemSelected(item)}
     >
       <Image
@@ -111,8 +111,8 @@ const MediaItem = React.memo((props) => {
           styles.selectedImage,
           {
             backgroundColor: isInSelectedAssets()
-              ? "rgba(255,255,255,0.40);"
-              : "transparent",
+              ? 'rgba(255,255,255,0.40);'
+              : 'transparent',
           },
         ]}
       />
@@ -121,14 +121,14 @@ const MediaItem = React.memo((props) => {
         style={[
           styles.selected,
           {
-            backgroundColor: isInSelectedAssets() ? "#0275d8" : "#292b2c",
-            borderColor: "white",
+            backgroundColor: isInSelectedAssets() ? '#0275d8' : '#292b2c',
+            borderColor: 'white',
             borderWidth: 2,
           },
         ]}
       >
         <Text style={styles.text}>
-          {isInSelectedAssets() ? getIndexInSelectedAssets() + 1 : ""}
+          {isInSelectedAssets() ? getIndexInSelectedAssets() + 1 : ''}
         </Text>
       </View>
     </TouchableOpacity>
@@ -139,8 +139,8 @@ const Content = (props) => {
   return (
     <FlatList
       columnWrapperStyle={{
-        flexWrap: "wrap",
-        width: "100%",
+        flexWrap: 'wrap',
+        width: '100%',
       }}
       data={props.albumAssets}
       renderItem={({ item }) => (
@@ -157,7 +157,7 @@ const Content = (props) => {
 };
 
 const MediaPicker = ({ navigation }) => {
-  const albumNames = ["Camera", "Screenshots", "Messenger", "Zalo", "Facebook"];
+  const albumNames = ['Camera', 'Screenshots', 'Messenger', 'Zalo', 'Facebook'];
   const dispatch = useDispatch();
   const [selectedAlbum, setSelectedAlbum] = useState(albumNames[0]);
   const [albumAssets, setAlbumAssets] = useState([]);
@@ -230,29 +230,29 @@ const styles = StyleSheet.create({
   image: {
     width: DEVICE_WIDTH / 3,
     height: DEVICE_WIDTH / 3,
-    resizeMode: "cover",
+    resizeMode: 'cover',
     // marginRight: 2,
   },
   selectedImage: {
-    position: "absolute",
-    width: "100%",
-    height: "100%",
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
     top: 0,
     left: 0,
   },
   text: {
     fontSize: 13,
-    color: "#FFFFFF",
+    color: '#FFFFFF',
   },
   selected: {
-    position: "absolute",
+    position: 'absolute',
     top: 2,
     right: 10,
     width: 22,
     height: 22,
     borderRadius: 15,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 

@@ -10,8 +10,8 @@ const addPost = async (postData, token) => {
     return createResult;
 }
 
-const getListPost = async (userId = null, token) => {
-    const url = userId ? `/posts/list?userId=${userId}` : '/posts/list';
+const getListPost = async (userId = null, token, page = 1) => {
+    const url = userId ? `/posts/list?userId=${userId}?page=${page}` : `/posts/list?page=${page}`;
     const listPost = await api({
         method: 'GET',
         url: url,
