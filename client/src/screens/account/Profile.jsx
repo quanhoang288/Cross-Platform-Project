@@ -102,10 +102,10 @@ const Profile = (props) => {
 
           <Button
             buttonStyle={styles.updateProfileBtn}
-            title='Update Avatar'
+            title='Edit profile'
             icon={{
-              type: "material-community",
-              name: "update",
+              type: "antdesign",
+              name: "edit",
               color: "rgb(0,0,0)",
               size: 18,
             }}
@@ -154,13 +154,24 @@ const Profile = (props) => {
   const ProfileHeader = () => {
     return (
       <View style={styles.container}>
-        <ImageBackground
-          source={{
-            uri: "https://mondaycareer.com/wp-content/uploads/2020/11/background-%C4%91%E1%BA%B9p-2-1024x585.jpg",
-          }}
-          alt='This is cover image'
-          style={styles.cover}
-        />
+        <View>
+          <ImageBackground
+            source={{
+              uri: "https://mondaycareer.com/wp-content/uploads/2020/11/background-%C4%91%E1%BA%B9p-2-1024x585.jpg",
+            }}
+            alt='This is cover image'
+            style={styles.cover}
+            // icon={{ name: 'pencil', type: 'font-awesome' }}
+          />
+          <Avatar.Accessory 
+            size={36} 
+            style={{
+              margin: 12
+            }}
+            
+            onPress={() => {console.log("Press on Edit Image background")}}
+          />
+        </View>
         <View style={styles.profileOutterContainer}>
           <View style={styles.profileInnerContainer}>
             <Avatar
@@ -171,6 +182,10 @@ const Profile = (props) => {
                 uri: "https://i.etsystatic.com/29282700/r/il/e3aae5/3152845862/il_340x270.3152845862_q44u.jpg",
               }}
               onPress={() => console.log("Pressed on avatar!")}
+            />
+            <Avatar.Accessory 
+              size={24}
+              onPress={() => {console.log("Press on Edit Avatar")}}
             />
           </View>
         </View>
@@ -285,14 +300,14 @@ const styles = StyleSheet.create({
     backgroundColor: "rgb(51, 133, 255)",
     borderRadius: 8,
     width: "50%",
-    minWidth: 120,
+    minWidth: 150,
     padding: 6,
     marginRight: 6,
   },
   updateProfileBtn: {
     backgroundColor: "rgb(230, 230, 230)",
     borderRadius: 8,
-    minWidth: 150,
+    minWidth: 140,
     width: "50%",
     padding: 6,
   },

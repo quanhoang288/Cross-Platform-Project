@@ -30,7 +30,7 @@ const ProfileItem = (props) => {
       </Avatar>
       <ListItem.Content str>
         <ListItem.Title>
-          <Text style={{ fontSize: 16 }}>{props.title}</Text>
+          <Text style={{ fontSize: 18 }}>{props.title}</Text>
         </ListItem.Title>
         <View style={{ flexDirection: "row" }}>
           <Text style={{ fontSize: 12, marginTop: 8 }}>{props.comment}</Text>
@@ -45,6 +45,7 @@ const ProfileItem = (props) => {
                   // borderColor: 'transparent',
                   borderWidth: 0,
                   marginTop: 0,
+                  padding: 4
                   // borderRadius: 30,
                 }}
                 containerStyle={{
@@ -66,6 +67,7 @@ const ProfileItem = (props) => {
                   // borderColor: 'transparent',
                   borderWidth: 0,
                   marginTop: 0,
+                  padding: 4
                   // borderRadius: 30,
                 }}
                 containerStyle={{
