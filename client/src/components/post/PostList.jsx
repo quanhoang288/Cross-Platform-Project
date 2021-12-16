@@ -8,11 +8,13 @@ const PostList = ({
   handleRefresh,
   handleEndReached,
   isFetchingNextPage,
+  header,
 }) => {
   const renderItem = ({ item }) => <PostItem post={item} postList={posts} />;
 
   return (
     <LazyFlatList
+      listHeader={header}
       data={posts}
       renderItem={renderItem}
       refreshing={refreshing}
