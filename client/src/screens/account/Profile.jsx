@@ -161,16 +161,20 @@ const Profile = (props) => {
             }}
             alt='This is cover image'
             style={styles.cover}
-            // icon={{ name: 'pencil', type: 'font-awesome' }}
-          />
-          <Avatar.Accessory 
-            size={36} 
-            style={{
-              margin: 12
-            }}
             
-            onPress={() => {console.log("Press on Edit Image background")}}
-          />
+          >
+            <Icon
+              name="camera"
+              type="entypo"
+              size={30} 
+              style={{
+                margin: 12,
+                padding: 8,
+                backgroundColor: "rgb(230, 230, 230)",
+                borderRadius: 24
+              }}
+            />
+          </ImageBackground>
         </View>
         <View style={styles.profileOutterContainer}>
           <View style={styles.profileInnerContainer}>
@@ -184,7 +188,13 @@ const Profile = (props) => {
               onPress={() => console.log("Pressed on avatar!")}
             />
             <Avatar.Accessory 
+              name="camera"
+              type="entypo"
               size={24}
+              color="black"
+              style={{
+                backgroundColor: "rgb(230, 230, 230)",
+              }}
               onPress={() => {console.log("Press on Edit Avatar")}}
             />
           </View>

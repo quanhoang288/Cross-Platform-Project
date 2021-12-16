@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Avatar, Button, Icon, ListItem } from 'react-native-elements';
+import { Avatar, Button, Icon, Image } from 'react-native-elements';
 import {View, Text, StyleSheet, TouchableOpacity, ImageBackground, ScrollView} from 'react-native';
 import { DatePicker, InputText } from '../../components/block';
 import { errorMessages } from '../../constants/message';
@@ -164,12 +164,13 @@ const personalInformation = () =>{
           >  Edit  </Text>
         </View>
         <View style={{alignItems:'center',}}>
-          <ImageBackground
+          <Image
             source={{
               uri: "https://mondaycareer.com/wp-content/uploads/2020/11/background-%C4%91%E1%BA%B9p-2-1024x585.jpg",
             }}
             alt='This is cover image'
             style={styles.imageCover}
+            
           />
         </View>
       </View> 
@@ -283,7 +284,7 @@ const styles = StyleSheet.create({
     height: 150,
     borderColor: "black",
     borderRadius: 5,
-    borderWidth: 2,
+    borderWidth: 1,
   },
 
   loadingProps:{
