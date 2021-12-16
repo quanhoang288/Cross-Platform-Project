@@ -14,6 +14,7 @@ const LazyFlatList = ({
   handleEndReached,
   isFetchingNextPage,
   listStyle,
+  listHeader,
 }) => {
   const renderFooter = () => {
     return isFetchingNextPage ? (
@@ -25,6 +26,7 @@ const LazyFlatList = ({
 
   return (
     <FlatList
+      ListHeaderComponent={listHeader}
       data={data}
       renderItem={renderItem}
       keyExtractor={(item) => item._id}

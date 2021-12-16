@@ -1,9 +1,9 @@
 import { Platform } from "react-native";
 
 const API_URL =
-  Platform.OS === "web" ? "http://localhost:8000" : "http://192.168.1.2:8000";
+  Platform.OS === "web" ? "http://localhost:8000" : "http://192.168.0.102:8000";
 const ASSET_API_URL = `${API_URL}/public`;
 const SOCKET_URL =
-  Platform.OS === "web" ? "ws://localhost:3000" : "ws://192.168.1.2:3000";
+  Platform.OS === "web" ? "ws://localhost:3000" : "ws://192.168.0.102:3000";
 
 export { API_URL, ASSET_API_URL, SOCKET_URL };

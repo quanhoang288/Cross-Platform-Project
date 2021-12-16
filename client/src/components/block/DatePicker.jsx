@@ -16,47 +16,48 @@ const DatePicker = (props) => {
     } = props;
 
     return(
-
-        <ListItem style={styles.container}>
-            <ListItem.Content >
-                <ListItem.Title >
-                    <Text style={styles.title}>
-                        {title}
-                    </Text>
-                    <Icon
-                        name="calendar"
-                        type="antdesign"
-                        onPress={handlePress}
-                        color="rgb(51, 51, 255)"
-                    />
-                </ListItem.Title>
-                <View>
-                    <Text style={styles.content}>
-                        {content}
-                    </Text>
-                </View>
-                
-                <DateTimePickerModal
-                    isVisible={isDatePickerVisible}
-                    mode="date"
-                    onConfirm={(date) => handleConfirm(date)}
-                    onCancel={hideDatePicker}
-                />
-            </ListItem.Content>
-		</ListItem>
+      <View style={styles.container}>
+        <View style={styles.view}>
+          <Text style={styles.title}>{title}</Text>
+          <Icon
+            name="calendar"
+            type="antdesign"
+            onPress={handlePress}
+            color="rgb(51, 51, 255)"
+            containerStyle={{marginRight: 10}}
+          />
+          <DateTimePickerModal
+            isVisible={isDatePickerVisible}
+            mode="date"
+            onConfirm={(date) => handleConfirm(date)}
+            onCancel={hideDatePicker}
+          />
+        </View>
+          <View style={{alignItems: "center"}}>
+            <Text style={styles.content}>{content}</Text>
+          </View>
+      </View>
     );
 };
 
 const styles = StyleSheet.create({
     container:{
+        backgroundColor: 'rgb(255, 255, 255)',
+        marginHorizontal: 10, 
+        marginBottom: 16
     },
     title:{
+        justifyContent: "center",
         fontSize: 20, 
-        fontWeight:'500'
+        fontWeight: "bold",
+    },
+    view:{
+      flexDirection:"row", 
+      justifyContent: "space-between"
     },
     content:{
-        marginTop: 8,
-        fontSize: 17,
+        fontSize: 28,
+        fontWeight: '700',
         fontWeight:"300"
     },
 })

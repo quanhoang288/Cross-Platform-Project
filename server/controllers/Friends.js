@@ -185,6 +185,20 @@ friendsController.listFriends = async (req, res, next) => {
                 }
             });
         }
+        else{
+            let requested = await FriendModel.find({sender: req.body.user_id, status: "1" }).distinct('receiver');
+            let accepted = await FriendModel.find({receiver: req.body.user_id, status: "1" }).distinct('sender');
+
+            let users = await UserModel.find().where('_id').in(requested.concat(accepted)).populate('avatar').populate('cover_image').exec()
+
+            res.status(200).json({
+                code: 200,
+                message: "Danh sách bạn bè",
+                data: {
+                    friends: users,
+                }
+            });
+        }
 
     } catch (e) {
         return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
