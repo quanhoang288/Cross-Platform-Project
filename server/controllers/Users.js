@@ -334,7 +334,7 @@ usersController.setBlock = async (req, res, next) => {
     let type = req.body.type;
     let user = await UserModel.findById(req.userId);
     blocked = [];
-    if (user.hasOwnProperty("blocked")) {
+    if (user.hasOwnProperty("blocked_inbox")) {
       blocked = user.blocked_inbox;
     }
 

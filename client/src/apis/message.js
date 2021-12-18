@@ -1,9 +1,15 @@
-import api from "./api";
+import api from './api';
 
-const getMessageByOtherUserId = async (receivedId, token) => {
+const getMessageByOtherUserId = async (
+  receivedId,
+  token,
+  offset = 0,
+  limit = 10,
+) => {
+  console.log('offset: ', offset);
   const getResult = await api({
-    method: "GET",
-    url: `/chats/getMessages?otherUserId=${receivedId}`,
+    method: 'GET',
+    url: `/chats/getMessages?otherUserId=${receivedId}&offset=${offset}&limit=${limit}`,
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -11,9 +17,9 @@ const getMessageByOtherUserId = async (receivedId, token) => {
   return getResult;
 };
 
-const getChats = async ( token) => {
+const getChats = async (token) => {
   const getList = await api({
-    method: "GET",
+    method: 'GET',
     url: `/chats/list`,
     headers: {
       Authorization: `Bearer ${token}`,
@@ -28,8 +34,8 @@ const deleteMessage = async (chatId, messageId, token) => {
   };
   console.log(messageDelete);
   const deleteMess = await api({
-    method: "POST",
-    url: "chats/deleteMessage",
+    method: 'POST',
+    url: 'chats/deleteMessage',
     data: messageDelete,
     headers: {
       Authorization: `Bearer ${token}`,
@@ -43,8 +49,8 @@ const deleteChat = async (chatId, token) => {
     chatId: chatId,
   };
   const deleteC = await api({
-    method: "POST",
-    url: "chats/deleteChat",
+    method: 'POST',
+    url: 'chats/deleteChat',
     data: chatDelete,
     headers: {
       Authorization: `Bearer ${token}`,
@@ -60,8 +66,8 @@ const sendMessage = async (receiverId, msg, token) => {
   };
 
   const sendResult = await api({
-    method: "POST",
-    url: "/chats/send/",
+    method: 'POST',
+    url: '/chats/send/',
     data: newMessage,
     headers: {
       Authorization: `Bearer ${token}`,
@@ -75,12 +81,12 @@ const sendNewMessage = async (senderId, receiverId, msg, token) => {
     receivedId: receiverId,
     member: [{ _id: senderId }, { _id: receiverId }],
     content: msg,
-    type: "PRIVATE_CHAT",
+    type: 'PRIVATE_CHAT',
   };
 
   const sendResult = await api({
-    method: "POST",
-    url: "/chats/send/",
+    method: 'POST',
+    url: '/chats/send/',
     data: newMessage,
     headers: {
       Authorization: `Bearer ${token}`,

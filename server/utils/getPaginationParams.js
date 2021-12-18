@@ -7,8 +7,8 @@ const getPaginationParams = async (req) => {
     limit = DEFAULT_PAGE_SIZE;
     offset = (req.query.page - 1) * limit;
   } else if (req.query.offset && req.query.limit) {
-    limit = req.query.limit;
-    offset = req.query.offset;
+    limit = Number(req.query.limit);
+    offset = Number(req.query.offset);
   }
   return {
     limit,

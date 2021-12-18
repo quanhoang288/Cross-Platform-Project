@@ -14,7 +14,7 @@ chatController.send = async (req, res, next) => {
     let chatId;
 
     const existingChat = await ChatModel.findOne({
-      member: [userId, receivedId],
+      member: { $all: [userId, receivedId] },
     });
 
     if (existingChat) {
@@ -37,8 +37,16 @@ chatController.send = async (req, res, next) => {
       await message.save();
       const savedMessage = await MessagesModel.findById(message._id)
         .populate("chat")
-        .populate("user");
-      console.log(savedMessage);
+        .populate({
+          path: "user",
+          select: "_id username",
+          populate: {
+            path: "avatar",
+            select: "_id fileName",
+            model: "Documents",
+          },
+          model: "Users",
+        });
 
       return res.status(httpStatus.CREATED).json({
         data: savedMessage,
@@ -131,8 +139,9 @@ chatController.getMessages = async (req, res, next) => {
   try {
     if (otherUserId) {
       const existingChat = await ChatModel.findOne({
-        member: [userId, otherUserId],
+        member: { $all: [userId, otherUserId] },
       });
+      console.log("existing chat: ", existingChat);
       if (!existingChat) {
         return res.status(httpStatus.NOT_FOUND).json({
           message: "Chat does not exist between 2 users",
@@ -143,13 +152,23 @@ chatController.getMessages = async (req, res, next) => {
       queryChatId = req.params.chatId;
     }
 
-    const query = { chat: queryChatId };
     const { offset, limit } = await getPaginationParams(req);
+    console.log(offset);
 
     messages = await MessagesModel.find({ chat: queryChatId })
       .skip(offset)
       .limit(limit)
-      .populate("user");
+      .sort({ createdAt: "desc" })
+      .populate({
+        path: "user",
+        select: "_id username",
+        populate: {
+          path: "avatar",
+          select: "_id fileName",
+          model: "Documents",
+        },
+        model: "Users",
+      });
 
     return res.status(httpStatus.OK).json({
       data: messages,
