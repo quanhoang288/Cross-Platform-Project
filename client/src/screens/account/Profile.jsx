@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
-import PropTypes from "prop-types";
+import React, { useEffect, useState } from 'react';
 import {
+  ActivityIndicator,
   View,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
   ImageBackground,
-} from "react-native";
+} from 'react-native';
 import {
   Avatar,
   Button,
@@ -15,23 +15,30 @@ import {
   Image,
   ListItem,
   Text,
-} from "react-native-elements";
-import { useNavigation } from "@react-navigation/core";
-import { PostList } from "../../components/post";
-import { DEVICE_WIDTH } from "../../constants/dimensions";
-import { auth, post } from "../../apis";
-import { useSelector } from "react-redux";
-import { useRoute } from "@react-navigation/core";
-import { stacks } from "../../constants/title";
-import { ASSET_API_URL } from "../../configs";
+} from 'react-native-elements';
+import { useNavigation } from '@react-navigation/core';
+import { PostList } from '../../components/post';
+import { DEVICE_WIDTH } from '../../constants/dimensions';
+import { auth, friend, post } from '../../apis';
+import { useDispatch, useSelector } from 'react-redux';
+import { useRoute } from '@react-navigation/core';
+import { stacks } from '../../constants/title';
+import { ASSET_API_URL } from '../../configs';
+import FRIEND_STATUS from '../../constants/friendStatus';
+import { Toast } from '../../helpers';
+import { hideModal, showModal } from '../../redux/reducers/modalReducer';
+import { types } from '../../constants/modalTypes';
 
 const Profile = (props) => {
   const user = useSelector((state) => state.auth.user);
-  const route = useRoute();
   const [userData, setUserData] = useState({ info: {}, posts: [] });
-  // console.log(userData.info.avatar);
   const [userId, setUserId] = useState(null);
+  const [isFirstLoad, setFirstLoad] = useState(false);
+  const [friendStatus, setFriendStatus] = useState(FRIEND_STATUS.NON_FRIEND);
+
+  const dispatch = useDispatch();
   const navigation = useNavigation();
+  const route = useRoute();
 
   const fetchUserInfo = async (userId) => {
     try {
@@ -51,6 +58,141 @@ const Profile = (props) => {
     }
   };
 
+  const initializeUserProfile = async (userId) => {
+    const info = await fetchUserInfo(userId);
+    const posts = await fetchUserPosts(userId);
+    setUserData({ info, posts });
+    setFirstLoad(false);
+  };
+
+  const handleAddFriend = async () => {
+    try {
+      await friend.sendFriendRequest(userId, user.token);
+      setFriendStatus(FRIEND_STATUS.SEND_REQUEST);
+    } catch (error) {
+      console.log(error);
+      Toast.showFailureMessage('Error adding friend');
+    }
+  };
+
+  const handleCancelFriendRequest = async () => {
+    try {
+      await friend.cancelFriendRequest(userId, user.token);
+      setFriendStatus(FRIEND_STATUS.NON_FRIEND);
+    } catch (error) {
+      console.log(error.response);
+      Toast.showFailureMessage('Error canceling friend request');
+    }
+  };
+
+  const handleUnfriend = async () => {
+    try {
+      await friend.removeFriend(userId, user.token);
+      setFriendStatus(FRIEND_STATUS.NON_FRIEND);
+      dispatch(hideModal());
+    } catch (error) {
+      console.log(error);
+      Toast.showFailureMessage('Error unfriending this person');
+    }
+  };
+
+  handleUpdateFriendStatus = (isAccept) => {
+    if (isAccept) {
+      setFriendStatus(FRIEND_STATUS.FRIENDS);
+    } else {
+      setFriendStatus(FRIEND_STATUS.NON_FRIEND);
+    }
+  };
+
+  const handleShowRespondModal = () => {
+    dispatch(
+      showModal({
+        modalType: types.respondModal,
+        propsData: {
+          otherUserId: userId,
+          callback: handleUpdateFriendStatus,
+        },
+      }),
+    );
+  };
+
+  const handleShowUnfriendConfirm = () => {
+    dispatch(
+      showModal({
+        modalType: types.confirm,
+        propsData: {
+          isModalVisible: true,
+          title: 'Remove friend',
+          content: 'Are you sure you want to remove this person as a friend?',
+          yesOptionTitle: 'Unfriend',
+          noOptionTitle: 'Cancel',
+          handleCancel: () => dispatch(hideModal()),
+          handleConfirm: handleUnfriend,
+        },
+      }),
+    );
+  };
+
+  const handleFriendBtnPress = () => {
+    switch (friendStatus) {
+      case FRIEND_STATUS.NON_FRIEND:
+        handleAddFriend();
+        break;
+
+      case FRIEND_STATUS.SEND_REQUEST:
+        handleCancelFriendRequest();
+        break;
+
+      case FRIEND_STATUS.REQUESTED:
+        handleShowRespondModal();
+        break;
+
+      case FRIEND_STATUS.FRIENDS:
+        handleShowUnfriendConfirm();
+    }
+  };
+
+  const getDate = (value) => {
+    let result = '';
+    let date = new Date(value);
+    result += `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} `;
+    return result;
+  };
+
+  const getIconByFriendStatus = () => {
+    if (friendStatus == FRIEND_STATUS.NON_FRIEND) {
+      return {
+        name: 'account-plus',
+        type: 'material-community',
+      };
+    } else if (friendStatus == FRIEND_STATUS.SEND_REQUEST) {
+      return {
+        name: 'account-arrow-right',
+        type: 'material-community',
+      };
+    }
+    return {
+      name: 'account-check',
+      type: 'material-community',
+    };
+  };
+
+  const getFriendBtnTitleByStatus = () => {
+    switch (friendStatus) {
+      case FRIEND_STATUS.NON_FRIEND:
+        return 'Add friend';
+
+      case FRIEND_STATUS.SEND_REQUEST:
+        return 'Requested';
+
+      case FRIEND_STATUS.REQUESTED:
+        return 'Respond';
+
+      case FRIEND_STATUS.FRIENDS:
+        return 'Friends';
+    }
+  };
+
   useEffect(() => {
     if (route.params && route.params.userId) {
       setUserId(route.params.userId);
@@ -60,23 +202,34 @@ const Profile = (props) => {
   }, [route]);
 
   useEffect(() => {
-    const initializeUserProfile = async (userId) => {
-      const info = await fetchUserInfo(userId);
-      console.log("user info: ", info);
-      const posts = await fetchUserPosts(userId);
-      setUserData({ info, posts });
-    };
     if (userId) {
-      initializeUserProfile(userId);
+      setFirstLoad(true);
     }
   }, [userId]);
 
-  const getDate = (value) => {
-    let result = "";
-    let date = new Date(value);
-    result += `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} `;
-    return result;
-  };
+  useEffect(() => {
+    if (isFirstLoad) {
+      initializeUserProfile(userId);
+    }
+  }, [isFirstLoad]);
+
+  useEffect(() => {
+    const friendStatus = userData.info.friendStatus;
+
+    if (!friendStatus) {
+      setFriendStatus(FRIEND_STATUS.NON_FRIEND);
+    } else {
+      if (friendStatus.status != '0' && friendStatus.status != '1') {
+        setFriendStatus(FRIEND_STATUS.NON_FRIEND);
+      } else if (friendStatus.status == '1') {
+        setFriendStatus(FRIEND_STATUS.FRIENDS);
+      } else if (friendStatus.sender == user.id) {
+        setFriendStatus(FRIEND_STATUS.SEND_REQUEST);
+      } else {
+        setFriendStatus(FRIEND_STATUS.REQUESTED);
+      }
+    }
+  }, [userData]);
 
   const renderUserActionButtons = () => {
     if (!userId) {
@@ -88,63 +241,75 @@ const Profile = (props) => {
         <>
           <Button
             buttonStyle={styles.addPostBtn}
-            title='Add post'
+            title="Add post"
             icon={{
-              type: "antdesign",
-              name: "pluscircle",
-              color: "rgb(255,255,255)",
+              type: 'antdesign',
+              name: 'pluscircle',
+              color: 'rgb(255,255,255)',
               size: 18,
             }}
             titleStyle={{
-              color: "rgb(255,255,255)",
+              color: 'rgb(255,255,255)',
             }}
+            onPress={() => navigation.navigate(stacks.createPost.name)}
           />
 
           <Button
             buttonStyle={styles.updateProfileBtn}
-            title='Edit profile'
+            title="Edit profile"
             icon={{
-              type: "antdesign",
-              name: "edit",
-              color: "rgb(0,0,0)",
+              type: 'antdesign',
+              name: 'edit',
+              color: 'rgb(0,0,0)',
               size: 18,
             }}
             titleStyle={{
-              color: "rgb(0,0,0)",
+              color: 'rgb(0,0,0)',
             }}
+            onPress={() => navigation.navigate(stacks.personalInformation.name)}
           />
         </>
       );
     }
+
+    const friendBtnTitle = getFriendBtnTitleByStatus();
+    const { name: iconName, type: iconType } = getIconByFriendStatus();
+
     return (
       <>
         <Button
           buttonStyle={styles.addFriendBtn}
-          title='Add friend'
+          title={friendBtnTitle}
           icon={{
-            type: "ionicons",
-            name: "person-add",
-            color: "rgb(255,255,255)",
+            type: iconType,
+            name: iconName,
+            color: 'rgb(255,255,255)',
             size: 18,
           }}
           titleStyle={{
-            fontWeight: "100",
-            color: "rgb(255,255,255)",
+            fontWeight: '100',
+            color: 'rgb(255,255,255)',
           }}
+          onPress={handleFriendBtnPress}
         />
 
         <Button
           buttonStyle={styles.messageBtn}
-          title='Message'
+          onPress={() =>
+            navigation.navigate(stacks.chatScreen.name, {
+              receivedId: userId,
+            })
+          }
+          title="Message"
           icon={{
-            type: "fontisto",
-            name: "messenger",
-            color: "rgb(255,255,255)",
+            type: 'fontisto',
+            name: 'messenger',
+            color: 'rgb(255,255,255)',
             size: 18,
           }}
           titleStyle={{
-            fontWeight: "100",
-            color: "rgb(255,255,255)",
+            fontWeight: '100',
+            color: 'rgb(255,255,255)',
           }}
         />
       </>
@@ -157,21 +322,20 @@ const Profile = (props) => {
         <View>
           <ImageBackground
             source={{
-              uri: "https://mondaycareer.com/wp-content/uploads/2020/11/background-%C4%91%E1%BA%B9p-2-1024x585.jpg",
+              uri: 'https://mondaycareer.com/wp-content/uploads/2020/11/background-%C4%91%E1%BA%B9p-2-1024x585.jpg',
             }}
-            alt='This is cover image'
+            alt="This is cover image"
             style={styles.cover}
-            
           >
             <Icon
               name="camera"
               type="entypo"
-              size={30} 
+              size={30}
               style={{
                 margin: 12,
                 padding: 8,
-                backgroundColor: "rgb(230, 230, 230)",
-                borderRadius: 24
+                backgroundColor: 'rgb(230, 230, 230)',
+                borderRadius: 24,
               }}
             />
           </ImageBackground>
@@ -183,19 +347,21 @@ const Profile = (props) => {
               size={88}
               source={{
                 // uri: `${ASSET_API_URL}/${userData.info.avatar.fileName}`,
-                uri: "https://i.etsystatic.com/29282700/r/il/e3aae5/3152845862/il_340x270.3152845862_q44u.jpg",
+                uri: 'https://i.etsystatic.com/29282700/r/il/e3aae5/3152845862/il_340x270.3152845862_q44u.jpg',
               }}
-              onPress={() => console.log("Pressed on avatar!")}
+              onPress={() => console.log('Pressed on avatar!')}
             />
-            <Avatar.Accessory 
+            <Avatar.Accessory
               name="camera"
               type="entypo"
               size={24}
               color="black"
               style={{
-                backgroundColor: "rgb(230, 230, 230)",
+                backgroundColor: 'rgb(230, 230, 230)',
               }}
-              onPress={() => {console.log("Press on Edit Avatar")}}
+              onPress={() => {
+                console.log('Press on Edit Avatar');
+              }}
             />
           </View>
         </View>
@@ -204,8 +370,8 @@ const Profile = (props) => {
         <View style={styles.buttonGroup}>
           {renderUserActionButtons()}
           <Icon
-            type='feather'
-            name='more-horizontal'
+            type="feather"
+            name="more-horizontal"
             size={16}
             containerStyle={styles.advanceIconContainer}
             onPress={() => {}}
@@ -215,9 +381,9 @@ const Profile = (props) => {
         <View>
           <ListItem containerStyle={{ paddingVertical: 6 }}>
             <Icon
-              type='antdesign'
-              name='contacts'
-              color='rgb(100,100,100)'
+              type="antdesign"
+              name="contacts"
+              color="rgb(100,100,100)"
               size={24}
             />
             <ListItem.Content>
@@ -227,14 +393,14 @@ const Profile = (props) => {
 
           <ListItem containerStyle={{ paddingVertical: 6 }}>
             <Icon
-              type='font-awesome'
-              name='birthday-cake'
-              color='rgb(100,100,100)'
+              type="font-awesome"
+              name="birthday-cake"
+              color="rgb(100,100,100)"
               size={24}
             />
             <ListItem.Content>
               <ListItem.Title>{`Birthday: ${
-                userData.info.birthday ? getDate(userData.info.birthday) : ""
+                userData.info.birthday ? getDate(userData.info.birthday) : ''
               }`}</ListItem.Title>
             </ListItem.Content>
           </ListItem>
@@ -247,22 +413,22 @@ const Profile = (props) => {
                   : stacks.listFriend.name,
                 {
                   userId,
-                }
+                },
               )
             }
           >
             <ListItem containerStyle={{ paddingVertical: 6, marginBottom: 20 }}>
               <Icon
-                type='font-awesome-5'
-                name='user-friends'
-                color='rgb(100,100,100)'
+                type="font-awesome-5"
+                name="user-friends"
+                color="rgb(100,100,100)"
                 size={20}
               />
               <ListItem.Content>
                 <ListItem.Title>Friends</ListItem.Title>
                 <ListItem.Subtitle>{`20 friends`}</ListItem.Subtitle>
               </ListItem.Content>
-              <ListItem.Chevron color='black' />
+              <ListItem.Chevron color="black" />
             </ListItem>
           </TouchableOpacity>
         </View>
@@ -270,76 +436,90 @@ const Profile = (props) => {
     );
   };
 
+  if (!userId || isFirstLoad) {
+    return (
+      <View
+        style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+          flex: 1,
+        }}
+      >
+        <ActivityIndicator size="large" color="rgba(0,0,0,0.3)" />
+      </View>
+    );
+  }
+
   return <PostList posts={userData.posts} header={ProfileHeader} />;
 };
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#FFF",
+    backgroundColor: '#FFF',
   },
   cover: {
     width: DEVICE_WIDTH,
     height: 180,
-    alignItems: "flex-end",
+    alignItems: 'flex-end',
   },
   profileOutterContainer: {
-    backgroundColor: "rgb(255,255,255)",
-    alignItems: "center",
+    backgroundColor: 'rgb(255,255,255)',
+    alignItems: 'center',
     paddingBottom: 6,
-    position: "relative",
+    position: 'relative',
   },
   profileInnerContainer: {
     marginTop: -50,
   },
 
   name: {
-    backgroundColor: "rgb(255,255,255)",
-    textAlign: "center",
+    backgroundColor: 'rgb(255,255,255)',
+    textAlign: 'center',
     fontSize: 32,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
 
   buttonGroup: {
-    backgroundColor: "rgb(255,255,255)",
-    width: "100%",
-    flexDirection: "row",
+    backgroundColor: 'rgb(255,255,255)',
+    width: '100%',
+    flexDirection: 'row',
     marginVertical: 20,
-    justifyContent: "center",
+    justifyContent: 'center',
   },
   addPostBtn: {
-    backgroundColor: "rgb(51, 133, 255)",
+    backgroundColor: 'rgb(51, 133, 255)',
     borderRadius: 8,
-    width: "50%",
+    width: '50%',
     minWidth: 150,
     padding: 6,
     marginRight: 6,
   },
   updateProfileBtn: {
-    backgroundColor: "rgb(230, 230, 230)",
+    backgroundColor: 'rgb(230, 230, 230)',
     borderRadius: 8,
     minWidth: 140,
-    width: "50%",
+    width: '50%',
     padding: 6,
   },
   addFriendBtn: {
-    backgroundColor: "rgb(51, 133, 255)",
+    backgroundColor: 'rgb(51, 133, 255)',
     borderRadius: 8,
-    width: "50%",
+    width: '50%',
     minWidth: 150,
     padding: 6,
     marginRight: 6,
   },
   messageBtn: {
-    backgroundColor: "rgb(51, 133, 255)",
+    backgroundColor: 'rgb(51, 133, 255)',
     borderRadius: 8,
     minWidth: 150,
-    width: "50%",
+    width: '50%',
     padding: 6,
   },
   advanceIconContainer: {
-    backgroundColor: "rgb(230, 230, 230)",
+    backgroundColor: 'rgb(230, 230, 230)',
     borderRadius: 8,
-    justifyContent: "center",
+    justifyContent: 'center',
     width: 40,
     marginLeft: 6,
   },
