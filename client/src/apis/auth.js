@@ -39,15 +39,6 @@ const changePassword = async (currentPassword, newPassword, token) => {
 };
 
 const editInfo = async (userInfo, token) => {
-  // const {
-  //   username,
-  //   gender,
-  //   birthday,
-  //   address,
-  // } = userInfo;
-
-  console.log('data', userInfo);
-
   const newInfo = await api({
     method: 'POST',
     url: 'users/edit',

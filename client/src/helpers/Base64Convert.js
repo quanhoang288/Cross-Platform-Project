@@ -5,7 +5,6 @@ const formatIntoBase64String = (data, mediaType) => {
 };
 
 const convertToBase64 = async (assets) => {
-  console.log(assets);
   const mimeTypes = assets.map((asset) => {
     const fileName = asset.filename;
     const mediaType = asset.mediaType === 'photo' ? 'image' : 'video';

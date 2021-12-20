@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   View,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   ImageBackground,
 } from 'react-native';
@@ -14,14 +13,14 @@ import {
   Icon,
   Image,
   ListItem,
+  LinearProgress,
   Text,
 } from 'react-native-elements';
-import { useNavigation } from '@react-navigation/core';
 import { PostList } from '../../components/post';
 import { DEVICE_WIDTH } from '../../constants/dimensions';
 import { auth, friend, post } from '../../apis';
 import { useDispatch, useSelector } from 'react-redux';
-import { useRoute } from '@react-navigation/core';
+import { useNavigation, useRoute } from '@react-navigation/core';
 import { stacks } from '../../constants/title';
 import { ASSET_API_URL } from '../../configs';
 import FRIEND_STATUS from '../../constants/friendStatus';
@@ -29,7 +28,6 @@ import { Toast } from '../../helpers';
 import { hideModal, showModal } from '../../redux/reducers/modalReducer';
 import { types } from '../../constants/modalTypes';
 import convertToBase64 from '../../helpers/Base64Convert';
-import { Toast } from '../../helpers';
 import { LogBox } from 'react-native';
 import { mediaActions } from '../../redux/actions';
 
@@ -38,23 +36,22 @@ LogBox.ignoreLogs([
 ]);
 
 const Profile = (props) => {
-  const user = useSelector((state) => state.auth.user);
   const [userData, setUserData] = useState({ info: {}, posts: [] });
   const [userId, setUserId] = useState(null);
   const [isFirstLoad, setFirstLoad] = useState(false);
   const [friendStatus, setFriendStatus] = useState(FRIEND_STATUS.NON_FRIEND);
-
-  const dispatch = useDispatch();
-  const navigation = useNavigation();
-  const route = useRoute();
   const [profileImgUris, setProfileImgUris] = useState({
     avatar: null,
     coverImage: null,
   });
+  const [updateType, setUpdateType] = useState(null);
+
+  const user = useSelector((state) => state.auth.user);
+  const selectedAssets = useSelector((state) => state.media.selectedAssets);
 
   const dispatch = useDispatch();
-
-  const selectedAssets = useSelector((state) => state.media.selectedAssets);
+  const navigation = useNavigation();
+  const route = useRoute();
 
   const fetchUserInfo = async (userId) => {
     try {
@@ -255,10 +252,9 @@ const Profile = (props) => {
     }
   }, [userData]);
 
-  const handleUpdateProfileImg = async (type) => {
+  const handleUpdateProfileImg = async (type, selectedAssets) => {
     const base64Assets = await convertToBase64(selectedAssets);
     const imageToUpload = base64Assets[0];
-    console.log('image: ', imageToUpload);
 
     let updateData = {
       [type]: imageToUpload,
@@ -267,7 +263,6 @@ const Profile = (props) => {
     try {
       const editRes = await auth.editInfo(updateData, user.token);
       const userInfo = editRes.data.data;
-      console.log('user info: ', userInfo);
 
       setProfileImgUris({
         avatar: `${ASSET_API_URL}/${userInfo.avatar.fileName}`,
@@ -279,6 +274,7 @@ const Profile = (props) => {
           ? 'Update avatar succesfully'
           : 'Update cover image successfully';
       Toast.showSuccessMessage(successMsg);
+      setUpdateType(null);
     } catch (error) {
       console.log('error');
       const errMsg =
@@ -289,9 +285,44 @@ const Profile = (props) => {
     }
   };
 
-  const handleUpdateAvatar = () => handleUpdateProfileImg('avatar');
+  useEffect(() => {
+    if (route.params && route.params.userId) {
+      setUserId(route.params.userId);
+    } else {
+      setUserId(user.id);
+    }
+  }, [route]);
 
-  const handleUpdateCoverImage = () => handleUpdateProfileImg('cover_image');
+  useEffect(() => {
+    const initializeUserProfile = async (userId) => {
+      const info = await fetchUserInfo(userId);
+      const posts = await fetchUserPosts(userId);
+      setUserData({ info, posts });
+    };
+    if (userId) {
+      initializeUserProfile(userId);
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    const info = userData.info;
+    if (info.avatar && info.cover_image) {
+      setProfileImgUris({
+        avatar: `${ASSET_API_URL}/${info.avatar.fileName}`,
+        coverImage: `${ASSET_API_URL}/${info.cover_image.fileName}`,
+      });
+    }
+  }, [userData]);
+
+  useEffect(() => {
+    if (
+      route.name === stacks.profile.name &&
+      updateType &&
+      selectedAssets.length > 0
+    ) {
+      handleUpdateProfileImg(updateType, selectedAssets);
+    }
+  }, [selectedAssets, updateType, route]);
 
   const renderUserActionButtons = () => {
     if (!userId) {
@@ -388,31 +419,38 @@ const Profile = (props) => {
             }}
             alt="This is cover image"
             style={styles.cover}
+            imageStyle={{ borderTopLeftRadius: 10, borderTopRightRadius: 10 }}
           >
-            <Icon
-              name="camera"
-              type="entypo"
-              size={30}
-              style={{
-                margin: 12,
-                padding: 8,
-                backgroundColor: 'rgb(230, 230, 230)',
-                borderRadius: 24,
-              }}
+            <TouchableOpacity
               onPress={() =>
                 navigation.navigate(stacks.mediaPicker.name, {
                   isSingleSelect: true,
-                  handleBack: handleUpdateCoverImage,
+                  headerRightTitle: 'Save',
+                  callback: () => setUpdateType('cover_image'),
                 })
               }
-            />
+            >
+              <Icon
+                name="camera"
+                type="entypo"
+                size={36}
+                iconStyle={{
+                  backgroundColor: 'rgb(230, 230, 230)',
+                  padding: 8,
+                  borderRadius: 24,
+                }}
+                style={{
+                  backgroundColor: 'rgb(230, 230, 230)',
+                }}
+              />
+            </TouchableOpacity>
           </ImageBackground>
         </View>
         <View style={styles.profileOutterContainer}>
           <View style={styles.profileInnerContainer}>
             <Avatar
               rounded
-              size={88}
+              size={150}
               source={{
                 uri: profileImgUris.avatar,
               }}
@@ -421,15 +459,19 @@ const Profile = (props) => {
             <Avatar.Accessory
               name="camera"
               type="entypo"
-              size={24}
-              color="black"
+              size={42}
+              iconProps={{
+                size: 28,
+                color: 'black',
+              }}
               style={{
                 backgroundColor: 'rgb(230, 230, 230)',
               }}
               onPress={() =>
                 navigation.navigate(stacks.mediaPicker.name, {
                   isSingleSelect: true,
-                  handleBack: handleUpdateAvatar,
+                  headerRightTitle: 'Save',
+                  callback: () => setUpdateType('avatar'),
                 })
               }
             />
@@ -520,7 +562,12 @@ const Profile = (props) => {
     );
   }
 
-  return <PostList posts={userData.posts} header={ProfileHeader} />;
+  return (
+    <View>
+      {updateType && <LinearProgress color="white" trackColor="#2eb0fb" />}
+      <PostList posts={userData.posts} header={ProfileHeader} />
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
@@ -528,8 +575,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
   },
   cover: {
-    width: DEVICE_WIDTH,
-    height: 180,
+    marginTop: 20,
+    paddingTop: 5,
+    paddingRight: 5,
+    marginHorizontal: 10,
+    width: DEVICE_WIDTH - 20,
+    height: 240,
     alignItems: 'flex-end',
   },
   profileOutterContainer: {

@@ -65,7 +65,7 @@ const PostItem = ({ post, postList }) => {
           <Avatar
             rounded
             source={{
-              uri: post.author.avatar.fileName,
+              uri: post.author.avatar?.fileName,
             }}
             onPress={() =>
               navigation.navigate(stacks.profile.name, {

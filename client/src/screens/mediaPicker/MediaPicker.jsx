@@ -10,27 +10,30 @@ import { useSelector } from 'react-redux';
 import { DEVICE_WIDTH } from '../../constants/dimensions';
 import { Picker } from '@react-native-picker/picker';
 import { StatusBar } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { useCallback } from 'react';
 
 const Header = (props) => {
   const Item = Picker.Item;
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
+
+  const handleCancel = () => {
+    dispatch(mediaActions.resetState());
+    navigation.pop();
+  };
 
   return (
     <View
       style={{
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        alignItems: 'center',
         marginBottom: 10,
       }}
     >
-      <Icon
-        name="close"
-        type="antdesign"
-        iconStyle={{
-          marginLeft: 10,
-        }}
-        onPress={props.handleBack}
-      />
+      <View style={{ paddingLeft: 10, paddingRight: 30 }}>
+        <Icon name="close" type="antdesign" onPress={handleCancel} />
+      </View>
 
       <View style={{ width: 200 }}>
         <Picker
@@ -47,54 +50,66 @@ const Header = (props) => {
 
       {props.selectedAssets.length > 0 ? (
         <Button
-          title="Next"
-          containerStyle={{ marginRight: 20 }}
-          style={{ marginRight: 20 }}
-          onPress={props.handleBack}
+          title={props.headerRightTitle}
+          containerStyle={{ marginLeft: 10, width: 75 }}
+          onPress={props.handleNext}
         />
       ) : (
-        <Icon
-          type="antdesign"
-          name="camera"
-          size={28}
-          iconStyle={{ marginRight: 20 }}
-          onPress={props.handleLaunchCamera}
-        />
+        <View style={{ marginLeft: 50 }}>
+          <Icon
+            type="antdesign"
+            name="camera"
+            size={32}
+            onPress={props.handleLaunchCamera}
+          />
+        </View>
       )}
     </View>
   );
 };
 
-const areEqual = (prevProps, nextProps) => {
-  const { item, selectedAssets } = nextProps;
-  const { item: prevItem, selectedAssets: prevSelectedAssets } = prevProps;
+const MediaItem = (props) => {
+  const dispatch = useDispatch();
+  const selectedAssets = useSelector((state) => state.media.selectedAssets);
+  const { item, isSingleSelect } = props;
 
-  if (item !== prevItem) {
-    return false;
-  }
+  const handleItemSelected = useCallback(
+    (item) => {
+      const isAlreadySelected =
+        selectedAssets.findIndex((asset) => asset.uri == item.uri) >= 0;
 
-  const selectedIndex = selectedAssets.findIndex(
-    (asset) => asset.uri === item.uri,
+      if (isAlreadySelected) {
+        dispatch(mediaActions.removeAsset(item));
+        return;
+      }
+
+      if (isSingleSelect) {
+        if (selectedAssets.length == 0 && item.mediaType == 'video') {
+          Toast.showFailureMessage('You can select image only');
+          return;
+        } else if (selectedAssets.length == 1) {
+          Toast.showFailureMessage('You can select 1 image only');
+          return;
+        }
+      } else if (
+        selectedAssets.length == 1 &&
+        selectedAssets[0].mediaType == 'video'
+      ) {
+        Toast.showFailureMessage('You can select 1 video only');
+        return;
+      } else if (selectedAssets.length == 4) {
+        Toast.showFailureMessage('You can select up to 4 images only');
+        return;
+      }
+
+      dispatch(mediaActions.addAsset(item));
+    },
+    [selectedAssets],
   );
-  const prevSelectedIndex = prevSelectedAssets.findIndex(
-    (asset) => asset.uri === item.uri,
-  );
 
-  return selectedIndex === prevSelectedIndex;
-};
-
-const MediaItem = React.memo((props) => {
-  const { selectedAssets, item, isSingleSelect, handleItemSelected } = props;
-
-  const isInSelectedAssets = () => {
-    return selectedAssets.filter((asset) => asset.uri === item.uri).length > 0;
-  };
-
-  const getIndexInSelectedAssets = () => {
+  const getIndexInSelectedAssets = useCallback(() => {
     return selectedAssets.findIndex((asset) => asset.uri === item.uri);
-  };
-
-  const isSelected = isInSelectedAssets();
+  }, [selectedAssets]);
 
   return (
     <TouchableOpacity
@@ -112,9 +127,10 @@ const MediaItem = React.memo((props) => {
         style={[
           styles.selectedImage,
           {
-            backgroundColor: isInSelectedAssets()
-              ? 'rgba(255,255,255,0.40);'
-              : 'transparent',
+            backgroundColor:
+              getIndexInSelectedAssets() > -1
+                ? 'rgba(255,255,255,0.40);'
+                : 'transparent',
           },
         ]}
       />
@@ -123,31 +139,36 @@ const MediaItem = React.memo((props) => {
         style={[
           styles.selected,
           {
-            backgroundColor: isSelected ? '#0275d8' : '#292b2c',
+            backgroundColor:
+              getIndexInSelectedAssets() > -1 ? '#0275d8' : '#292b2c',
             borderColor: 'white',
             borderWidth: 2,
           },
         ]}
       >
         {isSingleSelect ? (
-          isSelected && (
+          getIndexInSelectedAssets() > -1 && (
             <Icon
               type="font-awesome"
               name="check"
               color="white"
               iconStyle={styles.check}
+              size={16}
               style={styles.check}
+              containerStyle={{ marginBottom: 2 }}
             />
           )
         ) : (
           <Text style={styles.text}>
-            {isSelected ? getIndexInSelectedAssets() + 1 : ''}
+            {getIndexInSelectedAssets() > -1
+              ? getIndexInSelectedAssets() + 1
+              : ''}
           </Text>
         )}
       </View>
     </TouchableOpacity>
   );
-}, areEqual);
+};
 
 const Content = (props) => {
   return (
@@ -161,7 +182,7 @@ const Content = (props) => {
         <MediaItem
           item={item}
           selectedAssets={props.selectedAssets}
-          handleItemSelected={props.handleItemSelected}
+          // handleItemSelected={props.handleItemSelected}
           isSingleSelect={props.isSingleSelect}
         />
       )}
@@ -183,18 +204,6 @@ const MediaPicker = ({ navigation }) => {
 
   const selectedAssets = useSelector((state) => state.media.selectedAssets);
 
-  useEffect(() => {
-    console.log('selected: ', selectedAssets);
-  }, [selectedAssets]);
-
-  useEffect(() => {
-    const fetchAlbumAssets = async (albumName) => {
-      const albumAssets = await fetchAllAssetsInAlbum(albumName);
-      setAlbumAssets(albumAssets);
-    };
-    fetchAlbumAssets(selectedAlbum);
-  }, [selectedAlbum]);
-
   const fetchAllAssetsInAlbum = async (albumName) => {
     let albumAssets = [];
 
@@ -207,47 +216,13 @@ const MediaPicker = ({ navigation }) => {
     return albumAssets.assets;
   };
 
-  const handleBack = () => {
-    if (route.params && route.params.handleBack) {
-      route.params.handleBack();
+  const handleNext = () => {
+    if (route.params && route.params.callback) {
+      route.params.callback();
     }
     navigation.pop();
   };
   const handleAlbumSelected = (album) => setSelectedAlbum(album);
-
-  const handleItemSelected = (item) => {
-    const isAlreadySelected =
-      selectedAssets.findIndex((asset) => asset.uri === item.uri) >= 0;
-
-    console.log(selectedAssets);
-
-    if (isAlreadySelected) {
-      console.log('removing asset');
-      dispatch(mediaActions.removeAsset(item));
-      return;
-    }
-
-    if (isSingleSelect) {
-      if (selectedAssets.length == 0 && item.mediaType == 'video') {
-        Toast.showFailureMessage('You can select image only');
-        return;
-      } else if (selectedAssets.length == 1) {
-        Toast.showFailureMessage('You can select 1 image only');
-        return;
-      }
-    } else if (
-      selectedAssets.length == 1 &&
-      selectedAssets[0].mediaType == 'video'
-    ) {
-      Toast.showFailureMessage('You can select 1 video only');
-      return;
-    } else if (selectedAssets.length == 4) {
-      Toast.showFailureMessage('You can select up to 4 images only');
-      return;
-    }
-
-    dispatch(mediaActions.addAsset(item));
-  };
 
   const handleLaunchCamera = async () => {
     const result = await ImageHelper.launchCamera();
@@ -261,23 +236,27 @@ const MediaPicker = ({ navigation }) => {
     }
   };
 
+  useEffect(() => {
+    const fetchAlbumAssets = async (albumName) => {
+      const albumAssets = await fetchAllAssetsInAlbum(albumName);
+      setAlbumAssets(albumAssets);
+    };
+    fetchAlbumAssets(selectedAlbum);
+  }, [selectedAlbum]);
+
   return (
     <View style={styles.container}>
       <Header
         albumNames={albumNames}
         selectedAssets={selectedAssets}
         selectedAlbum={selectedAlbum}
-        handleBack={handleBack}
+        handleNext={handleNext}
         handleAlbumSelected={handleAlbumSelected}
         handleLaunchCamera={handleLaunchCamera}
+        headerRightTitle={route.params?.headerRightTitle || 'Next'}
       />
 
-      <Content
-        albumAssets={albumAssets}
-        selectedAssets={selectedAssets}
-        handleItemSelected={handleItemSelected}
-        isSingleSelect={isSingleSelect}
-      />
+      <Content albumAssets={albumAssets} isSingleSelect={isSingleSelect} />
     </View>
   );
 };
@@ -304,7 +283,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   check: {
-    color: '#000',
+    color: 'rgb(230,230,230)',
   },
   selected: {
     position: 'absolute',
