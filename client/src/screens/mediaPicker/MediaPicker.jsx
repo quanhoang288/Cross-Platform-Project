@@ -5,11 +5,12 @@ import { Button, Text, Image, Icon } from 'react-native-elements';
 import { useDispatch } from 'react-redux';
 import { mediaActions } from '../../redux/actions';
 import { mediaReducer } from '../../redux/reducers';
-import { ImageHelper } from '../../helpers';
+import { ImageHelper, Toast } from '../../helpers';
 import { useSelector } from 'react-redux';
 import { DEVICE_WIDTH } from '../../constants/dimensions';
 import { Picker } from '@react-native-picker/picker';
 import { StatusBar } from 'react-native';
+import { useRoute } from '@react-navigation/native';
 
 const Header = (props) => {
   const Item = Picker.Item;
@@ -83,8 +84,7 @@ const areEqual = (prevProps, nextProps) => {
 };
 
 const MediaItem = React.memo((props) => {
-  const selectedAssets = props.selectedAssets;
-  const item = props.item;
+  const { selectedAssets, item, isSingleSelect, handleItemSelected } = props;
 
   const isInSelectedAssets = () => {
     return selectedAssets.filter((asset) => asset.uri === item.uri).length > 0;
@@ -94,10 +94,12 @@ const MediaItem = React.memo((props) => {
     return selectedAssets.findIndex((asset) => asset.uri === item.uri);
   };
 
+  const isSelected = isInSelectedAssets();
+
   return (
     <TouchableOpacity
       style={{ position: 'relative' }}
-      onPress={() => props.handleItemSelected(item)}
+      onPress={() => handleItemSelected(item)}
     >
       <Image
         source={{
@@ -121,15 +123,27 @@ const MediaItem = React.memo((props) => {
         style={[
           styles.selected,
           {
-            backgroundColor: isInSelectedAssets() ? '#0275d8' : '#292b2c',
+            backgroundColor: isSelected ? '#0275d8' : '#292b2c',
             borderColor: 'white',
             borderWidth: 2,
           },
         ]}
       >
-        <Text style={styles.text}>
-          {isInSelectedAssets() ? getIndexInSelectedAssets() + 1 : ''}
-        </Text>
+        {isSingleSelect ? (
+          isSelected && (
+            <Icon
+              type="font-awesome"
+              name="check"
+              color="white"
+              iconStyle={styles.check}
+              style={styles.check}
+            />
+          )
+        ) : (
+          <Text style={styles.text}>
+            {isSelected ? getIndexInSelectedAssets() + 1 : ''}
+          </Text>
+        )}
       </View>
     </TouchableOpacity>
   );
@@ -148,6 +162,7 @@ const Content = (props) => {
           item={item}
           selectedAssets={props.selectedAssets}
           handleItemSelected={props.handleItemSelected}
+          isSingleSelect={props.isSingleSelect}
         />
       )}
       keyExtractor={(item) => item.id}
@@ -159,10 +174,18 @@ const Content = (props) => {
 const MediaPicker = ({ navigation }) => {
   const albumNames = ['Camera', 'Screenshots', 'Messenger', 'Zalo', 'Facebook'];
   const dispatch = useDispatch();
+  const route = useRoute();
+
   const [selectedAlbum, setSelectedAlbum] = useState(albumNames[0]);
   const [albumAssets, setAlbumAssets] = useState([]);
 
+  const isSingleSelect = (route.params && route.params.isSingleSelect) || false;
+
   const selectedAssets = useSelector((state) => state.media.selectedAssets);
+
+  useEffect(() => {
+    console.log('selected: ', selectedAssets);
+  }, [selectedAssets]);
 
   useEffect(() => {
     const fetchAlbumAssets = async (albumName) => {
@@ -184,22 +207,57 @@ const MediaPicker = ({ navigation }) => {
     return albumAssets.assets;
   };
 
-  const handleBack = () => navigation.pop();
-
+  const handleBack = () => {
+    if (route.params && route.params.handleBack) {
+      route.params.handleBack();
+    }
+    navigation.pop();
+  };
   const handleAlbumSelected = (album) => setSelectedAlbum(album);
 
   const handleItemSelected = (item) => {
-    if (selectedAssets.findIndex((asset) => asset.uri === item.uri) >= 0) {
+    const isAlreadySelected =
+      selectedAssets.findIndex((asset) => asset.uri === item.uri) >= 0;
+
+    console.log(selectedAssets);
+
+    if (isAlreadySelected) {
+      console.log('removing asset');
       dispatch(mediaActions.removeAsset(item));
-    } else {
-      dispatch(mediaActions.addAsset(item));
+      return;
     }
+
+    if (isSingleSelect) {
+      if (selectedAssets.length == 0 && item.mediaType == 'video') {
+        Toast.showFailureMessage('You can select image only');
+        return;
+      } else if (selectedAssets.length == 1) {
+        Toast.showFailureMessage('You can select 1 image only');
+        return;
+      }
+    } else if (
+      selectedAssets.length == 1 &&
+      selectedAssets[0].mediaType == 'video'
+    ) {
+      Toast.showFailureMessage('You can select 1 video only');
+      return;
+    } else if (selectedAssets.length == 4) {
+      Toast.showFailureMessage('You can select up to 4 images only');
+      return;
+    }
+
+    dispatch(mediaActions.addAsset(item));
   };
 
   const handleLaunchCamera = async () => {
     const result = await ImageHelper.launchCamera();
     if (!result.cancelled) {
       console.log(result.uri);
+      dispatch(
+        mediaActions.addAsset({
+          uri: result.uri,
+        }),
+      );
     }
   };
 
@@ -218,6 +276,7 @@ const MediaPicker = ({ navigation }) => {
         albumAssets={albumAssets}
         selectedAssets={selectedAssets}
         handleItemSelected={handleItemSelected}
+        isSingleSelect={isSingleSelect}
       />
     </View>
   );
@@ -243,6 +302,9 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 13,
     color: '#FFFFFF',
+  },
+  check: {
+    color: '#000',
   },
   selected: {
     position: 'absolute',

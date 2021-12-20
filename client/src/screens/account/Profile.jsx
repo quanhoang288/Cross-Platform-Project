@@ -28,6 +28,14 @@ import FRIEND_STATUS from '../../constants/friendStatus';
 import { Toast } from '../../helpers';
 import { hideModal, showModal } from '../../redux/reducers/modalReducer';
 import { types } from '../../constants/modalTypes';
+import convertToBase64 from '../../helpers/Base64Convert';
+import { Toast } from '../../helpers';
+import { LogBox } from 'react-native';
+import { mediaActions } from '../../redux/actions';
+
+LogBox.ignoreLogs([
+  'Non-serializable values were found in the navigation state',
+]);
 
 const Profile = (props) => {
   const user = useSelector((state) => state.auth.user);
@@ -39,6 +47,14 @@ const Profile = (props) => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const route = useRoute();
+  const [profileImgUris, setProfileImgUris] = useState({
+    avatar: null,
+    coverImage: null,
+  });
+
+  const dispatch = useDispatch();
+
+  const selectedAssets = useSelector((state) => state.media.selectedAssets);
 
   const fetchUserInfo = async (userId) => {
     try {
@@ -215,6 +231,14 @@ const Profile = (props) => {
 
   useEffect(() => {
     const friendStatus = userData.info.friendStatus;
+    const info = userData.info;
+
+    if (info.avatar && info.cover_image) {
+      setProfileImgUris({
+        avatar: `${ASSET_API_URL}/${info.avatar.fileName}`,
+        coverImage: `${ASSET_API_URL}/${info.cover_image.fileName}`,
+      });
+    }
 
     if (!friendStatus) {
       setFriendStatus(FRIEND_STATUS.NON_FRIEND);
@@ -230,6 +254,44 @@ const Profile = (props) => {
       }
     }
   }, [userData]);
+
+  const handleUpdateProfileImg = async (type) => {
+    const base64Assets = await convertToBase64(selectedAssets);
+    const imageToUpload = base64Assets[0];
+    console.log('image: ', imageToUpload);
+
+    let updateData = {
+      [type]: imageToUpload,
+    };
+
+    try {
+      const editRes = await auth.editInfo(updateData, user.token);
+      const userInfo = editRes.data.data;
+      console.log('user info: ', userInfo);
+
+      setProfileImgUris({
+        avatar: `${ASSET_API_URL}/${userInfo.avatar.fileName}`,
+        coverImage: `${ASSET_API_URL}/${userInfo.cover_image.fileName}`,
+      });
+      dispatch(mediaActions.resetState());
+      const successMsg =
+        type == 'avatar'
+          ? 'Update avatar succesfully'
+          : 'Update cover image successfully';
+      Toast.showSuccessMessage(successMsg);
+    } catch (error) {
+      console.log('error');
+      const errMsg =
+        type == 'avatar'
+          ? 'Error updating avatar'
+          : 'Error updating cover image';
+      Toast.showFailureMessage(errMsg);
+    }
+  };
+
+  const handleUpdateAvatar = () => handleUpdateProfileImg('avatar');
+
+  const handleUpdateCoverImage = () => handleUpdateProfileImg('cover_image');
 
   const renderUserActionButtons = () => {
     if (!userId) {
@@ -322,7 +384,7 @@ const Profile = (props) => {
         <View>
           <ImageBackground
             source={{
-              uri: 'https://mondaycareer.com/wp-content/uploads/2020/11/background-%C4%91%E1%BA%B9p-2-1024x585.jpg',
+              uri: profileImgUris.coverImage,
             }}
             alt="This is cover image"
             style={styles.cover}
@@ -337,6 +399,12 @@ const Profile = (props) => {
                 backgroundColor: 'rgb(230, 230, 230)',
                 borderRadius: 24,
               }}
+              onPress={() =>
+                navigation.navigate(stacks.mediaPicker.name, {
+                  isSingleSelect: true,
+                  handleBack: handleUpdateCoverImage,
+                })
+              }
             />
           </ImageBackground>
         </View>
@@ -346,8 +414,7 @@ const Profile = (props) => {
               rounded
               size={88}
               source={{
-                // uri: `${ASSET_API_URL}/${userData.info.avatar.fileName}`,
-                uri: 'https://i.etsystatic.com/29282700/r/il/e3aae5/3152845862/il_340x270.3152845862_q44u.jpg',
+                uri: profileImgUris.avatar,
               }}
               onPress={() => console.log('Pressed on avatar!')}
             />
@@ -359,9 +426,12 @@ const Profile = (props) => {
               style={{
                 backgroundColor: 'rgb(230, 230, 230)',
               }}
-              onPress={() => {
-                console.log('Press on Edit Avatar');
-              }}
+              onPress={() =>
+                navigation.navigate(stacks.mediaPicker.name, {
+                  isSingleSelect: true,
+                  handleBack: handleUpdateAvatar,
+                })
+              }
             />
           </View>
         </View>

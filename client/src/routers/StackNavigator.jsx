@@ -2,7 +2,8 @@ import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { stacks } from "../constants/title";
 import TabNavigator from "./TabNavigator";
-import { CreatePost, Comment, MediaPicker } from "../screens/post";
+import { CreatePost, Comment } from "../screens/post";
+import { MediaPicker } from "../screens/mediaPicker";
 import { Profile } from "../screens/account";
 import { ChangePW, PersonalInformation } from "../screens/advance";
 import {

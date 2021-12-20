@@ -120,6 +120,7 @@ usersController.edit = async (req, res, next) => {
   try {
     let userId = req.userId;
     let user;
+    console.log(req.body);
     const { avatar, cover_image } = req.body;
     const dataUserUpdate = {};
     const listPros = [
@@ -138,6 +139,7 @@ usersController.edit = async (req, res, next) => {
       if (req.body.hasOwnProperty(pro)) {
         switch (pro) {
           case "avatar":
+            console.log("avatar");
             let savedAvatarDocument = null;
             if (uploadFile.matchesFileBase64(avatar) !== false) {
               const avatarResult = uploadFile.uploadFile(avatar);
@@ -157,6 +159,7 @@ usersController.edit = async (req, res, next) => {
             break;
           case "cover_image":
             let savedCoverImageDocument = null;
+            console.log(cover_image);
             if (uploadFile.matchesFileBase64(cover_image) !== false) {
               const coverImageResult = uploadFile.uploadFile(cover_image);
               if (coverImageResult !== false) {
