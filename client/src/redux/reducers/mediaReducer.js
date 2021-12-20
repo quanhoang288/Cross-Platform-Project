@@ -7,8 +7,8 @@ const addAsset = (asset, state) => {
   return [...state.selectedAssets, asset];
 };
 
-const removeAsset = (removedAsset, state) => {
-  return state.selectedAssets.filter((asset) => asset.uri !== removedAsset.uri);
+const removeAsset = (asset, state) => {
+  return state.selectedAssets.filter((item) => item.uri !== asset.uri);
 };
 
 export default mediaReducer = (state = initialState, action) => {
