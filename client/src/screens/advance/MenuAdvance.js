@@ -7,38 +7,42 @@ import { useNavigation } from '@react-navigation/core';
 import { stacks } from '../../constants/title';
 import { useDispatch, useSelector } from 'react-redux';
 import { authActions } from '../../redux/actions';
+import { auth } from '../../apis';
 
 const MenuAdvance = () => {
   // user
-  const user = useSelector(state => state.auth.user);
+  const user = useSelector((state) => state.auth.user);
   // console.log(user);
 
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
+    await auth.logout(user.token);
     dispatch(authActions.logout());
     navigation.navigate(stacks.signIn.name);
-  }
+  };
 
-  return(
+  return (
     <View style={styles.container}>
       <FunctionalityItem
         icon={{
-          name:'user',
-          type:'feather'
+          name: 'user',
+          type: 'feather',
         }}
         content="User profile"
         note="View your personal posts and images"
-        onPress={() => navigation.navigate(stacks.profile.name, {
-          userId: user.id,
-        })}
+        onPress={() =>
+          navigation.navigate(stacks.profile.name, {
+            userId: user.id,
+          })
+        }
       />
 
       <FunctionalityItem
         icon={{
-          name:'user',
-          type:'feather'
+          name: 'user',
+          type: 'feather',
         }}
         content="Personal Information"
         note="Show your personal information"
@@ -47,43 +51,42 @@ const MenuAdvance = () => {
 
       <FunctionalityItem
         icon={{
-          name:'users',
-          type:'feather'
+          name: 'users',
+          type: 'feather',
         }}
         content="Friends"
         note="See your friends"
-        onPress={() => navigation.navigate(stacks.friendTabs.name, {
-          userId: user.id,
-        })}
-
+        onPress={() =>
+          navigation.navigate(stacks.friendTabs.name, {
+            userId: user.id,
+          })
+        }
       />
 
       <FunctionalityItem
         icon={{
-          name:'user-x',
-          type:'feather'
+          name: 'user-x',
+          type: 'feather',
         }}
         content="Black list"
         note="Person who you don't wanna see"
         onPress={() => navigation.navigate(stacks.friendRequest.name)}
-
       />
 
       <FunctionalityItem
         icon={{
-          name:'exchange',
-          type:'font-awesome'
+          name: 'exchange',
+          type: 'font-awesome',
         }}
         content="Change password"
         note=""
         onPress={() => navigation.navigate(stacks.changePW.name)}
-
       />
 
       <FunctionalityItem
         icon={{
-          name:'help-circle',
-          type:'feather'
+          name: 'help-circle',
+          type: 'feather',
         }}
         content="Help ?"
         note="Is there anything I can help for you?"
@@ -91,23 +94,22 @@ const MenuAdvance = () => {
 
       <FunctionalityItem
         icon={{
-          name:'log-out',
-          type:'feather'
+          name: 'log-out',
+          type: 'feather',
         }}
         content="Sign out"
         note=""
         onPress={handleSignOut}
       />
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
-  container:{
+  container: {
     // alignItems:'center',
     // justifyContent:'center'
   },
-})
-
+});
 
 export default MenuAdvance;

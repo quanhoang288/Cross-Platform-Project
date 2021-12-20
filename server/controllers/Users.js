@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const UserModel = require("../models/Users");
 const DocumentModel = require("../models/Documents");
 const FriendModel = require("../models/Friends");
+const AuthModel = require("../models/Auth");
 const httpStatus = require("../utils/httpStatus");
 const bcrypt = require("bcrypt");
 const { JWT_SECRET } = require("../constants/constants");
@@ -88,6 +89,15 @@ usersController.login = async (req, res, next) => {
         message: "Username or password incorrect",
       });
     }
+
+    const loginStatus = AuthModel.findOne({ user: user._id });
+    if (loginStatus && loginStatus.isLoggedIn) {
+      return res.status(httpStatus.UNAUTHORIZED).json({
+        message: "You have already logged in to this account",
+      });
+    }
+
+    await AuthModel.findOneAndUpdate({ user: user._id }, { isLoggedIn: true });
 
     // login success
 
@@ -411,6 +421,18 @@ usersController.searchUser = async (req, res, next) => {
   } catch (e) {
     return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
       message: e.message,
+    });
+  }
+};
+
+usersController.logout = async (req, res) => {
+  try {
+    const userId = req.userId;
+    await AuthModel.findOneAndUpdate({ user: userId }, { isLoggedIn: false });
+  } catch (error) {
+    console.error(error);
+    return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+      message: "Error logging out",
     });
   }
 };
