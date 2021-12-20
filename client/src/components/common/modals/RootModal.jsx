@@ -1,11 +1,12 @@
-import React, { useEffect } from "react";
-import { useSelector } from "react-redux";
-import { connect } from "react-redux";
-import PostAdvanceModal from "./PostAdvanceModal";
-import { types } from "../../../constants/modalTypes";
-import PostReportModal from "./PostReportModal";
-import ConfirmDialog from "./ConfirmDialog";
-import FriendAdvanceModal from "./FriendAdvanceModal";
+import React, { useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { connect } from 'react-redux';
+import PostAdvanceModal from './PostAdvanceModal';
+import { types } from '../../../constants/modalTypes';
+import PostReportModal from './PostReportModal';
+import ConfirmDialog from './ConfirmDialog';
+import FriendAdvanceModal from './FriendAdvanceModal';
+import RespondModal from './RespondModal';
 
 const RootModal = (props) => {
   const modal = useSelector((state) => state.modal);
@@ -22,6 +23,9 @@ const RootModal = (props) => {
 
     case types.confirm:
       return <ConfirmDialog {...modal.data} />;
+
+    case types.respondModal:
+      return <RespondModal {...modal.data} />;
 
     default:
       return null;

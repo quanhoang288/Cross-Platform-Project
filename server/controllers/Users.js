@@ -310,7 +310,10 @@ usersController.show = async (req, res, next) => {
       if (friendStatus) {
         resData.data = {
           ...user.toObject(),
-          friendStatus: friendStatus.status,
+          friendStatus: {
+            sender: friendStatus.sender,
+            status: friendStatus.status,
+          },
         };
       }
     }
