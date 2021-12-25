@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { STATUS_PUBLIC } = require("../constants/constants");
+const { STATUS_PUBLIC, STATUS_DELETED } = require("../constants/constants");
 
 const postsSchema = new mongoose.Schema({
   author: {
@@ -39,7 +39,7 @@ const postsSchema = new mongoose.Schema({
     default: false,
   },
   status: {
-    type: string,
+    type: String,
     enum: [STATUS_PUBLIC, STATUS_DELETED],
     default: STATUS_PUBLIC,
   },
