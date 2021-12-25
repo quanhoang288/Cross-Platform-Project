@@ -6,7 +6,11 @@ const DocumentModel = require("../models/Documents");
 var url = require("url");
 const httpStatus = require("../utils/httpStatus");
 const bcrypt = require("bcrypt");
-const { JWT_SECRET, DEFAULT_PAGE_SIZE } = require("../constants/constants");
+const {
+  JWT_SECRET,
+  DEFAULT_PAGE_SIZE,
+  STATUS_DELETED,
+} = require("../constants/constants");
 const { ROLE_CUSTOMER } = require("../constants/constants");
 const uploadFile = require("../functions/uploadFile");
 const getPaginationParams = require("../utils/getPaginationParams");
@@ -92,8 +96,6 @@ postsController.edit = async (req, res, next) => {
     let userId = req.userId;
     let postId = req.params.id;
 
-    console.log(postId);
-
     let postFind = await PostModel.findById(postId);
     if (postFind == null) {
       return res
@@ -104,6 +106,11 @@ postsController.edit = async (req, res, next) => {
       return res
         .status(httpStatus.FORBIDDEN)
         .json({ message: "Can not edit this post" });
+    }
+    if (postFind.status == STATUS_DELETED) {
+      return res
+        .status(httpStatus.GONE)
+        .json({ message: "This post has been deleted" });
     }
 
     const { described, images, videos } = req.body;
@@ -187,7 +194,7 @@ postsController.edit = async (req, res, next) => {
       data: postSaved,
     });
   } catch (e) {
-    console.log(e.message);
+    console.error(e.message);
     return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
       message: e.message,
     });
@@ -208,11 +215,19 @@ postsController.show = async (req, res, next) => {
           model: "Documents",
         },
       });
+
     if (post == null) {
       return res
         .status(httpStatus.NOT_FOUND)
         .json({ message: "Can not find post" });
     }
+
+    if (post.status == STATUS_DELETED) {
+      return res.status(httpStatus.GONE).json({
+        message: "This post has been deleted",
+      });
+    }
+
     post.isLike = post.like.includes(req.userId);
     return res.status(httpStatus.OK).json({
       data: post,
@@ -225,7 +240,9 @@ postsController.show = async (req, res, next) => {
 };
 postsController.delete = async (req, res, next) => {
   try {
-    let post = await PostModel.findByIdAndDelete(req.params.id);
+    let post = await PostModel.findByIdAndUpdate(req.params.id, {
+      status: STATUS_DELETED,
+    });
     if (post == null) {
       return res
         .status(httpStatus.NOT_FOUND)
@@ -245,11 +262,11 @@ postsController.list = async (req, res, next) => {
   try {
     let posts = [];
     let userId = req.userId;
-    let query;
+    let query = { status: { $ne: STATUS_DELETED } };
 
     if (req.query.userId) {
       // get posts of one user
-      query = { author: req.query.userId };
+      query = { ...query, author: req.query.userId };
     } else {
       // get list friend of 1 user
       let friends = await FriendModel.find({
@@ -273,7 +290,7 @@ postsController.list = async (req, res, next) => {
       listIdFriends.push(userId);
 
       // get post of friends of 1 user
-      query = { author: listIdFriends };
+      query = { ...query, author: listIdFriends };
     }
 
     const { offset, limit } = await getPaginationParams(req);

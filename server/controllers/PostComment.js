@@ -14,6 +14,12 @@ postCommentController.create = async (req, res, next) => {
           .status(httpStatus.NOT_FOUND)
           .json({ message: "Can not find post" });
       }
+
+      if ((post.status = STATUS_DELETED)) {
+        return res
+          .status(httpStatus.GONE)
+          .json({ message: "This post has been deleted" });
+      }
     } catch (error) {
       return res
         .status(httpStatus.INTERNAL_SERVER_ERROR)
