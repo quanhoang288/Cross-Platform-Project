@@ -79,7 +79,8 @@ io.on("connection", (socket) => {
   });
 
   socket.on("sendMessage", (msg) => {
-    console.log("emitting new msg: ", msg);
+    console.log("sending...");
     io.emit("getMessage", msg);
+    io.emit("latestMessage", msg);
   });
 });

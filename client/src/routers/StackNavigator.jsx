@@ -1,24 +1,24 @@
-import React from "react";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { stacks } from "../constants/title";
-import TabNavigator from "./TabNavigator";
-import { CreatePost, Comment } from "../screens/post";
-import { MediaPicker } from "../screens/mediaPicker";
-import { Profile } from "../screens/account";
-import { ChangePW, PersonalInformation } from "../screens/advance";
+import React from 'react';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { stacks } from '../constants/title';
+import TabNavigator from './TabNavigator';
+import { CreatePost, Comment } from '../screens/post';
+import { MediaPicker } from '../screens/mediaPicker';
+import { Profile } from '../screens/account';
+import { ChangePW, PersonalInformation } from '../screens/advance';
 import {
   ListFriend,
   FriendRequest,
   FriendTabView,
-} from "../screens/listFriend";
+} from '../screens/listFriend';
 import {
   ChatScreen,
   MessageScreen,
   ChatSetting,
   NewMessage,
-} from "../screens/message";
-import { SignIn, SignUp } from "../screens/signIn-signUp";
-import { CustomTabView } from "../components/common";
+} from '../screens/message';
+import { SignIn, SignUp } from '../screens/signIn-signUp';
+import { CustomTabView } from '../components/common';
 
 const Stack = createNativeStackNavigator();
 
@@ -38,7 +38,7 @@ const stackScreens = [
     },
   },
   {
-    name: "Tabs",
+    name: 'Tabs',
     component: TabNavigator,
     options: {
       headerShown: false,
@@ -107,9 +107,9 @@ const stackScreens = [
   {
     name: stacks.chatScreen.name,
     component: ChatScreen,
-    options: {
-      title: stacks.chatScreen.title,
-    },
+    // options: {
+    //   title: stacks.chatScreen.title,
+    // },
   },
   {
     name: stacks.messageScreen.name,
@@ -141,7 +141,7 @@ const StackNavigator = (props) => {
       screenOptions={{
         headerStyle: {
           // backgroundColor: 'rgb(0, 102, 255)'
-          backgroundColor: "#fff",
+          backgroundColor: '#fff',
         },
       }}
     >

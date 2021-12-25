@@ -6,7 +6,6 @@ const getMessageByOtherUserId = async (
   offset = 0,
   limit = 10,
 ) => {
-  console.log('offset: ', offset);
   const getResult = await api({
     method: 'GET',
     url: `/chats/getMessages?otherUserId=${receivedId}&offset=${offset}&limit=${limit}`,

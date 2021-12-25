@@ -3,11 +3,11 @@ import PropTypes from 'prop-types';
 import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import { LinearProgress } from 'react-native-elements';
 import { useSelector } from 'react-redux';
-import { post } from '../../apis';
+import { message, post } from '../../apis';
 import { Toast } from '../../helpers';
 import { successMessages } from '../../constants/message';
 import { useDispatch } from 'react-redux';
-import { uploadActions } from '../../redux/actions';
+import { chatActions, uploadActions } from '../../redux/actions';
 import { PostList } from '../../components/post';
 import { useNavigation, useRoute } from '@react-navigation/core';
 import { stacks } from '../../constants/title';
@@ -22,7 +22,7 @@ const NewsFeed = (props) => {
 
   const uploadStatus = useSelector((state) => state.upload);
   const user = useSelector((state) => state.auth.user);
-  console.log(user);
+  const socket = useSelector((state) => state.auth.socket);
 
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -37,6 +37,26 @@ const NewsFeed = (props) => {
       setPosts(latestPosts.data.data);
     } catch (err) {
       console.log(err);
+    }
+  };
+
+  const fetchChats = async () => {
+    try {
+      const res = await message.getChats(user.token);
+      const formattedChats = res.data.data.map((chat) => {
+        const receiver = chat.member.find((u) => u._id !== user.id);
+        return {
+          id: chat._id,
+          userName: receiver.username,
+          userImg: receiver.avatar.fileName,
+          unreadMessages: 20,
+          messageText: chat.latestMessage.content,
+          receivedId: receiver._id,
+        };
+      });
+      dispatch(chatActions.saveChats(formattedChats));
+    } catch (err) {
+      console.log(err.message);
     }
   };
 
@@ -80,8 +100,17 @@ const NewsFeed = (props) => {
   useEffect(() => {
     if (!user) {
       navigation.navigate(stacks.signIn.name);
+    } else {
+      socket?.on('latestMessage', (data) => {
+        const { senderId, receivedId } = data;
+        if (user && (user.id == senderId || user.id == receivedId)) {
+          dispatch(chatActions.updateChat(data));
+        }
+      });
+      fetchChats();
     }
-  }, [user]);
+    return () => {};
+  }, [user, socket]);
 
   useEffect(() => {
     if (uploadStatus.uploading) {

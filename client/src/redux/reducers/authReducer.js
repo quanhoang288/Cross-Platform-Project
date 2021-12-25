@@ -1,6 +1,4 @@
 import { authConstants } from '../../constants/actions';
-import { io } from 'socket.io-client';
-import { SOCKET_URL } from '../../configs';
 
 const initialState = {
   loggingIn: false,
@@ -18,13 +16,12 @@ const authReducer = (state = initialState, action) => {
       };
 
     case authConstants.LOGIN_SUCCESS:
-      const socket = io(SOCKET_URL);
       return {
         ...state,
         loggingIn: false,
         error: null,
         user: action.payload.user,
-        socket,
+        socket: action.payload.socket,
       };
 
     case authConstants.LOGIN_FAILURE:
@@ -35,16 +32,13 @@ const authReducer = (state = initialState, action) => {
       };
 
     case authConstants.LOGIN_RESET:
-      return {
-        logginIn: false,
-        user: null,
-        error: null,
-      };
+      return initialState;
 
     case authConstants.LOGOUT:
       return {
         ...state,
         user: null,
+        socket: null,
       };
 
     default:

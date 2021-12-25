@@ -48,6 +48,10 @@ chatController.send = async (req, res, next) => {
           model: "Users",
         });
 
+      await ChatModel.findByIdAndUpdate(chatId, {
+        latestMessageSentAt: savedMessage.createdAt,
+      });
+
       return res.status(httpStatus.CREATED).json({
         data: savedMessage,
       });
@@ -70,6 +74,7 @@ chatController.getChats = async (req, res, next) => {
     let chats = await ChatModel.find({ member: req.userId })
       .skip(offset)
       .limit(limit)
+      .sort({ updatedAt: -1 })
       .populate({
         path: "member",
         select: "_id username phonenumber avatar",
@@ -141,7 +146,7 @@ chatController.getMessages = async (req, res, next) => {
       const existingChat = await ChatModel.findOne({
         member: { $all: [userId, otherUserId] },
       });
-      console.log("existing chat: ", existingChat);
+      // console.log("existing chat: ", existingChat);
       if (!existingChat) {
         return res.status(httpStatus.NOT_FOUND).json({
           message: "Chat does not exist between 2 users",
@@ -153,7 +158,6 @@ chatController.getMessages = async (req, res, next) => {
     }
 
     const { offset, limit } = await getPaginationParams(req);
-    console.log(offset);
 
     messages = await MessagesModel.find({ chat: queryChatId })
       .skip(offset)
@@ -184,23 +188,17 @@ chatController.getMessages = async (req, res, next) => {
 chatController.deleteMessage = async (req, res, next) => {
   const { messageId, chatId } = req.body;
 
-  if (!isValidId(chatId) || !isValidId(messageId)) {
-    return res.status(httpStatus.BAD_REQUEST).json({
-      message: "Invalid message/chat id format",
-    });
-  }
-
   const userId = req.userId;
 
   try {
     const chat = await ChatModel.findById(chatId);
-    const isUserInChat = chat.member.includes(userId);
-
     if (!chat) {
       return res.status(httpStatus.BAD_REQUEST).json({
         message: "Chat not found!",
       });
     }
+
+    const isUserInChat = chat.member.includes(userId);
 
     if (!isUserInChat) {
       return res.status(httpStatus.FORBIDDEN).json({
@@ -255,7 +253,9 @@ chatController.deleteChat = async (req, res, next) => {
     await MessagesModel.deleteMany({ chat: chatId });
 
     // delete the chat
-    const deletedChat = await ChatModel.findByIdAndDelete(chatId);
+    const deletedChat = await ChatModel.findByIdAndUpdate(chatId, {
+      isDeleted: true,
+    });
     return res.status(httpStatus.OK).json({
       data: deletedChat,
     });

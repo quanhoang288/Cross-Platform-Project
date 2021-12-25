@@ -19,7 +19,7 @@ const ChatScreen = () => {
   // const socket = useRef();
   const [messages, setMessages] = useState([]);
   const route = useRoute();
-  const { receivedId } = route.params;
+  const { receivedId, receiverName, receiverImg } = route.params;
   const user = useSelector((state) => state.auth.user);
   const senderId = user.id;
   const token = user.token;
@@ -41,6 +41,25 @@ const ChatScreen = () => {
   };
 
   useEffect(() => {
+    navigation.setOptions({
+      title: receiverName,
+      headerRight: () => (
+        <Icon
+          type="feather"
+          name="more-horizontal"
+          size={32}
+          style={{ marginRight: 10 }}
+          onPress={() =>
+            navigation.navigate(stacks.chatSetting.name, {
+              chatId: chatId,
+            })
+          }
+        />
+      ),
+    });
+  }, [route, navigation]);
+
+  useEffect(() => {
     const initialize = async () => {
       const newMessages = await fetchMessages();
       if (newMessages && newMessages.length > 0) {
@@ -58,34 +77,12 @@ const ChatScreen = () => {
         );
         setChatId(newMessages[0].chat);
       }
-
-      // socket.current = io(SOCKET_URL);
     };
     initialize();
   }, []);
 
   useEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <Icon
-          type="feather"
-          name="more-horizontal"
-          size={32}
-          style={{ marginRight: 10 }}
-          onPress={() =>
-            navigation.navigate(stacks.chatSetting.name, {
-              chatId: chatId,
-            })
-          }
-        />
-      ),
-    });
-  }, [navigation]);
-
-  useEffect(() => {
     socket?.on('getMessage', (data) => {
-      // console.log('new mess: ', data);
-      // console.log('current user: ', senderId);
       if (senderId === data.receivedId) {
         const newMsg = {
           _id: data._id,
@@ -116,6 +113,12 @@ const ChatScreen = () => {
     }
   }, [isLoadingEarlier]);
 
+  useEffect(() => {
+    if (!user) {
+      navigation.navigate(stacks.signIn.name);
+    }
+  }, [user]);
+
   const handleLoadEarlier = async () => {
     try {
       const earlierMessages = await message.getMessageByOtherUserId(
@@ -144,21 +147,25 @@ const ChatScreen = () => {
     if (messages.length > 0) {
       const newMsgObj = messages[0];
       Keyboard.dismiss();
-      setMessages((previousMessages) =>
-        GiftedChat.append(previousMessages, messages),
-      );
+
       try {
         const sendResult = await message.sendMessage(
           receivedId,
           newMsgObj.text,
           token,
         );
+        setMessages((previousMessages) =>
+          GiftedChat.append(previousMessages, messages),
+        );
         const newMsg = sendResult.data.data;
+
         socket?.emit('sendMessage', {
           chatId: newMsg.chat._id,
           _id: newMsg._id,
           senderId: senderId,
           receivedId: receivedId,
+          userName: receiverName,
+          userImg: receiverImg,
           content: newMsgObj.text,
           createdAt: newMsg.createdAt,
         });
