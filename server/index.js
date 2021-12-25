@@ -8,6 +8,7 @@ const { MONGO_URI } = require("./constants/constants");
 const bodyParser = require("body-parser");
 const io = require("socket.io")(3000);
 const path = require("path");
+const cronJob = require("./utils/cronJob");
 
 // const MessageModel = require("../models/Messages");
 
@@ -67,6 +68,8 @@ app.listen(PORT, () => {
 //         })
 //     })
 // });
+
+cronJob();
 
 io.on("connection", (socket) => {
   console.log("a user connected", socket.id);

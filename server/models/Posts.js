@@ -1,42 +1,48 @@
 const mongoose = require("mongoose");
+const { STATUS_PUBLIC } = require("../constants/constants");
 
 const postsSchema = new mongoose.Schema({
-    author: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Users"
+  author: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Users",
+  },
+  described: {
+    type: String,
+    required: false,
+  },
+  images: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Documents",
     },
-    described: {
-        type: String,
-        required: false
+  ],
+  videos: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Documents",
     },
-    images: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Documents"
-        }
-    ],
-    videos: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Documents"
-        }
-    ],
-    like: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Users"
-        }
-    ],
-    countComments: {
-        type: Number,
-        required: false,
-        default: 0
+  ],
+  like: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Users",
     },
-    isLike: {
-        type: Boolean,
-        required: false,
-        default: false
-    },
+  ],
+  countComments: {
+    type: Number,
+    required: false,
+    default: 0,
+  },
+  isLike: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+  status: {
+    type: string,
+    enum: [STATUS_PUBLIC, STATUS_DELETED],
+    default: STATUS_PUBLIC,
+  },
 });
-postsSchema.set('timestamps', true);
-module.exports = mongoose.model('Posts', postsSchema);
+postsSchema.set("timestamps", true);
+module.exports = mongoose.model("Posts", postsSchema);

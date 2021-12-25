@@ -1,33 +1,38 @@
-require('dotenv').config();
+require("dotenv").config();
 
 // User Model
 // gender
-const GENDER_MALE = 'male';
-const GENDER_FEMALE = 'female';
-const GENDER_SECRET = 'secret';
+const GENDER_MALE = "male";
+const GENDER_FEMALE = "female";
+const GENDER_SECRET = "secret";
 
 // role
-const ROLE_CUSTOMER = 'customer'; // customer : only login to client website
-const ROLE_ADMIN = 'admin'; // admin : full roles in admin website
-const ROLE_CASHIER = 'cashier';
-const ROLE_INVENTORY = 'inventory';
+const ROLE_CUSTOMER = "customer"; // customer : only login to client website
+const ROLE_ADMIN = "admin"; // admin : full roles in admin website
+const ROLE_CASHIER = "cashier";
+const ROLE_INVENTORY = "inventory";
 
 // role
-const STATUS_PAID = 'paid';
-const STATUS_UNPAID = 'unpaid';
+const STATUS_PAID = "paid";
+const STATUS_UNPAID = "unpaid";
 
-const DOCUMENT_TYPE_VIDEO = 'video';
-const DOCUMENT_TYPE_IMAGE = 'image';
-const DOCUMENT_TYPE_OTHER = 'other';
+// post status
+const STATUS_PUBLIC = "public";
+const STATUS_DELETED = "deleted";
 
-const PRIVATE_CHAT = 'PRIVATE_CHAT';
-const GROUP_CHAT = 'GROUP_CHAT';
+const DOCUMENT_TYPE_VIDEO = "video";
+const DOCUMENT_TYPE_IMAGE = "image";
+const DOCUMENT_TYPE_OTHER = "other";
+
+const PRIVATE_CHAT = "PRIVATE_CHAT";
+const GROUP_CHAT = "GROUP_CHAT";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const MONGO_URI = process.env.MONGO_URI;
 const PORT = process.env.PORT;
 
 const DEFAULT_PAGE_SIZE = 10;
+const NUM_REPORTS_LIMIT = 10;
 
 module.exports = {
   GENDER_MALE,
@@ -48,4 +53,7 @@ module.exports = {
   PRIVATE_CHAT,
   GROUP_CHAT,
   DEFAULT_PAGE_SIZE,
+  NUM_REPORTS_LIMIT,
+  STATUS_PUBLIC,
+  STATUS_DELETED,
 };
