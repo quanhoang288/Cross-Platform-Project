@@ -1,37 +1,35 @@
-import { authConstants } from "../../constants/actions"
-
+import { authConstants } from '../../constants/actions';
 
 const loginRequest = () => {
-    return {
-        type: authConstants.LOGIN_REQUEST,
-    };
+  return {
+    type: authConstants.LOGIN_REQUEST,
+  };
 };
 
-const loginSuccess = (user) => {
-    return {
-        type: authConstants.LOGIN_SUCCESS,
-        payload: { user }
-    };
+const loginSuccess = (sessionData) => {
+  return {
+    type: authConstants.LOGIN_SUCCESS,
+    payload: sessionData,
+  };
 };
 
 const loginFailure = (error) => {
-    return {
-        type: authConstants.LOGIN_FAILURE,
-        payload: { error }
-    };
+  return {
+    type: authConstants.LOGIN_FAILURE,
+    payload: { error },
+  };
 };
 
 const resetState = () => {
-    return {
-        type: authConstants.LOGIN_RESET,
-    };
+  return {
+    type: authConstants.LOGIN_RESET,
+  };
 };
 
-
 const logout = () => {
-    return {
-        type: authConstants.LOGOUT
-    };
-}
+  return {
+    type: authConstants.LOGOUT,
+  };
+};
 
-export { loginFailure, loginRequest, loginSuccess,  logout, resetState };
+export { loginFailure, loginRequest, loginSuccess, logout, resetState };

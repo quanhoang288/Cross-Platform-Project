@@ -1,33 +1,34 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
-import { View, StyleSheet, Clipboard } from "react-native";
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { View, StyleSheet, Clipboard, Keyboard } from 'react-native';
 import {
   Bubble,
   GiftedChat,
   Send,
   InputToolbar,
-} from "react-native-gifted-chat";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
-import { io } from "socket.io-client";
-import axios from "axios";
-import { message } from "../../apis";
-import { set } from "react-native-reanimated";
-import { margin, marginBottom, paddingBottom } from "styled-system";
-import { SOCKET_URL } from "../../configs";
-import { useRoute, useNavigation } from "@react-navigation/native";
-import { useSelector } from "react-redux";
-import { Icon } from "react-native-elements";
-import { stacks } from "../../constants/title";
+} from 'react-native-gifted-chat';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { io } from 'socket.io-client';
+import { message } from '../../apis';
+import { SOCKET_URL } from '../../configs';
+import { useRoute, useNavigation } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
+import { Icon } from 'react-native-elements';
+import { stacks } from '../../constants/title';
 const ChatScreen = () => {
-  const socket = useRef();
+  // const socket = useRef();
   const [messages, setMessages] = useState([]);
   const route = useRoute();
-  const { receivedId } = route.params;
+  const { receivedId, receiverName, receiverImg } = route.params;
   const user = useSelector((state) => state.auth.user);
   const senderId = user.id;
   const token = user.token;
   const navigation = useNavigation();
-  const [chatId, setChatId] = useState("");
+  const [chatId, setChatId] = useState(null);
+  const [isLoadingEarlier, setLoadingEarlier] = useState(false);
+
+  const socket = useSelector((state) => state.auth.socket);
+
   const fetchMessages = async () => {
     try {
       const res = await message.getMessageByOtherUserId(receivedId, token);
@@ -38,34 +39,10 @@ const ChatScreen = () => {
       }
     }
   };
-  useEffect(() => {
-    const initialize = async () => {
-      const newMessages = await fetchMessages();
-
-      if (newMessages) {
-        setMessages(
-          newMessages
-            .map((msg) => ({
-              _id: msg._id,
-              text: msg.content,
-              createdAt: msg.createdAt,
-              user: {
-                _id: msg.user._id,
-                name: msg.user.username,
-              },
-            }))
-            .reverse()
-        );
-        setChatId(newMessages[0].chat);
-      }
-
-      socket.current = io(SOCKET_URL);
-    };
-    initialize();
-  }, []);
 
   useEffect(() => {
     navigation.setOptions({
+      title: receiverName,
       headerRight: () => (
         <Icon
           type="feather"
@@ -80,10 +57,32 @@ const ChatScreen = () => {
         />
       ),
     });
-  }, [navigation]);
+  }, [route, navigation]);
 
   useEffect(() => {
-    socket.current?.on("getMessage", (data) => {
+    const initialize = async () => {
+      const newMessages = await fetchMessages();
+      if (newMessages && newMessages.length > 0) {
+        setMessages(
+          newMessages.map((msg) => ({
+            ...msg,
+            _id: msg._id,
+            text: msg.content,
+            createdAt: msg.createdAt,
+            user: {
+              _id: msg.user._id,
+              name: msg.user.username,
+            },
+          })),
+        );
+        setChatId(newMessages[0].chat);
+      }
+    };
+    initialize();
+  }, []);
+
+  useEffect(() => {
+    socket?.on('getMessage', (data) => {
       if (senderId === data.receivedId) {
         const newMsg = {
           _id: data._id,
@@ -95,45 +94,84 @@ const ChatScreen = () => {
         };
 
         setMessages((previousMessages) =>
-          GiftedChat.append(previousMessages, [newMsg])
+          GiftedChat.append(previousMessages, [newMsg]),
         );
       }
     });
-    socket.current?.on("removeMess", (data) => {
-      if (receiverId === data.userId) {
+    socket?.on('removeMess', (data) => {
+      if (receivedId === data.userId) {
         setMessages((previousMessages) =>
-          previousMessages.filter((messages) => messages._id !== data._id)
+          previousMessages.filter((messages) => messages._id !== data._id),
         );
       }
     });
   }, [socket]);
 
+  useEffect(() => {
+    if (isLoadingEarlier) {
+      handleLoadEarlier();
+    }
+  }, [isLoadingEarlier]);
+
+  useEffect(() => {
+    if (!user) {
+      navigation.navigate(stacks.signIn.name);
+    }
+  }, [user]);
+
+  const handleLoadEarlier = async () => {
+    try {
+      const earlierMessages = await message.getMessageByOtherUserId(
+        receivedId,
+        token,
+        messages.length,
+      );
+      const formattedEarlierMessages = earlierMessages.data.data.map((msg) => ({
+        ...msg,
+        _id: msg._id,
+        text: msg.content,
+        createdAt: msg.createdAt,
+        user: {
+          _id: msg.user._id,
+          name: msg.user.username,
+        },
+      }));
+      setMessages(messages.concat(formattedEarlierMessages));
+      setLoadingEarlier(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const onSend = useCallback(async (messages = []) => {
     if (messages.length > 0) {
       const newMsgObj = messages[0];
+      Keyboard.dismiss();
 
       try {
         const sendResult = await message.sendMessage(
           receivedId,
           newMsgObj.text,
-          token
+          token,
+        );
+        setMessages((previousMessages) =>
+          GiftedChat.append(previousMessages, messages),
         );
         const newMsg = sendResult.data.data;
-        socket.current?.emit("sendMessage", {
-          chatId: chatId,
+
+        socket?.emit('sendMessage', {
+          chatId: newMsg.chat._id,
           _id: newMsg._id,
           senderId: senderId,
           receivedId: receivedId,
+          userName: receiverName,
+          userImg: receiverImg,
           content: newMsgObj.text,
           createdAt: newMsg.createdAt,
         });
       } catch (err) {
         console.log(err);
       }
-
-      setMessages((previousMessages) =>
-        GiftedChat.append(previousMessages, messages)
-      );
     }
   }, []);
 
@@ -158,12 +196,12 @@ const ChatScreen = () => {
         {...props}
         wrapperStyle={{
           right: {
-            backgroundColor: "#2e64e5",
+            backgroundColor: '#2e64e5',
           },
         }}
         textStyle={{
           right: {
-            color: "#fff",
+            color: '#fff',
           },
         }}
       />
@@ -176,24 +214,23 @@ const ChatScreen = () => {
 
   const onDelete = async (messageIdToDelete) => {
     setMessages((previousMessages) =>
-      previousMessages.filter((messages) => messages._id !== messageIdToDelete)
+      previousMessages.filter((messages) => messages._id !== messageIdToDelete),
     );
     const deleteMess = await message.deleteMessage(
       chatId,
       messageIdToDelete,
-      token
+      token,
     );
     console.log(deleteMess.data.data);
     const messDelete = deleteMess.data.data;
-    socket.current?.emit("deleteMessage", {
+    socket?.emit('deleteMessage', {
       _id: messDelete._id,
       userId: messDelete.user,
     });
   };
 
   const onLongPress = (context, message) => {
-    console.log(message);
-    const options = ["copy", "Delete Message", "Cancel"];
+    const options = ['Copy', 'Delete Message', 'Cancel'];
     const cancelButtonIndex = options.length - 1;
     context.actionSheet().showActionSheetWithOptions(
       {
@@ -206,11 +243,11 @@ const ChatScreen = () => {
             Clipboard.setString(message.text);
             break;
           case 1:
-            console.log("delete");
+            console.log('delete');
             onDelete(message._id);
             break;
         }
-      }
+      },
     );
   };
   return (
@@ -227,16 +264,11 @@ const ChatScreen = () => {
       renderSend={renderSend}
       scrollToBottom
       scrollToBottomComponent={scrollToBottomComponent}
+      isLoadingEarlier={isLoadingEarlier}
+      loadEarlier
+      onLoadEarlier={() => setLoadingEarlier(true)}
     />
   );
 };
 
 export default ChatScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});

@@ -1,68 +1,68 @@
-import React from "react";
+import React from 'react';
 import {
   MessageStack,
   NotificationStack,
   PersonalStack,
   PostStack,
   SearchStack,
-} from "../stacks";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Icon } from "react-native-elements";
-import { NewsFeed } from "../screens/post";
+} from '../stacks';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Icon } from 'react-native-elements';
+import { NewsFeed } from '../screens/post';
 import {
   PostListHeader,
   PostListHeaderRight,
-} from "../components/headers/post";
+} from '../components/headers/post';
 const Tab = createBottomTabNavigator();
 
 const tabScreens = [
   {
-    name: "PostStack",
+    name: 'PostStack',
     component: PostStack,
     options: {
       headerShown: false,
-      tabBarLabel: "Home",
+      tabBarLabel: 'Home',
       // tabBarIcon: ({ color, size }) => (
       //     <Icon type='entypo' name='home' color={color} size={size}/>
       // )
     },
   },
   {
-    name: "SearchStack",
+    name: 'SearchStack',
     component: SearchStack,
     options: {
       headerShown: false,
-      tabBarLabel: "Search",
+      tabBarLabel: 'Search',
       // tabBarIcon: ({ color, size }) => (
       //     <Icon type='fontawesome' name='search' color={color} size={size}/>
       // )
     },
   },
   {
-    name: "MessageStack",
+    name: 'MessageStack',
     component: MessageStack,
     options: {
       headerShown: false,
-      tabBarLabel: "Message",
+      tabBarLabel: 'Message',
       // tabBarIcon: ({ color, size }) => (
       //     <Icon type='antdesign' name='message1' color={color} size={size}/>
       // )
     },
   },
   {
-    name: "NotificationStack",
+    name: 'NotificationStack',
     component: NotificationStack,
     options: {
       headerShown: false,
-      tabBarLabel: "Notification",
+      tabBarLabel: 'Notification',
     },
   },
   {
-    name: "PersonalStack",
+    name: 'PersonalStack',
     component: PersonalStack,
     options: {
       headerShown: false,
-      tabBarLabel: "Profile",
+      tabBarLabel: 'Profile',
     },
   },
 ];
@@ -70,31 +70,31 @@ const tabScreens = [
 const TabNavigator = (props) => {
   const routeToIconMappings = {
     PostStack: {
-      type: "entypo",
-      name: "home",
+      type: 'entypo',
+      name: 'home',
     },
     SearchStack: {
-      type: "fontawesome",
-      name: "search",
+      type: 'fontawesome',
+      name: 'search',
     },
     MessageStack: {
-      type: "antdesign",
-      name: "message1",
+      type: 'antdesign',
+      name: 'message1',
     },
     NotificationStack: {
-      type: "ionicon",
-      name: "notifications",
+      type: 'ionicon',
+      name: 'notifications',
     },
     PersonalStack: {
-      type: "material-community",
-      name: "account",
+      type: 'material-community',
+      name: 'account',
     },
   };
 
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        tabBarActiveTintColor: "blue",
+        tabBarActiveTintColor: 'blue',
         tabBarShowLabel: false,
         tabBarIcon: ({ color, size }) => {
           return (

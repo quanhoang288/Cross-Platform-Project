@@ -79,8 +79,8 @@ io.on("connection", (socket) => {
   });
 
   socket.on("sendMessage", (msg) => {
-    console.log("from socket id: ", socket.id);
-    console.log(msg);
-    socket.broadcast.emit("getMessage", msg);
+    console.log("sending...");
+    io.emit("getMessage", msg);
+    io.emit("latestMessage", msg);
   });
 });
