@@ -22,6 +22,18 @@ const updateChats = (chatData, chatList) => {
   return [updatedChat, ...chatListWithoutUpdatedChat];
 };
 
+const updateSeenStatus = (chatId, chatList) => {
+  return chatList.map((chat) => {
+    if (chat.id != chatId) {
+      return chat;
+    }
+    return {
+      ...chat,
+      numUnseenMessages: 0,
+    };
+  });
+};
+
 export default (state = initialState, action) => {
   switch (action.type) {
     case 'SAVE':
@@ -32,6 +44,11 @@ export default (state = initialState, action) => {
     case 'UPDATE':
       return {
         chats: updateChats(action.payload, state.chats),
+      };
+
+    case 'UPDATE_SEEN_STATUS':
+      return {
+        chats: updateSeenStatus(action.payload, state.chats),
       };
 
     case 'REMOVE':

@@ -1,11 +1,19 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { View, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
-import { Avatar, ListItem, Text, Badge, Icon } from 'react-native-elements';
+import {
+  Avatar,
+  Divider,
+  ListItem,
+  Text,
+  Badge,
+  Icon,
+} from 'react-native-elements';
 
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { stacks } from '../../constants/title';
 import { useDispatch, useSelector } from 'react-redux';
 import { ASSET_API_URL } from '../../configs';
+import { formatDate } from '../../helpers';
 
 const MessageScreen = () => {
   const navigation = useNavigation();
@@ -24,6 +32,7 @@ const MessageScreen = () => {
       ),
     });
   }, [navigation]);
+
   return (
     <FlatList
       data={chatList}
@@ -49,16 +58,35 @@ const MessageScreen = () => {
               />
               <ListItem.Content>
                 <ListItem.Title>
-                  <Text>{item.userName}</Text>
+                  {item.numUnseenMessages > 0 ? (
+                    <Text style={{ fontWeight: 'bold' }}>{item.userName}</Text>
+                  ) : (
+                    <Text>{item.userName}</Text>
+                  )}
                 </ListItem.Title>
                 <View>
-                  <Text>{item.messageText}</Text>
+                  {item.numUnseenMessages > 0 ? (
+                    <Text style={{ fontWeight: 'bold' }}>
+                      {item.messageText}
+                    </Text>
+                  ) : (
+                    <Text>{item.messageText}</Text>
+                  )}
                 </View>
               </ListItem.Content>
-              <Badge
-                value={item.unreadMessages}
-                badgeStyle={{ backgroundColor: '#25D366' }}
-              />
+              <View
+                style={{
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-end',
+                }}
+              >
+                <Text style={{ marginBottom: 10 }}>
+                  {formatDate(item.latestMessageSentAt)}
+                </Text>
+                {item.numUnseenMessages > 0 && (
+                  <Badge value={item.numUnseenMessages} status="error" />
+                )}
+              </View>
             </ListItem>
           </View>
         </TouchableOpacity>

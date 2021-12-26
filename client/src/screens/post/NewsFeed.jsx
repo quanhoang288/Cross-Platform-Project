@@ -49,9 +49,10 @@ const NewsFeed = (props) => {
           id: chat._id,
           userName: receiver.username,
           userImg: receiver.avatar.fileName,
-          unreadMessages: 20,
+          numUnseenMessages: chat.numUnseenMessages,
           messageText: chat.latestMessage.content,
           receivedId: receiver._id,
+          latestMessageSentAt: chat.latestMessageSentAt,
         };
       });
       dispatch(chatActions.saveChats(formattedChats));
