@@ -12,9 +12,10 @@ import { io } from 'socket.io-client';
 import { message } from '../../apis';
 import { SOCKET_URL } from '../../configs';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Icon } from 'react-native-elements';
 import { stacks } from '../../constants/title';
+import { chatActions } from '../../redux/actions';
 const ChatScreen = () => {
   // const socket = useRef();
   const [messages, setMessages] = useState([]);
@@ -27,6 +28,7 @@ const ChatScreen = () => {
   const [chatId, setChatId] = useState(null);
   const [isLoadingEarlier, setLoadingEarlier] = useState(false);
 
+  const dispatch = useDispatch();
   const socket = useSelector((state) => state.auth.socket);
 
   const fetchMessages = async () => {
@@ -76,9 +78,11 @@ const ChatScreen = () => {
           })),
         );
         setChatId(newMessages[0].chat);
+        dispatch(chatActions.updateSeenStatus(newMessages[0].chat));
       }
     };
     initialize();
+    return () => {};
   }, []);
 
   useEffect(() => {
@@ -157,7 +161,9 @@ const ChatScreen = () => {
         setMessages((previousMessages) =>
           GiftedChat.append(previousMessages, messages),
         );
+
         const newMsg = sendResult.data.data;
+        dispatch(chatActions.updateSeenStatus(newMsg.chat._id));
 
         socket?.emit('sendMessage', {
           chatId: newMsg.chat._id,

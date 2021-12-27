@@ -19,4 +19,11 @@ const removeChat = (chatId) => {
   };
 };
 
-export { saveChats, updateChat, removeChat };
+const updateSeenStatus = (chatId) => {
+  return {
+    type: 'UPDATE_SEEN_STATUS',
+    payload: chatId,
+  };
+};
+
+export { saveChats, updateChat, removeChat, updateSeenStatus };

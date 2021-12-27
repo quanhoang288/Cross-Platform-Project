@@ -13,6 +13,9 @@ import {
   PostListHeader,
   PostListHeaderRight,
 } from '../components/headers/post';
+import { useSelector } from 'react-redux';
+import { useState } from 'react';
+import { useEffect } from 'react';
 const Tab = createBottomTabNavigator();
 
 const tabScreens = [
@@ -68,6 +71,11 @@ const tabScreens = [
 ];
 
 const TabNavigator = (props) => {
+  const chats = useSelector((state) => state.chat.chats);
+  const numUnseenChats = chats.filter(
+    (chat) => chat.numUnseenMessages > 0,
+  ).length;
+
   const routeToIconMappings = {
     PostStack: {
       type: 'entypo',
@@ -108,14 +116,27 @@ const TabNavigator = (props) => {
         },
       })}
     >
-      {tabScreens.map((screen, idx) => (
-        <Tab.Screen
-          key={idx}
-          name={screen.name}
-          component={screen.component}
-          options={screen.options}
-        />
-      ))}
+      {tabScreens.map((screen, idx) => {
+        if (screen.name == 'MessageStack' && numUnseenChats > 0) {
+          return (
+            <Tab.Screen
+              key={idx}
+              name={screen.name}
+              component={screen.component}
+              options={{ ...screen.options, tabBarBadge: numUnseenChats }}
+            />
+          );
+        }
+
+        return (
+          <Tab.Screen
+            key={idx}
+            name={screen.name}
+            component={screen.component}
+            options={screen.options}
+          />
+        );
+      })}
     </Tab.Navigator>
   );
 };

@@ -1,6 +1,7 @@
 const { PRIVATE_CHAT, GROUP_CHAT } = require("../constants/constants");
 const ChatModel = require("../models/Chats");
 const MessagesModel = require("../models/Messages");
+const ChatHistoryModel = require("../models/ChatHistories");
 const getPaginationParams = require("../utils/getPaginationParams");
 const httpStatus = require("../utils/httpStatus");
 const { isValidId } = require("../utils/validateIdString");
@@ -48,9 +49,29 @@ chatController.send = async (req, res, next) => {
           model: "Users",
         });
 
-      await ChatModel.findByIdAndUpdate(chatId, {
+      const updatedChat = await ChatModel.findByIdAndUpdate(chatId, {
         latestMessageSentAt: savedMessage.createdAt,
       });
+
+      // update or create new chat history for receiver
+      const receiverId = updatedChat.member.find((user) => user._id != userId);
+      const receiverChatHistory = await ChatHistoryModel.findOne({
+        user: receiverId,
+      });
+
+      if (!receiverChatHistory) {
+        const newChatHistory = new ChatHistoryModel({
+          user: receiverId,
+          chat: chatId,
+          numUnseenMessages: 1,
+        });
+        await newChatHistory.save();
+      } else {
+        const oldNumUnseen = receiverChatHistory.numUnseenMessages;
+        await receiverChatHistory.update({
+          numUnseenMessages: oldNumUnseen + 1,
+        });
+      }
 
       return res.status(httpStatus.CREATED).json({
         data: savedMessage,
@@ -68,10 +89,43 @@ chatController.send = async (req, res, next) => {
   }
 };
 
+chatController.updateOrCreateHistory = async (req, res) => {
+  const userId = req.userId;
+  const { chatId, lastMessageId } = req.body;
+  try {
+    let chatHistory = await ChatHistoryModel.find({
+      user: userId,
+      chat: chatId,
+    });
+    if (!chatHistory) {
+      chatHistory = new ChatHistoryModel({
+        user: userId,
+        chat: chatId,
+        lastSeenMessage: lastMessageId,
+      });
+      chatHistory = await chatHistory.save();
+    } else {
+      chatHistory = await chatHistory.update(
+        { lastSeenMessage: lastMessageId },
+        { new: true }
+      );
+    }
+    return res.status(httpStatus.OK).json({
+      data: chatHistory,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+      message: "Error updating chat history",
+    });
+  }
+};
+
 chatController.getChats = async (req, res, next) => {
   try {
+    const userId = req.userId;
     const { offset, limit } = await getPaginationParams(req);
-    let chats = await ChatModel.find({ member: req.userId })
+    let chats = await ChatModel.find({ member: userId })
       .skip(offset)
       .limit(limit)
       .sort({ updatedAt: -1 })
@@ -93,17 +147,36 @@ chatController.getChats = async (req, res, next) => {
         .exec();
     });
 
+    // get chat histories to check seen status
+    const chatHistoryPromises = chats.map((chat) => {
+      const chatId = chat._id;
+      return ChatHistoryModel.findOne({ chat: chatId, user: userId });
+    });
+
     const latestMessages = await Promise.all(latestMessagePromises);
+    const chatHistories = await Promise.all(chatHistoryPromises);
 
     const chatsWithLatestMessage = chats.map((chat, idx) => {
       const latestMessage = latestMessages[idx];
-      return {
+      let formattedChat = {
         ...chat.toObject(),
         latestMessage: {
           content: latestMessage ? latestMessage.content : null,
           createdAt: latestMessage ? latestMessage.createdAt : null,
         },
+        numUnseenMessages: 0,
       };
+
+      const chatHistory = chatHistories[idx];
+
+      if (latestMessage.user != userId && chatHistory) {
+        formattedChat = {
+          ...formattedChat,
+          numUnseenMessages: chatHistory.numUnseenMessages,
+        };
+      }
+
+      return formattedChat;
     });
 
     return res.status(httpStatus.OK).json({
@@ -129,18 +202,6 @@ chatController.getMessages = async (req, res, next) => {
     });
   }
 
-  if (otherUserId && !isValidId(otherUserId)) {
-    return res.status(httpStatus.BAD_REQUEST).json({
-      message: "Invalid other user id provided",
-    });
-  }
-
-  if (chatId && !isValidId(chatId)) {
-    return res.status(httpStatus.BAD_REQUEST).json({
-      message: "Invalid chat id provided",
-    });
-  }
-
   try {
     if (otherUserId) {
       const existingChat = await ChatModel.findOne({
@@ -154,7 +215,7 @@ chatController.getMessages = async (req, res, next) => {
       }
       queryChatId = existingChat._id;
     } else if (chatId) {
-      queryChatId = req.params.chatId;
+      queryChatId = chatId;
     }
 
     const { offset, limit } = await getPaginationParams(req);
@@ -173,6 +234,26 @@ chatController.getMessages = async (req, res, next) => {
         },
         model: "Users",
       });
+
+    // update chat history
+    if (messages.length > 0) {
+      const latestMsg = messages[0];
+      const chatHistory = await ChatHistoryModel.findOne({
+        user: userId,
+        chat: queryChatId,
+      });
+      if (
+        chatHistory &&
+        latestMsg.user != userId &&
+        chatHistory.lastSeenMessage != latestMsg._id
+      ) {
+        console.log("update chat history");
+        await chatHistory.update({
+          lastSeenMessage: latestMsg._id,
+          numUnseenMessages: 0,
+        });
+      }
+    }
 
     return res.status(httpStatus.OK).json({
       data: messages,
