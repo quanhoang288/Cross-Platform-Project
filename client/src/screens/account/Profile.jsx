@@ -109,7 +109,7 @@ const Profile = (props) => {
     }
   };
 
-  handleUpdateFriendStatus = (isAccept) => {
+  const handleUpdateFriendStatus = (isAccept) => {
     if (isAccept) {
       setFriendStatus(FRIEND_STATUS.FRIENDS);
     } else {
@@ -430,19 +430,21 @@ const Profile = (props) => {
                 })
               }
             >
-              <Icon
-                name="camera"
-                type="entypo"
-                size={36}
-                iconStyle={{
-                  backgroundColor: 'rgb(230, 230, 230)',
-                  padding: 8,
-                  borderRadius: 24,
-                }}
-                style={{
-                  backgroundColor: 'rgb(230, 230, 230)',
-                }}
-              />
+              {userId === user.id && (
+                <Icon
+                  name="camera"
+                  type="entypo"
+                  size={36}
+                  iconStyle={{
+                    backgroundColor: 'rgb(230, 230, 230)',
+                    padding: 8,
+                    borderRadius: 24,
+                  }}
+                  style={{
+                    backgroundColor: 'rgb(230, 230, 230)',
+                  }}
+                />
+              )}
             </TouchableOpacity>
           </ImageBackground>
         </View>
@@ -456,25 +458,27 @@ const Profile = (props) => {
               }}
               onPress={() => console.log('Pressed on avatar!')}
             />
-            <Avatar.Accessory
-              name="camera"
-              type="entypo"
-              size={42}
-              iconProps={{
-                size: 28,
-                color: 'black',
-              }}
-              style={{
-                backgroundColor: 'rgb(230, 230, 230)',
-              }}
-              onPress={() =>
-                navigation.navigate(stacks.mediaPicker.name, {
-                  isSingleSelect: true,
-                  headerRightTitle: 'Save',
-                  callback: () => setUpdateType('avatar'),
-                })
-              }
-            />
+            {userId === user.id && (
+              <Avatar.Accessory
+                name="camera"
+                type="entypo"
+                size={42}
+                iconProps={{
+                  size: 28,
+                  color: 'black',
+                }}
+                style={{
+                  backgroundColor: 'rgb(230, 230, 230)',
+                }}
+                onPress={() =>
+                  navigation.navigate(stacks.mediaPicker.name, {
+                    isSingleSelect: true,
+                    headerRightTitle: 'Save',
+                    callback: () => setUpdateType('avatar'),
+                  })
+                }
+              />
+            )}
           </View>
         </View>
         <Text style={styles.name}> {userData.info.username} </Text>

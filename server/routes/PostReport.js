@@ -10,6 +10,9 @@ postReportRoutes.post(
   asyncWrapper(postReportController.create)
 );
 
-postReportRoutes.get("/stats", asyncWrapper(postReportController.getStats));
+postReportRoutes.get(
+  "/stats", 
+  asyncWrapper(postReportController.getStats)
+);
 
 module.exports = postReportRoutes;

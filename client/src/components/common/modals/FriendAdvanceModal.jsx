@@ -1,15 +1,18 @@
-import React, { useEffect, useState } from "react";
-import BottomHalfModal from "./BottomHalfModal";
-import { View } from "react-native";
-import { Divider, Icon, ListItem } from "react-native-elements";
-import { useDispatch, useSelector } from "react-redux";
-import { hideModal, showModal } from "../../../redux/reducers/modalReducer";
-import { types } from "../../../constants/modalTypes";
-import { useNavigation } from "@react-navigation/core";
-import { stacks } from "../../../constants/title";
+import React, { useEffect, useState } from 'react';
+import BottomHalfModal from './BottomHalfModal';
+import { View } from 'react-native';
+import { Divider, Icon, ListItem } from 'react-native-elements';
+import { useDispatch, useSelector } from 'react-redux';
+import { hideModal, showModal } from '../../../redux/reducers/modalReducer';
+import { types } from '../../../constants/modalTypes';
+import { useNavigation } from '@react-navigation/core';
+import { stacks } from '../../../constants/title';
+import { friend } from '../../../apis';
+import { Toast } from '../../../helpers';
 const FriendAdvanceModal = ({ userId }) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth.user);
 
   const handleMessage = () => {
     //TODO: redirect to message screen
@@ -19,49 +22,62 @@ const FriendAdvanceModal = ({ userId }) => {
     //TODO: block user
   };
 
+  const handleConfirmRemove = async () => {
+    try {
+      await friend.removeFriend(userId, user.token);
+      dispatch(hideModal());
+      Toast.showSuccessMessage('Remove friend successfully');
+    } catch (error) {
+      console.log(error);
+      Toast.showFailureMessage('Error removing friend');
+    }
+  };
+
   const handleRemoveFriend = () => {
-    console.log("friend id: ", userId);
+    console.log('friend id: ', userId);
     dispatch(
       showModal({
         modalType: types.confirm,
         propsData: {
           isModalVisible: true,
-          title: "Unfriend",
-          content: "Are you sure you want to unfriend this person?",
-          yesOptionTitle: "Yes",
-          noOptionTitle: "Cancel",
-          userId,
+          title: 'Unfriend',
+          content: 'Are you sure you want to unfriend this person?',
+          yesOptionTitle: 'Yes',
+          noOptionTitle: 'Cancel',
+          userId: userId,
+          handleCancel: () => dispatch(hideModal()),
+          handleConfirm: handleConfirmRemove,
         },
-      })
+      }),
     );
   };
 
   const functionalities = [
     {
-      title: "Message",
+      title: 'Message',
       icon: {
-        type: "ant-design",
-        name: "message1",
+        type: 'ant-design',
+        name: 'message1',
       },
       onPress: handleMessage,
     },
 
     {
-      title: "Block",
+      title: 'Block',
       subTitle: "This person won't be able to see your posts.",
       icon: {
-        type: "entypo",
-        name: "block",
+        type: 'entypo',
+        name: 'block',
       },
       onPress: handleBlock,
     },
 
     {
-      title: "Unfriend",
-      subTitle: "Remove this person as a friend.",
+      title: 'Unfriend',
+      subTitle: 'Remove this person as a friend.',
       icon: {
-        type: "material-community",
-        name: "account-remove-outline",
+        type: 'material-community',
+        name: 'account-remove-outline',
       },
       onPress: handleRemoveFriend,
     },
@@ -72,8 +88,8 @@ const FriendAdvanceModal = ({ userId }) => {
       <View
         style={{
           height: 250,
-          backgroundColor: "#fff",
-          justifyContent: "center",
+          backgroundColor: '#fff',
+          justifyContent: 'center',
           borderTopStartRadius: 10,
           borderTopEndRadius: 10,
         }}

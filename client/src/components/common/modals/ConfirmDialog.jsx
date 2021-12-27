@@ -40,8 +40,8 @@ const DialogContent = (props) => {
 };
 
 DialogContent.defaultProps = {
-  noOptionTitle: 'KHÔNG',
-  yesOptionTitle: 'CÓ',
+  noOptionTitle: 'No',
+  yesOptionTitle: 'Yes',
 };
 
 const ConfirmDialog = (props) => {

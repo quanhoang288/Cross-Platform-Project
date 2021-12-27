@@ -39,4 +39,23 @@ const editPost = async (postId, postData, token) => {
     return editResult;
 }
 
-export {addPost, editPost, getListPost, getPost};
+const deletePost = async (postId, token) => {
+    const deleteResult = await api({
+        method: 'GET',
+        url: `/posts/delete/${postId}`,
+        headers: { Authorization: `Bearer ${token}`}
+    });
+    return deleteResult;
+}
+
+const postReport = async (postId, report, token) => {
+    const reportResult = await api({
+        method: 'POST',
+        url: `/postReport/create/${postId}`,
+        data: {subject: report,},
+        headers: { Authorization: `Bearer ${token}`}
+    })
+    return reportResult;
+}
+
+export {addPost, editPost, getListPost, getPost, deletePost, postReport};
