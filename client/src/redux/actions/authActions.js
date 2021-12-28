@@ -14,6 +14,7 @@ const loginSuccess = (sessionData) => {
 };
 
 const loginFailure = (error) => {
+  console.log('error: ', error);
   return {
     type: authConstants.LOGIN_FAILURE,
     payload: { error },

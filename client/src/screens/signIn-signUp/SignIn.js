@@ -22,8 +22,6 @@ const SignIn = () => {
   const register = useSelector((state) => state.register);
   const authState = useSelector((state) => state.auth);
 
-  const passwordRef = useRef();
-
   useEffect(() => {
     if (register.registered && route.name === stacks.signIn.name) {
       if (Platform.OS === 'web') {
@@ -39,7 +37,7 @@ const SignIn = () => {
       if (Platform.OS === 'web') {
         window.alert(authState.error.message);
       } else {
-        Toast.showFailureMessage(authState.error.message);
+        Toast.showFailureMessage(authState.error);
       }
 
       dispatch(authActions.resetState());
@@ -129,8 +127,14 @@ const SignIn = () => {
         navigation.navigate('Tabs');
       })
       .catch((error) => {
+        console.log(error);
         if (error.response) {
-          dispatch(authActions.loginFailure(error.response.data));
+          dispatch(authActions.loginFailure(error.response.data.message));
+        } else {
+          setTimeout(
+            () => dispatch(authActions.loginFailure('No internet connection')),
+            4000,
+          );
         }
       });
   };

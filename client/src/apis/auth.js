@@ -1,10 +1,11 @@
-import api from './api';
+import api, { abortFetchSignal } from './api';
 
 const login = async (phonenumber, password) => {
   const loginInfo = await api({
     method: 'POST',
     url: '/users/login',
     data: { phonenumber, password },
+    signal: abortFetchSignal(),
   });
   return loginInfo;
 };
@@ -14,6 +15,7 @@ const register = async (phonenumber, username, password) => {
     method: 'POST',
     url: '/users/register',
     data: { phonenumber, username, password },
+    signal: abortFetchSignal(),
   });
   return registerInfo;
 };

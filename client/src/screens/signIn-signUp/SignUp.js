@@ -4,38 +4,37 @@ import { Button, Image } from 'react-native-elements';
 import { View, StyleSheet, StatusBar } from 'react-native';
 import { InputText } from '../../components/block';
 import { useNavigation, useRoute } from '@react-navigation/core';
-import { DEVICE_WIDTH, DEVICE_HEIGHT } from '../../constants/dimensions'; 
+import { DEVICE_WIDTH, DEVICE_HEIGHT } from '../../constants/dimensions';
 import { errorMessages } from '../../constants/message';
 import { useDispatch, useSelector } from 'react-redux';
 import { registerActions } from '../../redux/actions';
 import { auth } from '../../apis';
 import { stacks } from '../../constants/title';
 import Toast from 'react-native-root-toast';
-import {API_URL} from '../../configs';
+import { API_URL } from '../../configs';
 import { showFailureMessage } from '../../helpers/Toast';
 const SignUp = () => {
   const navigation = useNavigation();
   const route = useRoute();
 
-
   const dispatch = useDispatch();
 
   const [credentials, setCredential] = useState({
-    userName: "",
-    phoneNumber: "", 
-    password: "",
-    confirmPassword: "",
+    userName: '',
+    phoneNumber: '',
+    password: '',
+    confirmPassword: '',
   });
 
   const [errors, setErrors] = useState({
     userName: null,
-    phoneNumber: null, 
+    phoneNumber: null,
     password: null,
     confirmPassword: null,
   });
 
   const [isSignUpButtonClicked, setSignUpButtonClicked] = useState(false);
-  const registerState = useSelector(state => state.register);
+  const registerState = useSelector((state) => state.register);
 
   useEffect(() => {
     if (route.name === stacks.signUp.name) {
@@ -45,68 +44,66 @@ const SignUp = () => {
 
   useEffect(() => {
     if (registerState.error) {
-
       if (Platform.OS === 'web') {
         window.alert(registerState.error.message);
       } else {
-        showFailureMessage(registerState.error.message);
+        showFailureMessage(registerState.error);
       }
-      
-      dispatch(registerActions.resetState());
-  
-    }
-  }, [registerState])
 
+      dispatch(registerActions.resetState());
+    }
+  }, [registerState]);
 
   const isValidUserName = (val) => {
     return val != '';
-  }
+  };
 
   const isValidPhoneNumber = (val) => {
     const reg = /^[0]\d{9}$/;
     return reg.test(val);
-  }
+  };
 
   const isValidPassword = (val) => {
     return val.trim().length >= 6;
-  }
+  };
 
   const isValidConfirmPassword = (val) => {
     return val === credentials.password;
-  }
+  };
 
   const handleTextChange = (name, val) => {
     setCredential({
       ...credentials,
       [name]: val,
-    })
-    if (isSignUpButtonClicked){
-      if (name === "userName"){
+    });
+    if (isSignUpButtonClicked) {
+      if (name === 'userName') {
         setErrors({
           ...errors,
           userName: isValidUserName(val) ? null : errorMessages.invalidUserName,
-        })
-      }
-      else if (name === "phoneNumber"){
+        });
+      } else if (name === 'phoneNumber') {
         setErrors({
           ...errors,
-          phoneNumber: isValidPhoneNumber(val) ? null : errorMessages.invalidPhoneNumber,
-        })
-      }
-      else if (name === "password"){
+          phoneNumber: isValidPhoneNumber(val)
+            ? null
+            : errorMessages.invalidPhoneNumber,
+        });
+      } else if (name === 'password') {
         setErrors({
           ...errors,
           password: isValidPassword(val) ? null : errorMessages.invalidPassword,
-        })
-      }
-      else {
+        });
+      } else {
         setErrors({
           ...errors,
-          confirmPassword: isValidConfirmPassword(val) ? null : errorMessages.invalidConfirmPassword,
-        })
+          confirmPassword: isValidConfirmPassword(val)
+            ? null
+            : errorMessages.invalidConfirmPassword,
+        });
       }
     }
-  }
+  };
 
   const isValidInput = (data) => {
     // update state
@@ -122,87 +119,93 @@ const SignUp = () => {
       userName: checkUserName ? null : errorMessages.invalidUserName,
       phoneNumber: checkPhone ? null : errorMessages.invalidPhoneNumber,
       password: checkPassword ? null : errorMessages.invalidPassword,
-      confirmPassword: checkConfirmPassword ? null : errorMessages.invalidConfirmPassword
+      confirmPassword: checkConfirmPassword
+        ? null
+        : errorMessages.invalidConfirmPassword,
     });
     return checkUserName && checkPassword && checkConfirmPassword && checkPhone;
-  }
+  };
 
-  const handleSignUp = () =>{
+  const handleSignUp = () => {
     if (!isSignUpButtonClicked) setSignUpButtonClicked(true);
 
-    if(isValidInput(credentials)) {
+    if (isValidInput(credentials)) {
       const data = {
         username: credentials.userName,
         phonenumber: credentials.phoneNumber,
         password: credentials.password,
-      }
+      };
       register(data);
     }
-
-  }
+  };
 
   const register = (data) => {
-    const {
-        phonenumber,
-        username,
-        password
-    } = data;
-    
+    const { phonenumber, username, password } = data;
+
     dispatch(registerActions.registerRequest());
     console.log(API_URL);
-    auth.register(phonenumber, username, password)
-        .then(user => {
-            // console.log(user);
-            dispatch(registerActions.registerSuccess());
-            navigation.navigate(stacks.signIn.name);
-        })
-        .catch(error => {
-            if (error.response) {
-              console.log(error.response.data);
-              console.log(error.response.status);
-              dispatch(registerActions.registerFailure(error.response.data));
-            }
-        });
-    
-  }
+    auth
+      .register(phonenumber, username, password)
+      .then((user) => {
+        // console.log(user);
+        dispatch(registerActions.registerSuccess());
+        navigation.navigate(stacks.signIn.name);
+      })
+      .catch((error) => {
+        if (error.response) {
+          console.log(error.response.data);
+          console.log(error.response.status);
+          dispatch(
+            registerActions.registerFailure(error.response.data.message),
+          );
+        } else {
+          setTimeout(
+            () =>
+              dispatch(
+                registerActions.registerFailure('No internet connection'),
+              ),
+            4000,
+          );
+        }
+      });
+  };
 
-  return(
+  return (
     <View style={styles.container}>
       <InputText
         name="userName"
         label="User Name"
         leftIcon={{
-          name:"user",
-          type:"feather"
+          name: 'user',
+          type: 'feather',
         }}
         errorMessage={errors.userName}
         value={credentials.userName}
         handleTextChange={handleTextChange}
-        
       />
 
-      <InputText 
+      <InputText
         name="phoneNumber"
         label="Phone Number"
         leftIcon={{
-          name:"phone",
-          type:"antdesign"
+          name: 'phone',
+          type: 'antdesign',
         }}
         errorMessage={errors.phoneNumber}
         value={credentials.phoneNumber}
         handleTextChange={handleTextChange}
       />
 
-      <InputText 
+      <InputText
         name="password"
         label="Password"
         leftIcon={{
-          name:"lock",
-          type:"feather"
+          name: 'lock',
+          type: 'feather',
         }}
         rightIcon={{
-          name:"eye-off",
-          type:"feather"
+          name: 'eye-off',
+          type: 'feather',
         }}
         secureTextEntry={true}
         errorMessage={errors.password}
@@ -210,16 +213,16 @@ const SignUp = () => {
         handleTextChange={handleTextChange}
       />
 
-      <InputText 
+      <InputText
         name="confirmPassword"
         label="Confirm Password"
         leftIcon={{
-          name:"lock",
-          type:"feather"
+          name: 'lock',
+          type: 'feather',
         }}
         rightIcon={{
-          name:"eye-off",
-          type:"feather"
+          name: 'eye-off',
+          type: 'feather',
         }}
         secureTextEntry={true}
         errorMessage={errors.confirmPassword}
@@ -238,38 +241,36 @@ const SignUp = () => {
         loading={registerState.registering}
       />
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
-  container:{
+  container: {
     backgroundColor: 'rgb(255, 255, 255)',
-    alignItems:'center',
+    alignItems: 'center',
     // justifyContent:'center',
     flex: 1,
-    height: DEVICE_HEIGHT,
+    // height: DEVICE_HEIGHT,
     // marginTop: StatusBar.currentHeight,
   },
 
-  loadingProps:{
-
-    color: 'white'
+  loadingProps: {
+    color: 'white',
   },
-  titleStyle:{
+  titleStyle: {
     fontWeight: 'bold',
-    fontSize: 24
+    fontSize: 24,
   },
-  buttonStyle:{
+  buttonStyle: {
     backgroundColor: 'rgb(0, 102, 255)',
     borderRadius: 8,
   },
-  containerStyle:{
+  containerStyle: {
     marginVertical: 12,
     justifyContent: 'center',
-    height:50,
-    width:200
+    height: 50,
+    width: 200,
   },
-})
-
+});
 
 export default SignUp;
