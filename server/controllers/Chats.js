@@ -267,11 +267,18 @@ chatController.getMessages = async (req, res, next) => {
 };
 
 chatController.deleteMessage = async (req, res, next) => {
-  const { messageId, chatId } = req.body;
+  const { messageId } = req.body;
 
   const userId = req.userId;
 
   try {
+    const messageToDelete = MessagesModel.findById(messageId);
+    if (!messageToDelete) {
+      return res.status(httpStatus.NOT_FOUND).json({
+        message: "Message not found",
+      });
+    }
+    const chatId = messageToDelete.chat;
     const chat = await ChatModel.findById(chatId);
     if (!chat) {
       return res.status(httpStatus.BAD_REQUEST).json({
@@ -287,7 +294,7 @@ chatController.deleteMessage = async (req, res, next) => {
       });
     }
 
-    const deletedMessage = await MessagesModel.findByIdAndUpdate(messageId, {
+    const deletedMessage = await messageToDelete.update({
       isDeleted: true,
     });
 
