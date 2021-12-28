@@ -33,7 +33,6 @@ const NewsFeed = (props) => {
   const fetchPosts = async () => {
     try {
       const latestPosts = await post.getListPost(null, user.token);
-      console.log(latestPosts.data.data);
       setPosts(latestPosts.data.data);
     } catch (err) {
       console.log(err);

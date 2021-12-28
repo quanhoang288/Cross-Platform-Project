@@ -268,11 +268,12 @@ chatController.getMessages = async (req, res, next) => {
 
 chatController.deleteMessage = async (req, res, next) => {
   const { messageId, chatId } = req.body;
-
+  console.log("hello", chatId);
   const userId = req.userId;
 
   try {
     const chat = await ChatModel.findById(chatId);
+    console.log(chat);
     if (!chat) {
       return res.status(httpStatus.BAD_REQUEST).json({
         message: "Chat not found!",

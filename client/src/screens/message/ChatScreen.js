@@ -66,16 +66,33 @@ const ChatScreen = () => {
       const newMessages = await fetchMessages();
       if (newMessages && newMessages.length > 0) {
         setMessages(
-          newMessages.map((msg) => ({
-            ...msg,
-            _id: msg._id,
-            text: msg.content,
-            createdAt: msg.createdAt,
-            user: {
-              _id: msg.user._id,
-              name: msg.user.username,
-            },
-          })),
+          newMessages.map((msg) => {
+            if (msg.isDeleted == false) {
+              return {
+                ...msg,
+                _id: msg._id,
+                text: msg.content,
+                createdAt: msg.createdAt,
+                isDeleted: msg.isDeleted,
+                user: {
+                  _id: msg.user._id,
+                  name: msg.user.username,
+                },
+              };
+            } else {
+              return {
+                ...msg,
+                _id: msg._id,
+                text: 'Message unsent',
+                createdAt: msg.createdAt,
+                isdeleted: msg.isDeleted,
+                user: {
+                  _id: msg.user._id,
+                  name: msg.user.username,
+                },
+              };
+            }
+          }),
         );
         setChatId(newMessages[0].chat);
         dispatch(chatActions.updateSeenStatus(newMessages[0].chat));
@@ -84,6 +101,10 @@ const ChatScreen = () => {
     initialize();
     return () => {};
   }, []);
+
+  useEffect(() => {
+    console.log(chatId, 'heeloo');
+  }, [chatId]);
 
   useEffect(() => {
     socket?.on('getMessage', (data) => {
@@ -197,21 +218,43 @@ const ChatScreen = () => {
   };
 
   const renderBubble = (props) => {
-    return (
-      <Bubble
-        {...props}
-        wrapperStyle={{
-          right: {
-            backgroundColor: '#2e64e5',
-          },
-        }}
-        textStyle={{
-          right: {
-            color: '#fff',
-          },
-        }}
-      />
-    );
+    if (props.currentMessage.isDeleted == true) {
+      return (
+        <Bubble
+          {...props}
+          textStyle={{
+            right: {
+              color: '#000000',
+              fontStyle: 'italic',
+            },
+          }}
+          wrapperStyle={{
+            right: {
+              backgroundColor: '#FFFFFF',
+            },
+          }}
+        />
+      );
+    } else {
+      return (
+        <Bubble
+          {...props}
+          wrapperStyle={{
+            right: {
+              backgroundColor: '#2e64e5',
+            },
+            left: {
+              backgroundColor: '#fff2cc',
+            },
+          }}
+          textStyle={{
+            right: {
+              color: '#fff',
+            },
+          }}
+        />
+      );
+    }
   };
 
   const scrollToBottomComponent = () => {
@@ -219,15 +262,26 @@ const ChatScreen = () => {
   };
 
   const onDelete = async (messageIdToDelete) => {
-    setMessages((previousMessages) =>
-      previousMessages.filter((messages) => messages._id !== messageIdToDelete),
-    );
+    console.log(chatId, 'hihi');
     const deleteMess = await message.deleteMessage(
       chatId,
       messageIdToDelete,
       token,
     );
-    console.log(deleteMess.data.data);
+    setMessages(
+      messages.map((msg) => {
+        if (msg._id == messageIdToDelete) {
+          return {
+            ...msg,
+            isDeleted: true,
+            text: 'Message unsent',
+          };
+        }
+        return msg;
+      }),
+      // previousMessages.filter((messages) => messages._id !== messageIdToDelete),
+    );
+
     const messDelete = deleteMess.data.data;
     socket?.emit('deleteMessage', {
       _id: messDelete._id,
