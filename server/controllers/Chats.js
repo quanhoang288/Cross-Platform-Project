@@ -287,12 +287,9 @@ chatController.deleteMessage = async (req, res, next) => {
       });
     }
 
-    const deletedMessage = await MessagesModel.findByIdAndDelete(messageId);
-
-    const numOfMessages = await MessagesModel.find({ chat: chat._id }).count();
-    if (numOfMessages === 0) {
-      await ChatModel.findByIdAndDelete(chat._id);
-    }
+    const deletedMessage = await MessagesModel.findByIdAndUpdate(messageId, {
+      isDeleted: true,
+    });
 
     return res.status(httpStatus.OK).json({
       data: deletedMessage,
