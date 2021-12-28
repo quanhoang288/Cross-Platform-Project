@@ -272,7 +272,7 @@ chatController.deleteMessage = async (req, res, next) => {
   const userId = req.userId;
 
   try {
-    const messageToDelete = MessagesModel.findById(messageId);
+    const messageToDelete = await MessagesModel.findById(messageId);
     if (!messageToDelete) {
       return res.status(httpStatus.NOT_FOUND).json({
         message: "Message not found",

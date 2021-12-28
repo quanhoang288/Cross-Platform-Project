@@ -26,10 +26,9 @@ const getChats = async (token) => {
   });
   return getList;
 };
-const deleteMessage = async (chatId, messageId, token) => {
+const deleteMessage = async (messageId, token) => {
   const messageDelete = {
     messageId: messageId,
-    chatId: chatId,
   };
   console.log(messageDelete);
   const deleteMess = await api({

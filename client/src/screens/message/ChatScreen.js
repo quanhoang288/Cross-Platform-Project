@@ -263,11 +263,7 @@ const ChatScreen = () => {
 
   const onDelete = async (messageIdToDelete) => {
     console.log(chatId, 'hihi');
-    const deleteMess = await message.deleteMessage(
-      chatId,
-      messageIdToDelete,
-      token,
-    );
+    const deleteMess = await message.deleteMessage(messageIdToDelete, token);
     setMessages(
       messages.map((msg) => {
         if (msg._id == messageIdToDelete) {
