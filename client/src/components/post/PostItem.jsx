@@ -12,6 +12,7 @@ import { like } from '../../apis';
 import { uploadActions } from '../../redux/actions';
 import { formatDate } from '../../helpers';
 import { MoreOrLessText } from '../common';
+import { ASSET_API_URL } from '../../configs';
 
 const areEqual = (prevProps, nextProps) => {
   const { post, postList } = nextProps;
@@ -58,6 +59,8 @@ const PostItem = ({ post, postList }) => {
       });
   };
 
+  console.log(post.author.avatar);
+
   return (
     <View style={styles.container}>
       <View style={styles.profileContainer}>
@@ -65,7 +68,7 @@ const PostItem = ({ post, postList }) => {
           <Avatar
             rounded
             source={{
-              uri: post.author.avatar?.fileName,
+              uri: `${ASSET_API_URL}/${post.author.avatar?.fileName}`,
             }}
             onPress={() =>
               navigation.navigate(stacks.profile.name, {

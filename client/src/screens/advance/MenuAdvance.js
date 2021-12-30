@@ -87,6 +87,7 @@ const MenuAdvance = () => {
         }}
         content="Help ?"
         note="Is there anything I can help for you?"
+        onPress={() => navigation.navigate('help')}
       />
 
       <FunctionalityItem
