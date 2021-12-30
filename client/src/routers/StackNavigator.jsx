@@ -19,6 +19,7 @@ import {
 } from '../screens/message';
 import { SignIn, SignUp } from '../screens/signIn-signUp';
 import { CustomTabView } from '../components/common';
+import { Empty, Error } from '../components/emptyAndError';
 
 const Stack = createNativeStackNavigator();
 
@@ -94,6 +95,14 @@ const stackScreens = [
       title: stacks.changePW.title,
     },
     component: ChangePW,
+  },
+
+  {
+    name: 'help',
+    options: {
+      title: 'Help',
+    },
+    component: Error,
   },
 
   {
