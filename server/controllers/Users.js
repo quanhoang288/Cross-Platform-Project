@@ -101,12 +101,14 @@ usersController.login = async (req, res, next) => {
       },
       JWT_SECRET
     );
-    delete user["password"];
+
     return res.status(httpStatus.OK).json({
       data: {
         id: user._id,
         phonenumber: user.phonenumber,
         username: user.username,
+        blocked_inbox: user.blocked_inbox,
+        blocked_diary: user.blocked_diary,
       },
       token: token,
     });
@@ -333,29 +335,29 @@ usersController.setBlock = async (req, res, next) => {
     let targetId = req.body.user_id;
     let type = req.body.type;
     let user = await UserModel.findById(req.userId);
-    blocked = [];
-    if (user.hasOwnProperty("blocked_inbox")) {
-      blocked = user.blocked_inbox;
+
+    let blocked = user.blocked_inbox || [];
+
+    const index = blocked.indexOf(targetId);
+
+    if (type && index == -1) {
+      blocked.push(targetId);
+    } else if (!type && index > -1) {
+      blocked.splice(index, 1);
     }
 
-    if (type) {
-      if (blocked.indexOf(targetId) === -1) {
-        blocked.push(targetId);
+    const savedUser = await UserModel.findByIdAndUpdate(
+      user._id,
+      {
+        blocked_inbox: blocked,
+      },
+      {
+        new: true,
       }
-    } else {
-      const index = blocked.indexOf(targetId);
-      if (index > -1) {
-        blocked.splice(index, 1);
-      }
-    }
+    );
 
-    user.blocked_inbox = blocked;
-    user.save();
-
-    res.status(200).json({
-      code: 200,
-      message: "Thao tác thành công",
-      data: user,
+    return res.status(httpStatus.OK).json({
+      data: savedUser,
     });
   } catch (e) {
     return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
@@ -368,29 +370,32 @@ usersController.setBlockDiary = async (req, res, next) => {
     let targetId = req.body.user_id;
     let type = req.body.type;
     let user = await UserModel.findById(req.userId);
-    blocked = [];
-    if (user.hasOwnProperty("blocked")) {
-      blocked = user.blocked_diary;
-    }
+    let blocked = user.blocked_diary || [];
+
+    const index = blocked.indexOf(targetId);
 
     if (type) {
-      if (blocked.indexOf(targetId) === -1) {
+      if (index == -1) {
         blocked.push(targetId);
       }
     } else {
-      const index = blocked.indexOf(targetId);
       if (index > -1) {
         blocked.splice(index, 1);
       }
     }
 
-    user.blocked_diary = blocked;
-    user.save();
+    const savedUser = await UserModel.findByIdAndUpdate(
+      user._id,
+      {
+        blocked_diary: blocked,
+      },
+      {
+        new: true,
+      }
+    );
 
-    res.status(200).json({
-      code: 200,
-      message: "Thao tác thành công",
-      data: user,
+    return res.status(httpStatus.OK).json({
+      data: savedUser,
     });
   } catch (e) {
     return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
