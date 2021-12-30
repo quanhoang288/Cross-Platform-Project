@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/core';
 import { showFailureMessage, showSuccessMessage } from '../../helpers/Toast';
 import { DEVICE_WIDTH } from "../../constants/dimensions";
+import { ASSET_API_URL } from '../../configs';
 
 const personalInformation = () =>{
 
@@ -22,6 +23,8 @@ const personalInformation = () =>{
         gender: null,
         birthday: null,
         address: "",
+        avatar: null,
+        imageCover: null,
     });
 
     const getUserInfo = async () => {
@@ -34,6 +37,8 @@ const personalInformation = () =>{
                 gender: curUserInfo.gender,
                 birthday: curUserInfo.birthday,
                 address: curUserInfo.address,
+                avatar: curUserInfo.avatar.fileName,
+                imageCover: curUserInfo.cover_image.fileName,
             });
             console.log(userInfo);
         } 
@@ -147,8 +152,8 @@ const personalInformation = () =>{
             rounded
             size={120}
             source={{
-              // uri: `${ASSET_API_URL}/${userData.info.avatar.fileName}`,
-              uri: "https://i.etsystatic.com/29282700/r/il/e3aae5/3152845862/il_340x270.3152845862_q44u.jpg",
+              uri: `${ASSET_API_URL}/${userInfo.avatar}`,
+              // uri: "https://i.etsystatic.com/29282700/r/il/e3aae5/3152845862/il_340x270.3152845862_q44u.jpg",
             }}
             onPress={() => console.log("Pressed on avatar!")}
           />
@@ -166,7 +171,7 @@ const personalInformation = () =>{
         <View style={{alignItems:'center',}}>
           <Image
             source={{
-              uri: "https://mondaycareer.com/wp-content/uploads/2020/11/background-%C4%91%E1%BA%B9p-2-1024x585.jpg",
+              uri: `${ASSET_API_URL}/${userInfo.imageCover}`,
             }}
             alt='This is cover image'
             style={styles.imageCover}
