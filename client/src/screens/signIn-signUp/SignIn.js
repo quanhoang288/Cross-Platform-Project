@@ -172,8 +172,7 @@ const SignIn = () => {
           type: 'feather',
         }}
         placeholderText={'Password'}
-        secureTextEntry={true}
-        // rightIcon={true}
+        isPassword={true}
         errorMessage={errors.password}
         value={credentials.password}
         handleTextChange={handleTextChange}
@@ -226,10 +225,8 @@ const SignIn = () => {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    // justifyContent:'center',
     backgroundColor: 'rgb(255, 255, 255)',
     flex: 1,
-    height: DEVICE_HEIGHT,
     marginTop: StatusBar.currentHeight,
     paddingTop: DEVICE_HEIGHT / 12,
   },
