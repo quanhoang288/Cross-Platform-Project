@@ -14,11 +14,24 @@ import { stacks } from '../../constants/title';
 import { useDispatch, useSelector } from 'react-redux';
 import { ASSET_API_URL } from '../../configs';
 import { formatDate } from '../../helpers';
-
+import { message } from '../../apis';
 const MessageScreen = () => {
   const navigation = useNavigation();
   const chatList = useSelector((state) => state.chat.chats);
-
+  const user = useSelector((state) => state.auth.user);
+  const token = user.token;
+  const [blockList, setBlockList] = useState([]);
+  console.log(chatList);
+  const fetchBlockList = async () => {
+    try {
+      const res = await message.getBlockChat(token);
+      return res.data.data.blocked_inbox;
+    } catch (err) {
+      if (err.response.status == 404) {
+        return null;
+      }
+    }
+  };
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -33,19 +46,33 @@ const MessageScreen = () => {
     });
   }, [navigation]);
 
+  useEffect(() => {
+    const initialize = async () => {
+      const listBlock = await fetchBlockList();
+      setBlockList(
+        listBlock.map((block) => ({
+          Id: block,
+        })),
+      );
+      console.log(blockList);
+    };
+    initialize();
+    return () => {};
+  }, []);
+
   return (
     <FlatList
       data={chatList}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => (
         <TouchableOpacity
-          onPress={() =>
+          onPress={() => {
             navigation.navigate(stacks.chatScreen.name, {
               receivedId: item.receivedId,
               receiverName: item.userName,
               receiverImg: item.userImg,
-            })
-          }
+            });
+          }}
         >
           <View>
             <ListItem>

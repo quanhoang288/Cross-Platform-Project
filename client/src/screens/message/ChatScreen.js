@@ -306,6 +306,8 @@ const ChatScreen = () => {
       },
     );
   };
+
+  const renderInputToolbar = () => {};
   return (
     <GiftedChat
       messages={messages}
@@ -323,6 +325,7 @@ const ChatScreen = () => {
       isLoadingEarlier={isLoadingEarlier}
       loadEarlier
       onLoadEarlier={() => setLoadingEarlier(true)}
+      renderInputToolbar={renderInputToolbar}
     />
   );
 };

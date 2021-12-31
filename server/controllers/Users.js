@@ -333,29 +333,33 @@ usersController.setBlock = async (req, res, next) => {
     let targetId = req.body.user_id;
     let type = req.body.type;
     let user = await UserModel.findById(req.userId);
-    blocked = [];
+    console.log(user);
+    let blocked = [];
     if (user.hasOwnProperty("blocked_inbox")) {
       blocked = user.blocked_inbox;
     }
 
     if (type) {
+      console.log(blocked.indexOf(targetId));
       if (blocked.indexOf(targetId) === -1) {
-        blocked.push(targetId);
+        blocked = blocked.push(targetId);
       }
     } else {
       const index = blocked.indexOf(targetId);
       if (index > -1) {
-        blocked.splice(index, 1);
+        blocked = blocked.splice(index, 1);
       }
     }
 
-    user.blocked_inbox = blocked;
-    user.save();
+    console.log(blocked);
+    const saveUser = await UserModel.findByIdAndUpdate(user._id, {
+      blocked_inbox: blocked,
+    });
 
     res.status(200).json({
       code: 200,
       message: "Thao tác thành công",
-      data: user,
+      data: saveUser,
     });
   } catch (e) {
     return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
@@ -384,13 +388,15 @@ usersController.setBlockDiary = async (req, res, next) => {
       }
     }
 
-    user.blocked_diary = blocked;
-    user.save();
+    console.log(blocked);
+    const saveUser = await UserModel.findByIdAndUpdate(user._id, {
+      blocked_inbox: blocked,
+    });
 
     res.status(200).json({
       code: 200,
       message: "Thao tác thành công",
-      data: user,
+      data: saveUser,
     });
   } catch (e) {
     return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({

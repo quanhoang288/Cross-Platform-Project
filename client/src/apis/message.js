@@ -93,6 +93,49 @@ const sendNewMessage = async (senderId, receiverId, msg, token) => {
 
   return sendResult;
 };
+
+const blockChat = async (user_id, token) => {
+  const userBlocked = {
+    user_id: user_id,
+    type: 'PRIVATE_CHAT',
+  };
+  const block = await api({
+    method: 'POST',
+    url: 'users/set-block-user/',
+    data: userBlocked,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return block;
+};
+
+const unBlockChat = async (user_id, token) => {
+  const userBlocked = {
+    user_id: user_id,
+  };
+  const unBlock = await api({
+    method: 'POST',
+    url: 'users/set-block-user/',
+    data: userBlocked,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return unBlock;
+};
+
+const getBlockChat = async (token) => {
+  const getBlock = await api({
+    method: 'POST',
+    url: 'users/set-block-diary/',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return getBlock;
+};
+
 export {
   getMessageByOtherUserId,
   sendMessage,
@@ -100,4 +143,7 @@ export {
   deleteMessage,
   deleteChat,
   sendNewMessage,
+  blockChat,
+  unBlockChat,
+  getBlockChat,
 };
