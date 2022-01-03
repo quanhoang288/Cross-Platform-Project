@@ -83,4 +83,19 @@ io.on("connection", (socket) => {
     io.emit("getMessage", msg);
     io.emit("latestMessage", msg);
   });
+  socket.on("deleteMessage", (msg) => {
+    console.log("deleting");
+    io.emit("removeMess", msg);
+  });
+  socket.on("blockUser", (msg) => {
+    console.log("blocking");
+    io.emit("beBlocked", msg);
+    io.emit("blocked", msg);
+    io.emit("renderBlock", msg);
+  });
+  socket.on("unblock", (msg) => {
+    console.log("unblocking");
+    io.emit("beUnblocked", msg);
+    io.emit("renderUnblock", msg);
+  });
 });

@@ -26,10 +26,9 @@ const getChats = async (token) => {
   });
   return getList;
 };
-const deleteMessage = async (chatId, messageId, token) => {
+const deleteMessage = async (messageId, token) => {
   const messageDelete = {
     messageId: messageId,
-    chatId: chatId,
   };
   console.log(messageDelete);
   const deleteMess = await api({
@@ -94,6 +93,38 @@ const sendNewMessage = async (senderId, receiverId, msg, token) => {
 
   return sendResult;
 };
+
+const blockChat = async (user_id, token) => {
+  const userBlocked = {
+    user_id: user_id,
+    type: 'PRIVATE_CHAT',
+  };
+  const block = await api({
+    method: 'POST',
+    url: 'users/set-block-user/',
+    data: userBlocked,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return block;
+};
+
+const unBlockChat = async (user_id, token) => {
+  const userBlocked = {
+    user_id: user_id,
+  };
+  const unBlock = await api({
+    method: 'POST',
+    url: 'users/set-block-user/',
+    data: userBlocked,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return unBlock;
+};
+
 export {
   getMessageByOtherUserId,
   sendMessage,
@@ -101,4 +132,6 @@ export {
   deleteMessage,
   deleteChat,
   sendNewMessage,
+  blockChat,
+  unBlockChat,
 };

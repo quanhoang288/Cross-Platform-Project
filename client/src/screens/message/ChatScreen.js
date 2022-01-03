@@ -9,13 +9,14 @@ import {
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { io } from 'socket.io-client';
-import { message } from '../../apis';
+import { message, auth } from '../../apis';
 import { SOCKET_URL } from '../../configs';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
-import { Icon } from 'react-native-elements';
+import { Icon, ListItem, Button, Text } from 'react-native-elements';
 import { stacks } from '../../constants/title';
 import { chatActions } from '../../redux/actions';
+import { Toast } from '../../helpers';
 const ChatScreen = () => {
   // const socket = useRef();
   const [messages, setMessages] = useState([]);
@@ -27,10 +28,11 @@ const ChatScreen = () => {
   const navigation = useNavigation();
   const [chatId, setChatId] = useState(null);
   const [isLoadingEarlier, setLoadingEarlier] = useState(false);
-
+  const [isBlocked, setIsBlocked] = useState(route.params.isBlocked);
+  const [blocked, setBlocked] = useState(route.params.blocked);
   const dispatch = useDispatch();
   const socket = useSelector((state) => state.auth.socket);
-
+  console.log(blocked);
   const fetchMessages = async () => {
     try {
       const res = await message.getMessageByOtherUserId(receivedId, token);
@@ -54,6 +56,7 @@ const ChatScreen = () => {
           onPress={() =>
             navigation.navigate(stacks.chatSetting.name, {
               chatId: chatId,
+              receivedId: receivedId,
             })
           }
         />
@@ -66,16 +69,33 @@ const ChatScreen = () => {
       const newMessages = await fetchMessages();
       if (newMessages && newMessages.length > 0) {
         setMessages(
-          newMessages.map((msg) => ({
-            ...msg,
-            _id: msg._id,
-            text: msg.content,
-            createdAt: msg.createdAt,
-            user: {
-              _id: msg.user._id,
-              name: msg.user.username,
-            },
-          })),
+          newMessages.map((msg) => {
+            if (msg.isDeleted == false) {
+              return {
+                ...msg,
+                _id: msg._id,
+                text: msg.content,
+                createdAt: msg.createdAt,
+                isDeleted: msg.isDeleted,
+                user: {
+                  _id: msg.user._id,
+                  name: msg.user.username,
+                },
+              };
+            } else {
+              return {
+                ...msg,
+                _id: msg._id,
+                text: 'Message unsent',
+                createdAt: msg.createdAt,
+                isdeleted: msg.isDeleted,
+                user: {
+                  _id: msg.user._id,
+                  name: msg.user.username,
+                },
+              };
+            }
+          }),
         );
         setChatId(newMessages[0].chat);
         dispatch(chatActions.updateSeenStatus(newMessages[0].chat));
@@ -102,15 +122,57 @@ const ChatScreen = () => {
         );
       }
     });
+
+    // socket?.on('blocked', (data) => {
+    //   if (user.id == data.userId){
+    //     set
+    //   }
+    // })
+  }, [socket]);
+  useEffect(() => {
+    socket?.on('beBlocked', (data) => {
+      if (user.id == data.receivedId) {
+        setIsBlocked(true);
+      }
+    });
+  }, [socket]);
+  useEffect(() => {
+    socket?.on('blocked', (data) => {
+      if (user.id == data.userId) {
+        setBlocked(true);
+      }
+    });
+  }, [socket]);
+  useEffect(() => {
+    socket?.on('beUnblocked', (data) => {
+      if (user.id == data.receivedId) {
+        setIsBlocked(false);
+        console.log('vu hoang trung');
+      }
+    });
+  }, [socket]);
+  useEffect(() => {
     socket?.on('removeMess', (data) => {
+      console.log('data', data);
+      // console.log(messages[0]);
       if (receivedId === data.userId) {
-        setMessages((previousMessages) =>
-          previousMessages.filter((messages) => messages._id !== data._id),
+        setMessages(
+          messages.map((msg) => {
+            if (msg._id == data._id) {
+              return {
+                ...msg,
+                isDeleted: true,
+                text: 'Message unsent',
+              };
+            } else {
+              return msg;
+            }
+          }),
+          // previousMessages.filter((messages) => messages._id !== messageIdToDelete),
         );
       }
     });
   }, [socket]);
-
   useEffect(() => {
     if (isLoadingEarlier) {
       handleLoadEarlier();
@@ -197,21 +259,50 @@ const ChatScreen = () => {
   };
 
   const renderBubble = (props) => {
-    return (
-      <Bubble
-        {...props}
-        wrapperStyle={{
-          right: {
-            backgroundColor: '#2e64e5',
-          },
-        }}
-        textStyle={{
-          right: {
-            color: '#fff',
-          },
-        }}
-      />
-    );
+    if (props.currentMessage.isDeleted == true) {
+      return (
+        <Bubble
+          {...props}
+          textStyle={{
+            right: {
+              color: '#000000',
+              fontStyle: 'italic',
+            },
+            left: {
+              color: '#000000',
+              fontStyle: 'italic',
+            },
+          }}
+          wrapperStyle={{
+            right: {
+              backgroundColor: '#FFFFFF',
+            },
+            left: {
+              backgroundColor: '#FFFFFF',
+            },
+          }}
+        />
+      );
+    } else {
+      return (
+        <Bubble
+          {...props}
+          wrapperStyle={{
+            right: {
+              backgroundColor: '#2e64e5',
+            },
+            left: {
+              backgroundColor: '#fff2cc',
+            },
+          }}
+          textStyle={{
+            right: {
+              color: '#fff',
+            },
+          }}
+        />
+      );
+    }
   };
 
   const scrollToBottomComponent = () => {
@@ -219,19 +310,24 @@ const ChatScreen = () => {
   };
 
   const onDelete = async (messageIdToDelete) => {
-    setMessages((previousMessages) =>
-      previousMessages.filter((messages) => messages._id !== messageIdToDelete),
+    const deleteMess = await message.deleteMessage(messageIdToDelete, token);
+    setMessages(
+      messages.map((msg) => {
+        if (msg._id == messageIdToDelete) {
+          return {
+            ...msg,
+            isDeleted: true,
+            text: 'Message unsent',
+          };
+        }
+        return msg;
+      }),
     );
-    const deleteMess = await message.deleteMessage(
-      chatId,
-      messageIdToDelete,
-      token,
-    );
-    console.log(deleteMess.data.data);
+
     const messDelete = deleteMess.data.data;
     socket?.emit('deleteMessage', {
       _id: messDelete._id,
-      userId: messDelete.user,
+      userId: user.id,
     });
   };
 
@@ -256,6 +352,58 @@ const ChatScreen = () => {
       },
     );
   };
+  const onPressUnblockUser = async () => {
+    try {
+      const rs = await message.unBlockChat(receivedId, token);
+      setBlocked(false);
+      socket?.emit('unblock', {
+        userId: user.id,
+        receivedId: receivedId,
+      });
+    } catch (error) {
+      console.log(error);
+      Toast.showFailureMessage('Error unblock');
+    }
+  };
+  const renderInputToolbar = (props) => {
+    if (!blocked) {
+      if (!isBlocked) {
+        return <InputToolbar {...props}></InputToolbar>;
+      } else {
+        return (
+          <ListItem
+            style={{
+              marginTop: -20,
+            }}
+          >
+            <ListItem.Title
+              style={{
+                marginLeft: 46,
+              }}
+            >
+              You have been blocked by this user
+            </ListItem.Title>
+          </ListItem>
+        );
+      }
+    } else {
+      return (
+        <ListItem
+          style={{
+            marginTop: -20,
+          }}
+        >
+          <ListItem.Title>You have blocked this user</ListItem.Title>
+          <Button
+            onPress={onPressUnblockUser}
+            title="Unblock this user"
+            color="#841584"
+            accessibilityLabel="Learn more about this purple button"
+          />
+        </ListItem>
+      );
+    }
+  };
   return (
     <GiftedChat
       messages={messages}
@@ -273,6 +421,7 @@ const ChatScreen = () => {
       isLoadingEarlier={isLoadingEarlier}
       loadEarlier
       onLoadEarlier={() => setLoadingEarlier(true)}
+      renderInputToolbar={renderInputToolbar}
     />
   );
 };

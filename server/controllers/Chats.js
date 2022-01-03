@@ -131,7 +131,7 @@ chatController.getChats = async (req, res, next) => {
       .sort({ updatedAt: -1 })
       .populate({
         path: "member",
-        select: "_id username phonenumber avatar",
+        select: "_id username phonenumber avatar blocked_inbox",
         model: "Users",
         populate: {
           path: "avatar",
@@ -272,7 +272,7 @@ chatController.deleteMessage = async (req, res, next) => {
   const userId = req.userId;
 
   try {
-    const messageToDelete = MessagesModel.findById(messageId);
+    const messageToDelete = await MessagesModel.findById(messageId);
     if (!messageToDelete) {
       return res.status(httpStatus.NOT_FOUND).json({
         message: "Message not found",
@@ -280,6 +280,7 @@ chatController.deleteMessage = async (req, res, next) => {
     }
     const chatId = messageToDelete.chat;
     const chat = await ChatModel.findById(chatId);
+    console.log(chat);
     if (!chat) {
       return res.status(httpStatus.BAD_REQUEST).json({
         message: "Chat not found!",
@@ -294,9 +295,12 @@ chatController.deleteMessage = async (req, res, next) => {
       });
     }
 
-    const deletedMessage = await messageToDelete.update({
-      isDeleted: true,
-    });
+    const deletedMessage = await messageToDelete.update(
+      {
+        isDeleted: true,
+      },
+      { new: true }
+    );
 
     return res.status(httpStatus.OK).json({
       data: deletedMessage,
