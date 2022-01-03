@@ -131,7 +131,7 @@ chatController.getChats = async (req, res, next) => {
       .sort({ updatedAt: -1 })
       .populate({
         path: "member",
-        select: "_id username phonenumber avatar",
+        select: "_id username phonenumber avatar blocked_inbox",
         model: "Users",
         populate: {
           path: "avatar",

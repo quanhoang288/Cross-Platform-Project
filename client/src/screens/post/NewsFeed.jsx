@@ -44,12 +44,18 @@ const NewsFeed = (props) => {
       const res = await message.getChats(user.token);
       const formattedChats = res.data.data.map((chat) => {
         const receiver = chat.member.find((u) => u._id !== user.id);
+        const blocked =
+          user.blocked_inbox.find((u) => u == receiver._id) !== null;
+        const isBlocked =
+          receiver.blocked_inbox.find((u) => u == user.id) !== null;
         return {
           id: chat._id,
           userName: receiver.username,
           userImg: receiver.avatar.fileName,
           numUnseenMessages: chat.numUnseenMessages,
           messageText: chat.latestMessage.content,
+          blocked,
+          isBlocked,
           receivedId: receiver._id,
           latestMessageSentAt: chat.latestMessageSentAt,
         };

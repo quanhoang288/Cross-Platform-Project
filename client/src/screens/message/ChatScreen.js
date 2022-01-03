@@ -9,13 +9,14 @@ import {
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { io } from 'socket.io-client';
-import { message } from '../../apis';
+import { message, auth } from '../../apis';
 import { SOCKET_URL } from '../../configs';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
-import { Icon } from 'react-native-elements';
+import { Icon, ListItem, Button, Text } from 'react-native-elements';
 import { stacks } from '../../constants/title';
 import { chatActions } from '../../redux/actions';
+import { Toast } from '../../helpers';
 const ChatScreen = () => {
   // const socket = useRef();
   const [messages, setMessages] = useState([]);
@@ -27,10 +28,10 @@ const ChatScreen = () => {
   const navigation = useNavigation();
   const [chatId, setChatId] = useState(null);
   const [isLoadingEarlier, setLoadingEarlier] = useState(false);
-
+  const [isBlocked, setIsBlocked] = useState(route.params.isBlocked);
+  const [blocked, setBlocked] = useState(route.params.blocked);
   const dispatch = useDispatch();
   const socket = useSelector((state) => state.auth.socket);
-
   const fetchMessages = async () => {
     try {
       const res = await message.getMessageByOtherUserId(receivedId, token);
@@ -54,6 +55,7 @@ const ChatScreen = () => {
           onPress={() =>
             navigation.navigate(stacks.chatSetting.name, {
               chatId: chatId,
+              receivedId: receivedId,
             })
           }
         />
@@ -103,10 +105,6 @@ const ChatScreen = () => {
   }, []);
 
   useEffect(() => {
-    console.log(chatId, 'heeloo');
-  }, [chatId]);
-
-  useEffect(() => {
     socket?.on('getMessage', (data) => {
       if (senderId === data.receivedId) {
         const newMsg = {
@@ -125,11 +123,33 @@ const ChatScreen = () => {
     });
     socket?.on('removeMess', (data) => {
       if (receivedId === data.userId) {
-        setMessages((previousMessages) =>
-          previousMessages.filter((messages) => messages._id !== data._id),
+        setMessages(
+          messages.map((msg) => {
+            if (msg._id == messageIdToDelete) {
+              return {
+                ...msg,
+                isDeleted: true,
+                text: 'Message unsent',
+              };
+            }
+            return msg;
+          }),
+          // previousMessages.filter((messages) => messages._id !== messageIdToDelete),
         );
       }
     });
+
+    socket?.on('beBlocked', (data) => {
+      if (user.id == data.receivedId) {
+        setIsBlocked(true);
+      }
+    });
+
+    // socket?.on('blocked', (data) => {
+    //   if (user.id == data.userId){
+    //     set
+    //   }
+    // })
   }, [socket]);
 
   useEffect(() => {
@@ -227,9 +247,16 @@ const ChatScreen = () => {
               color: '#000000',
               fontStyle: 'italic',
             },
+            left: {
+              color: '#000000',
+              fontStyle: 'italic',
+            },
           }}
           wrapperStyle={{
             right: {
+              backgroundColor: '#FFFFFF',
+            },
+            left: {
               backgroundColor: '#FFFFFF',
             },
           }}
@@ -306,8 +333,54 @@ const ChatScreen = () => {
       },
     );
   };
-
-  const renderInputToolbar = () => {};
+  const onPressUnblockUser = async () => {
+    try {
+      const rs = await message.unBlockChat(receivedId, token);
+      setBlocked(false);
+    } catch (error) {
+      console.log(error);
+      Toast.showFailureMessage('Error unblock');
+    }
+  };
+  const renderInputToolbar = (props) => {
+    if (!blocked) {
+      if (!isBlocked) {
+        return <InputToolbar {...props}></InputToolbar>;
+      } else {
+        return (
+          <ListItem
+            style={{
+              marginTop: -20,
+            }}
+          >
+            <ListItem.Title
+              style={{
+                marginLeft: 46,
+              }}
+            >
+              You have been blocked by this user
+            </ListItem.Title>
+          </ListItem>
+        );
+      }
+    } else {
+      return (
+        <ListItem
+          style={{
+            marginTop: -20,
+          }}
+        >
+          <ListItem.Title>You have blocked this user</ListItem.Title>
+          <Button
+            onPress={onPressUnblockUser}
+            title="Unblock this user"
+            color="#841584"
+            accessibilityLabel="Learn more about this purple button"
+          />
+        </ListItem>
+      );
+    }
+  };
   return (
     <GiftedChat
       messages={messages}

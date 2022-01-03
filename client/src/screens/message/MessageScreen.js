@@ -14,24 +14,20 @@ import { stacks } from '../../constants/title';
 import { useDispatch, useSelector } from 'react-redux';
 import { ASSET_API_URL } from '../../configs';
 import { formatDate } from '../../helpers';
-import { message } from '../../apis';
 const MessageScreen = () => {
   const navigation = useNavigation();
   const chatList = useSelector((state) => state.chat.chats);
   const user = useSelector((state) => state.auth.user);
   const token = user.token;
-  const [blockList, setBlockList] = useState([]);
+  const socket = useSelector((state) => state.auth.socket);
   console.log(chatList);
-  const fetchBlockList = async () => {
-    try {
-      const res = await message.getBlockChat(token);
-      return res.data.data.blocked_inbox;
-    } catch (err) {
-      if (err.response.status == 404) {
-        return null;
-      }
-    }
-  };
+  // useEffect(() => {
+  //   socket.on?("update chatlist", (data) =>{
+  //     chatList.map((list) =>{
+
+  //     })
+  //   });
+  // },[])
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -46,33 +42,39 @@ const MessageScreen = () => {
     });
   }, [navigation]);
 
-  useEffect(() => {
-    const initialize = async () => {
-      const listBlock = await fetchBlockList();
-      setBlockList(
-        listBlock.map((block) => ({
-          Id: block,
-        })),
-      );
-      console.log(blockList);
-    };
-    initialize();
-    return () => {};
-  }, []);
+  // useEffect(() => {
+  //   const initialize = async () => {
+  //     const blocklist = await getBlockList(chatList[0].receivedId);
+  //     console.log(blocklist.blocked_inbox);
+  //   };
+  //   initialize();
+  // }, []);
+  console.log(chatList[0].receivedId);
+  console.log(user.id);
 
+  const handleClick = (item, user) => {
+    navigation.navigate(stacks.chatScreen.name, {
+      receivedId: item.receivedId,
+      receiverName: item.userName,
+      receiverImg: item.userImg,
+      blocked: item.blocked,
+      isBlocked: item.isBlocked,
+    });
+  };
   return (
     <FlatList
       data={chatList}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => (
         <TouchableOpacity
-          onPress={() => {
-            navigation.navigate(stacks.chatScreen.name, {
-              receivedId: item.receivedId,
-              receiverName: item.userName,
-              receiverImg: item.userImg,
-            });
-          }}
+          onPress={() => handleClick(item, user)}
+          // onPress={() => {
+          //   navigation.navigate(stacks.chatScreen.name, {
+          //     receivedId: item.receivedId,
+          //     receiverName: item.userName,
+          //     receiverImg: item.userImg,
+          //   });
+          // }}
         >
           <View>
             <ListItem>

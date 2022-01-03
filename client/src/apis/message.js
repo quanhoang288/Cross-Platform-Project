@@ -125,17 +125,6 @@ const unBlockChat = async (user_id, token) => {
   return unBlock;
 };
 
-const getBlockChat = async (token) => {
-  const getBlock = await api({
-    method: 'POST',
-    url: 'users/set-block-diary/',
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  return getBlock;
-};
-
 export {
   getMessageByOtherUserId,
   sendMessage,
@@ -145,5 +134,4 @@ export {
   sendNewMessage,
   blockChat,
   unBlockChat,
-  getBlockChat,
 };
