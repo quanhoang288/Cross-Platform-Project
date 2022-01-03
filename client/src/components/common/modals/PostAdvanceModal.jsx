@@ -7,145 +7,152 @@ import { hideModal, showModal } from '../../../redux/reducers/modalReducer';
 import { types } from '../../../constants/modalTypes';
 import { useNavigation } from '@react-navigation/core';
 import { stacks } from '../../../constants/title';
+import { post } from '../../../apis';
+import { Toast } from '../../../helpers';
 const PostAdvanceModal = ({ postId, authorId }) => {
-    
-    const user = useSelector(state => state.auth.user);
-    const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth.user);
+  const dispatch = useDispatch();
 
-    const navigation = useNavigation();
+  const navigation = useNavigation();
 
-    const ownPost = user && user.id === authorId;
+  const ownPost = user && user.id === authorId;
 
-    
-    const handleHideModal = () => {
-        setModalVisible(false);
-    }
+  const handleHideModal = () => {
+    setModalVisible(false);
+  };
 
-    const handleEditPost = () => {
-        dispatch(hideModal());
-        navigation.navigate(stacks.createPost.name, {
-            postId: postId,
-            title: 'Edit post'
-        });
-    }
+  const handleEditPost = () => {
+    dispatch(hideModal());
+    navigation.navigate(stacks.createPost.name, {
+      postId: postId,
+      title: 'Edit post',
+    });
+  };
 
-    const handleReportPost = () => {
-        dispatch(showModal({
-            modalType: types.postReport,
-            propsData: {
-                postId: postId
-            }
-        }))
-    }
-
-    const handleHidePost = () => {
-        console.log(postId);
-    }
-
-    const handleDeletePost = () => {
-        dispatch(showModal({
-            modalType: types.confirm,
-            propsData: {
-                isModalVisible: true,
-                title: 'Xóa bài viết',
-                content: 'Bạn có chắc chắn muốn xóa bài viết?',
-                yesOptionTitle: 'XÓA',
-                postId: postId
-            }
-        }))
-    }
-
-    const functionalities = ownPost ? [
-        {
-            title: 'Edit post',
-            subTitle: 'Only text content is editable',
-            icon: {
-                type: 'feather',
-                name: 'edit'
-            },
-            onPress: handleEditPost
+  const handleReportPost = () => {
+    dispatch(
+      showModal({
+        modalType: types.postReport,
+        propsData: {
+          postId: postId,
         },
-      
-        {
-            title: 'Delete post',
-            subTitle: 'Delete this post',
-            icon: {
-                type: 'ant-design',
-                name: 'delete'
-            },
-            onPress: handleDeletePost
-        },
-    ] : [
-        
-        
-        {
-            title: 'Delete post',
-            subTitle: 'This post will be hidden from your newsfeed',
-            icon: {
-                type: 'ant-design',
-                name: 'delete'
-            },
-            onPress: handleDeletePost
-        },
-        {
-            title: 'Hide all posts from newsfeed',
-            subTitle: 'All posts by this person will be hidden from your newsfeed',
-            icon: {
-                type: 'material-icon',
-                name: 'cancel-presentation'
-            },
-            onPress: handleHidePost
-        },
-        {
-            title: 'Report post',
-            icon: {
-                type: 'ant-design',
-                name: 'warning'
-            },
-            onPress: handleReportPost
-        },
-    ];
+      }),
+    );
+  };
 
-    return (
-        <BottomHalfModal 
-            isModalVisible={true}
-            hideModal={handleHideModal}
-        >
-            <View style={{
-                height: ownPost ? 200 : 250, 
-                backgroundColor: '#fff',
-                justifyContent: 'center',
-                borderTopStartRadius: 10,
-                borderTopEndRadius: 10,
-            }}>
-                {
-                    functionalities.map((func, idx) => (
-                        <ListItem
-                            key={idx}
-                            onPress={func.onPress}
-                        >
-                            <Icon type={func.icon.type} name={func.icon.name} style={{marginRight: 4}}/>
-                            <ListItem.Content>
-                                
-                                <ListItem.Title>
-                                    {func.title}
-                                </ListItem.Title>
-                                {func.subTitle && 
-                                    <ListItem.Subtitle>
-                                        {func.subTitle}
-                                    </ListItem.Subtitle> 
-                                }
-                            </ListItem.Content>
-                        </ListItem>
-                    ))
-                    
-                }
-                
-            </View>
-        </BottomHalfModal>
-    )
+  const handleHidePost = () => {
+    console.log(postId);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await post.deletePost(postId, user.token);
+      dispatch(hideModal());
+      Toast.showSuccessMessage('Delete post successfully');
+    } catch (error) {
+      Toast.showFailureMessage('Error deleting post');
+    }
+  };
+
+  const handleDeletePost = () => {
+    dispatch(
+      showModal({
+        modalType: types.confirm,
+        propsData: {
+          isModalVisible: true,
+          title: 'Delete post',
+          content: 'Are you sure you want to delete this post?',
+          yesOptionTitle: 'Delete',
+          noOptionTitle: 'Cancel',
+          postId: postId,
+          handleCancel: () => dispatch(hideModal()),
+          handleConfirm: handleConfirmDelete,
+        },
+      }),
+    );
+  };
+
+  const functionalities = ownPost
+    ? [
+        {
+          title: 'Edit post',
+          subTitle: 'Only text content is editable',
+          icon: {
+            type: 'feather',
+            name: 'edit',
+          },
+          onPress: handleEditPost,
+        },
+
+        {
+          title: 'Delete post',
+          subTitle: 'Delete this post',
+          icon: {
+            type: 'ant-design',
+            name: 'delete',
+          },
+          onPress: handleDeletePost,
+        },
+      ]
+    : [
+        {
+          title: 'Delete post',
+          subTitle: 'This post will be hidden from your newsfeed',
+          icon: {
+            type: 'ant-design',
+            name: 'delete',
+          },
+          onPress: handleDeletePost,
+        },
+        {
+          title: 'Hide all posts from newsfeed',
+          subTitle:
+            'All posts by this person will be hidden from your newsfeed',
+          icon: {
+            type: 'material-icon',
+            name: 'cancel-presentation',
+          },
+          onPress: handleHidePost,
+        },
+        {
+          title: 'Report post',
+          icon: {
+            type: 'ant-design',
+            name: 'warning',
+          },
+          onPress: handleReportPost,
+        },
+      ];
+
+  return (
+    <BottomHalfModal isModalVisible={true} hideModal={handleHideModal}>
+      <View
+        style={{
+          height: ownPost ? 200 : 250,
+          backgroundColor: '#fff',
+          justifyContent: 'center',
+          borderTopStartRadius: 10,
+          borderTopEndRadius: 10,
+        }}
+      >
+        {functionalities.map((func, idx) => (
+          <ListItem key={idx} onPress={func.onPress}>
+            <Icon
+              type={func.icon.type}
+              name={func.icon.name}
+              style={{ marginRight: 4 }}
+            />
+            <ListItem.Content>
+              <ListItem.Title>{func.title}</ListItem.Title>
+              {func.subTitle && (
+                <ListItem.Subtitle>{func.subTitle}</ListItem.Subtitle>
+              )}
+            </ListItem.Content>
+          </ListItem>
+        ))}
+      </View>
+    </BottomHalfModal>
+  );
 };
-
-
 
 export default PostAdvanceModal;

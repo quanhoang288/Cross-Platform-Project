@@ -1,9 +1,9 @@
 export const errorMessages = {
-    invalidUserName: "Tên người dùng không được để trống",
-    invalidPhoneNumber: "Số điện thoại không hợp lệ",
-    invalidPassword: "Mật khẩu chứa ít nhất 6 kí tự",
-    invalidConfirmPassword: "Các mật khẩu không khớp với nhau",
-    invalidBirthday: "Ngày sinh định dạng dd/mm/yyyy",
+    invalidUserName: "Username must not be empty",
+    invalidPhoneNumber: "Invalid phone number",
+    invalidPassword: "Password must contain at least 6 characters",
+    invalidConfirmPassword: "Password does not match",
+    invalidBirthday: "Invalid date format",
 }
 
 export const successMessages = {

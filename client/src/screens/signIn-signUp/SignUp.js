@@ -196,15 +196,11 @@ const SignUp = () => {
       <InputText 
         name="password"
         label="Password"
+        isPassword={true}
         leftIcon={{
           name:"lock",
           type:"feather"
         }}
-        rightIcon={{
-          name:"eye-off",
-          type:"feather"
-        }}
-        secureTextEntry={true}
         errorMessage={errors.password}
         value={credentials.password}
         handleTextChange={handleTextChange}
@@ -217,11 +213,7 @@ const SignUp = () => {
           name:"lock",
           type:"feather"
         }}
-        rightIcon={{
-          name:"eye-off",
-          type:"feather"
-        }}
-        secureTextEntry={true}
+        isPassword={true}
         errorMessage={errors.confirmPassword}
         value={credentials.confirmPassword}
         handleTextChange={handleTextChange}
@@ -245,14 +237,13 @@ const styles = StyleSheet.create({
   container:{
     backgroundColor: 'rgb(255, 255, 255)',
     alignItems:'center',
-    // justifyContent:'center',
     flex: 1,
-    height: DEVICE_HEIGHT,
+    // height: DEVICE_HEIGHT,
+    // justifyContent:'center',
     // marginTop: StatusBar.currentHeight,
   },
 
   loadingProps:{
-
     color: 'white'
   },
   titleStyle:{
