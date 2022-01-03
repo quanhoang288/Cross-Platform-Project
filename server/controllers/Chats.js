@@ -295,9 +295,12 @@ chatController.deleteMessage = async (req, res, next) => {
       });
     }
 
-    const deletedMessage = await messageToDelete.update({
-      isDeleted: true,
-    });
+    const deletedMessage = await messageToDelete.update(
+      {
+        isDeleted: true,
+      },
+      { new: true }
+    );
 
     return res.status(httpStatus.OK).json({
       data: deletedMessage,

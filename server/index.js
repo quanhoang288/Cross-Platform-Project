@@ -90,5 +90,12 @@ io.on("connection", (socket) => {
   socket.on("blockUser", (msg) => {
     console.log("blocking");
     io.emit("beBlocked", msg);
+    io.emit("blocked", msg);
+    io.emit("renderBlock", msg);
+  });
+  socket.on("unblock", (msg) => {
+    console.log("unblocking");
+    io.emit("beUnblocked", msg);
+    io.emit("renderUnblock", msg);
   });
 });

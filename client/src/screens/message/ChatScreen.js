@@ -32,6 +32,7 @@ const ChatScreen = () => {
   const [blocked, setBlocked] = useState(route.params.blocked);
   const dispatch = useDispatch();
   const socket = useSelector((state) => state.auth.socket);
+  console.log(blocked);
   const fetchMessages = async () => {
     try {
       const res = await message.getMessageByOtherUserId(receivedId, token);
@@ -121,29 +122,6 @@ const ChatScreen = () => {
         );
       }
     });
-    socket?.on('removeMess', (data) => {
-      if (receivedId === data.userId) {
-        setMessages(
-          messages.map((msg) => {
-            if (msg._id == messageIdToDelete) {
-              return {
-                ...msg,
-                isDeleted: true,
-                text: 'Message unsent',
-              };
-            }
-            return msg;
-          }),
-          // previousMessages.filter((messages) => messages._id !== messageIdToDelete),
-        );
-      }
-    });
-
-    socket?.on('beBlocked', (data) => {
-      if (user.id == data.receivedId) {
-        setIsBlocked(true);
-      }
-    });
 
     // socket?.on('blocked', (data) => {
     //   if (user.id == data.userId){
@@ -151,7 +129,50 @@ const ChatScreen = () => {
     //   }
     // })
   }, [socket]);
-
+  useEffect(() => {
+    socket?.on('beBlocked', (data) => {
+      if (user.id == data.receivedId) {
+        setIsBlocked(true);
+      }
+    });
+  }, [socket]);
+  useEffect(() => {
+    socket?.on('blocked', (data) => {
+      if (user.id == data.userId) {
+        setBlocked(true);
+      }
+    });
+  }, [socket]);
+  useEffect(() => {
+    socket?.on('beUnblocked', (data) => {
+      if (user.id == data.receivedId) {
+        setIsBlocked(false);
+        console.log('vu hoang trung');
+      }
+    });
+  }, [socket]);
+  useEffect(() => {
+    socket?.on('removeMess', (data) => {
+      console.log('data', data);
+      // console.log(messages[0]);
+      if (receivedId === data.userId) {
+        setMessages(
+          messages.map((msg) => {
+            if (msg._id == data._id) {
+              return {
+                ...msg,
+                isDeleted: true,
+                text: 'Message unsent',
+              };
+            } else {
+              return msg;
+            }
+          }),
+          // previousMessages.filter((messages) => messages._id !== messageIdToDelete),
+        );
+      }
+    });
+  }, [socket]);
   useEffect(() => {
     if (isLoadingEarlier) {
       handleLoadEarlier();
@@ -289,7 +310,6 @@ const ChatScreen = () => {
   };
 
   const onDelete = async (messageIdToDelete) => {
-    console.log(chatId, 'hihi');
     const deleteMess = await message.deleteMessage(messageIdToDelete, token);
     setMessages(
       messages.map((msg) => {
@@ -302,13 +322,12 @@ const ChatScreen = () => {
         }
         return msg;
       }),
-      // previousMessages.filter((messages) => messages._id !== messageIdToDelete),
     );
 
     const messDelete = deleteMess.data.data;
     socket?.emit('deleteMessage', {
       _id: messDelete._id,
-      userId: messDelete.user,
+      userId: user.id,
     });
   };
 
@@ -337,6 +356,10 @@ const ChatScreen = () => {
     try {
       const rs = await message.unBlockChat(receivedId, token);
       setBlocked(false);
+      socket?.emit('unblock', {
+        userId: user.id,
+        receivedId: receivedId,
+      });
     } catch (error) {
       console.log(error);
       Toast.showFailureMessage('Error unblock');

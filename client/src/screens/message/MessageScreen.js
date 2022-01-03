@@ -17,17 +17,14 @@ import { formatDate } from '../../helpers';
 const MessageScreen = () => {
   const navigation = useNavigation();
   const chatList = useSelector((state) => state.chat.chats);
+  const [listChat, setListChat] = useState([]);
   const user = useSelector((state) => state.auth.user);
   const token = user.token;
   const socket = useSelector((state) => state.auth.socket);
-  console.log(chatList);
-  // useEffect(() => {
-  //   socket.on?("update chatlist", (data) =>{
-  //     chatList.map((list) =>{
-
-  //     })
-  //   });
-  // },[])
+  useEffect(() => {
+    setListChat(chatList);
+    console.log(listChat);
+  }, [listChat]);
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -42,15 +39,48 @@ const MessageScreen = () => {
     });
   }, [navigation]);
 
-  // useEffect(() => {
-  //   const initialize = async () => {
-  //     const blocklist = await getBlockList(chatList[0].receivedId);
-  //     console.log(blocklist.blocked_inbox);
-  //   };
-  //   initialize();
-  // }, []);
-  console.log(chatList[0].receivedId);
-  console.log(user.id);
+  useEffect(() => {
+    socket?.on('renderBlock', (data) => {
+      setListChat(
+        listChat.map((chat) => {
+          if (chat.receivedId == data.userId) {
+            return {
+              ...chat,
+              isBlocked: true,
+            };
+          }
+          if (chat.receivedId == data.receivedId) {
+            return {
+              ...chat,
+              blocked: true,
+            };
+          }
+          return chat;
+        }),
+      );
+    });
+  }, [socket]);
+  useEffect(() => {
+    socket?.on('renderUnblock', (data) => {
+      setListChat(
+        listChat.map((chat) => {
+          if (chat.receivedId == data.userId) {
+            return {
+              ...chat,
+              isBlocked: false,
+            };
+          }
+          if (chat.receivedId == data.receivedId) {
+            return {
+              ...chat,
+              blocked: false,
+            };
+          }
+          return chat;
+        }),
+      );
+    });
+  }, [socket]);
 
   const handleClick = (item, user) => {
     navigation.navigate(stacks.chatScreen.name, {
@@ -63,7 +93,7 @@ const MessageScreen = () => {
   };
   return (
     <FlatList
-      data={chatList}
+      data={listChat}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => (
         <TouchableOpacity
