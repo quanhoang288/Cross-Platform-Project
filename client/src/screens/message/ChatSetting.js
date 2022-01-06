@@ -37,7 +37,7 @@ const ChatSetting = () => {
   };
 
   const onPressBlockUser = async () => {
-    const rs = await message.blockChat(receivedId, token);
+    await message.blockChat(receivedId, token);
     socket?.emit('blockUser', {
       userId: user.id,
       receivedId: receivedId,

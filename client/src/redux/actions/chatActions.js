@@ -12,6 +12,13 @@ const updateChat = (chatData) => {
   };
 };
 
+const removeLatestMessage = (chatId) => {
+  return {
+    type: 'REMOVE_LATEST_MESSAGE',
+    payload: chatId,
+  };
+};
+
 const removeChat = (chatId) => {
   return {
     type: 'REMOVE',
@@ -26,4 +33,18 @@ const updateSeenStatus = (chatId) => {
   };
 };
 
-export { saveChats, updateChat, removeChat, updateSeenStatus };
+const updateCurrentChatRoom = (chatId) => {
+  return {
+    type: 'UPDATE_CURRENT_CHAT_ROOM',
+    payload: chatId,
+  };
+};
+
+export {
+  saveChats,
+  updateChat,
+  removeChat,
+  removeLatestMessage,
+  updateSeenStatus,
+  updateCurrentChatRoom,
+};
