@@ -98,4 +98,8 @@ io.on("connection", (socket) => {
     io.emit("beUnblocked", msg);
     io.emit("renderUnblock", msg);
   });
+  socket.on("deleteChat", (data) => {
+    console.log("emit chat delete event with data: ", data);
+    io.emit("deleteChat", data);
+  });
 });

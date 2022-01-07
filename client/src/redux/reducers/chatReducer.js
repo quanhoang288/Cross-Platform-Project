@@ -52,7 +52,9 @@ export default (state = initialState, action) => {
       };
 
     case 'REMOVE':
-      return { chats: chats.filter((chat) => chat._id != action.payload) };
+      return {
+        chats: state.chats.filter((chat) => chat.id != action.payload),
+      };
 
     default:
       return state;

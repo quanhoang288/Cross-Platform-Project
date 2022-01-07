@@ -127,6 +127,12 @@ const NewsFeed = (props) => {
           dispatch(chatActions.updateChat(data));
         }
       });
+      socket?.on('deleteChat', (data) => {
+        const { chatId, deletedBy } = data;
+        if (deletedBy == user.id) {
+          dispatch(chatActions.removeChat(chatId));
+        }
+      });
       fetchChats();
     }
     return () => {};
