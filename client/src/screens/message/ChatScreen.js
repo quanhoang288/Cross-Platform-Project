@@ -55,14 +55,14 @@ const ChatScreen = () => {
           style={{ marginRight: 10 }}
           onPress={() =>
             navigation.navigate(stacks.chatSetting.name, {
-              chatId: chatId,
+              chatId,
               receivedId: receivedId,
             })
           }
         />
       ),
     });
-  }, [route, navigation]);
+  }, [route, navigation, chatId]);
 
   useEffect(() => {
     const initialize = async () => {

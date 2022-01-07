@@ -17,14 +17,7 @@ import { formatDate } from '../../helpers';
 const MessageScreen = () => {
   const navigation = useNavigation();
   const chatList = useSelector((state) => state.chat.chats);
-  const [listChat, setListChat] = useState([]);
-  const user = useSelector((state) => state.auth.user);
-  const token = user.token;
-  const socket = useSelector((state) => state.auth.socket);
-  useEffect(() => {
-    setListChat(chatList);
-    console.log(listChat);
-  }, [listChat]);
+
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -33,56 +26,13 @@ const MessageScreen = () => {
           name="new-message"
           size={32}
           style={{ marginRight: 10 }}
-          onPress={() => navigation.navigate(stacks.searchMessage.name)}
+          onPress={() => navigation.navigate(stacks.newMessage.name)}
         />
       ),
     });
   }, [navigation]);
 
-  useEffect(() => {
-    socket?.on('renderBlock', (data) => {
-      setListChat(
-        listChat.map((chat) => {
-          if (chat.receivedId == data.userId) {
-            return {
-              ...chat,
-              isBlocked: true,
-            };
-          }
-          if (chat.receivedId == data.receivedId) {
-            return {
-              ...chat,
-              blocked: true,
-            };
-          }
-          return chat;
-        }),
-      );
-    });
-  }, [socket]);
-  useEffect(() => {
-    socket?.on('renderUnblock', (data) => {
-      setListChat(
-        listChat.map((chat) => {
-          if (chat.receivedId == data.userId) {
-            return {
-              ...chat,
-              isBlocked: false,
-            };
-          }
-          if (chat.receivedId == data.receivedId) {
-            return {
-              ...chat,
-              blocked: false,
-            };
-          }
-          return chat;
-        }),
-      );
-    });
-  }, [socket]);
-
-  const handleClick = (item, user) => {
+  const handleClick = (item) => {
     navigation.navigate(stacks.chatScreen.name, {
       receivedId: item.receivedId,
       receiverName: item.userName,
@@ -93,19 +43,10 @@ const MessageScreen = () => {
   };
   return (
     <FlatList
-      data={listChat}
+      data={chatList}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => (
-        <TouchableOpacity
-          onPress={() => handleClick(item, user)}
-          // onPress={() => {
-          //   navigation.navigate(stacks.chatScreen.name, {
-          //     receivedId: item.receivedId,
-          //     receiverName: item.userName,
-          //     receiverImg: item.userImg,
-          //   });
-          // }}
-        >
+        <TouchableOpacity onPress={() => handleClick(item)}>
           <View>
             <ListItem>
               <Avatar

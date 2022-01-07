@@ -2,6 +2,7 @@ const { PRIVATE_CHAT, GROUP_CHAT } = require("../constants/constants");
 const ChatModel = require("../models/Chats");
 const MessagesModel = require("../models/Messages");
 const ChatHistoryModel = require("../models/ChatHistories");
+const DeleteChatArchiveModel = require("../models/DeleteChatArchives");
 const getPaginationParams = require("../utils/getPaginationParams");
 const httpStatus = require("../utils/httpStatus");
 const { isValidId } = require("../utils/validateIdString");
@@ -125,7 +126,21 @@ chatController.getChats = async (req, res, next) => {
   try {
     const userId = req.userId;
     const { offset, limit } = await getPaginationParams(req);
-    let chats = await ChatModel.find({ member: userId })
+
+    const deletedChats = await DeleteChatArchiveModel.find({
+      deletedBy: userId,
+    }).populate("chat");
+
+    const inactiveArchives = deletedChats
+      .filter(
+        (archive) => archive.chat.latestMessageSentAt <= archive.updatedAt
+      )
+      .map((archive) => archive.chat._id);
+
+    let chats = await ChatModel.find({
+      _id: { $nin: inactiveArchives },
+      member: userId,
+    })
       .skip(offset)
       .limit(limit)
       .sort({ updatedAt: -1 })
@@ -218,9 +233,36 @@ chatController.getMessages = async (req, res, next) => {
       queryChatId = chatId;
     }
 
+    let fromMessage = null;
+    const existingDeleteArchive = await DeleteChatArchiveModel.findOne({
+      chat: queryChatId,
+      deletedBy: userId,
+    }).populate({
+      path: "lastMessageBeforeDelete",
+      select: "_id createdAt",
+    });
+
+    if (existingDeleteArchive) {
+      fromMessage = existingDeleteArchive.lastMessageBeforeDelete;
+    }
+
     const { offset, limit } = await getPaginationParams(req);
 
-    messages = await MessagesModel.find({ chat: queryChatId })
+    let query = {
+      chat: queryChatId,
+    };
+
+    if (fromMessage) {
+      query = {
+        ...query,
+        createdAt: { $gt: fromMessage.createdAt },
+      };
+    }
+
+    console.log("fetch from message: ", fromMessage);
+    console.log("query: ", query);
+
+    messages = await MessagesModel.find(query)
       .skip(offset)
       .limit(limit)
       .sort({ createdAt: "desc" })
@@ -317,36 +359,53 @@ chatController.deleteChat = async (req, res, next) => {
   const userId = req.userId;
   const { chatId } = req.body;
 
-  if (!isValidId(chatId)) {
-    return res.status(httpStatus.BAD_REQUEST).json({
-      message: "Invalid id format",
-    });
-  }
-
   try {
-    const chat = await ChatModel.findOne({ _id: chatId });
-    if (!chat) {
-      return res.status(httpStatus.BAD_REQUEST).json({
+    const chatToDelete = await ChatModel.findOne({ _id: chatId });
+    if (!chatToDelete) {
+      return res.status(httpStatus.NOT_FOUND).json({
         message: "Chat not found!",
       });
     }
 
-    const isUserInChat = chat.member.includes(userId);
+    const isUserInChat = chatToDelete.member.includes(userId);
     if (!isUserInChat) {
       return res.status(httpStatus.FORBIDDEN).json({
         message: "Cannot delete chat of other users!",
       });
     }
 
-    // delete all the messages of the chat first
-    await MessagesModel.deleteMany({ chat: chatId });
-
-    // delete the chat
-    const deletedChat = await ChatModel.findByIdAndUpdate(chatId, {
-      isDeleted: true,
+    const latestMessage = await MessagesModel.findOne({ chat: chatId }).sort({
+      createdAt: -1,
     });
+    console.log("latest: ", latestMessage);
+
+    if (!latestMessage) {
+      return res.status(httpStatus.OK).json({
+        data: chatToDelete,
+      });
+    }
+
+    const existingArchive = await DeleteChatArchiveModel.findOne({
+      chat: chatId,
+      deletedBy: userId,
+    });
+
+    // update or create new delete chat archive
+    if (existingArchive) {
+      await existingArchive.update({
+        lastMessageBeforeDelete: latestMessage._id,
+      });
+    } else {
+      const deleteArchive = new DeleteChatArchiveModel({
+        chat: chatId,
+        deletedBy: userId,
+        lastMessageBeforeDelete: latestMessage._id,
+      });
+      await deleteArchive.save();
+    }
+
     return res.status(httpStatus.OK).json({
-      data: deletedChat,
+      data: chatToDelete,
     });
   } catch (e) {
     console.error(e.message);
