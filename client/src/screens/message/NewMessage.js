@@ -46,7 +46,7 @@ const NewMessage = () => {
       return;
     } else {
       setListFriend(
-        newListFriend.filter((item) => item.username.includes(keyword)),
+        newListFriend.filter((item) => item.name.includes(keyword)),
       );
     }
   };
@@ -54,7 +54,11 @@ const NewMessage = () => {
   useEffect(() => {
     const initialize = async () => {
       const newListFriend = await fetchFriendList();
-      handleSearch(value, newListFriend);
+      const nListFriend = newListFriend.map((friend) => ({
+        id: friend._id,
+        name: friend.username,
+      }));
+      handleSearch(value, nListFriend);
     };
     initialize();
   }, [value]);
@@ -64,7 +68,7 @@ const NewMessage = () => {
       <TouchableOpacity
         onPress={() =>
           navigation.navigate(stacks.chatScreen.name, {
-            receivedId: item.id,
+            receivedId: item._id,
           })
         }
       >
@@ -77,7 +81,7 @@ const NewMessage = () => {
             />
             <ListItem.Content>
               <ListItem.Title>
-                <Text>{item.username}</Text>
+                <Text>{item.name}</Text>
               </ListItem.Title>
             </ListItem.Content>
           </ListItem>
