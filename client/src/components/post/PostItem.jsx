@@ -59,8 +59,6 @@ const PostItem = ({ post, postList }) => {
       });
   };
 
-  console.log(post.author.avatar);
-
   return (
     <View style={styles.container}>
       <View style={styles.profileContainer}>

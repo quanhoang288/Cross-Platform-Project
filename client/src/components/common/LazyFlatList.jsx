@@ -16,6 +16,11 @@ const LazyFlatList = ({
   listStyle,
   listHeader,
 }) => {
+  const [
+    onEndReachedCalledDuringMomentum,
+    setOnEndReachedCalledDuringMomentum,
+  ] = useState(false);
+
   const renderFooter = () => {
     return isFetchingNextPage ? (
       <View style={{ alignItems: 'center' }}>
@@ -34,8 +39,14 @@ const LazyFlatList = ({
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
       }
-      onEndReached={handleEndReached}
-      onEndReachedThreshold={0.01}
+      onMomentumScrollBegin={() => setOnEndReachedCalledDuringMomentum(false)}
+      onEndReached={() => {
+        if (!onEndReachedCalledDuringMomentum) {
+          handleEndReached();
+          setOnEndReachedCalledDuringMomentum(true);
+        }
+      }}
+      onEndReachedThreshold={0.1}
       ListFooterComponent={renderFooter}
       style={listStyle}
     />

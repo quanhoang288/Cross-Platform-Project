@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Image, Text } from 'react-native-elements';
 import { View, StyleSheet, StatusBar, Platform } from 'react-native';
@@ -22,7 +22,7 @@ const SignIn = () => {
   const register = useSelector((state) => state.register);
   const authState = useSelector((state) => state.auth);
 
-  const passwordRef = useRef();
+  const [shouldRender, setShouldRender] = useState(false);
 
   useEffect(() => {
     if (register.registered && route.name === stacks.signIn.name) {
@@ -35,14 +35,18 @@ const SignIn = () => {
   }, [register]);
 
   useEffect(() => {
-    if (authState.error && route.name === stacks.signIn.name) {
-      if (Platform.OS === 'web') {
-        window.alert(authState.error.message);
-      } else {
-        Toast.showFailureMessage(authState.error.message);
+    if (authState.user) {
+      navigation.navigate('Tabs');
+    } else {
+      setShouldRender(true);
+      if (authState.error && route.name === stacks.signIn.name) {
+        if (Platform.OS === 'web') {
+          window.alert(authState.error.message);
+        } else {
+          Toast.showFailureMessage(authState.error.message);
+        }
+        dispatch(authActions.resetState());
       }
-
-      dispatch(authActions.resetState());
     }
   }, [authState]);
 
@@ -134,6 +138,10 @@ const SignIn = () => {
         }
       });
   };
+
+  if (!shouldRender) {
+    return null;
+  }
 
   return (
     <View style={styles.container}>

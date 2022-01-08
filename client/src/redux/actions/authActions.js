@@ -1,5 +1,12 @@
 import { authConstants } from '../../constants/actions';
 
+const setSocket = (socket) => {
+  return {
+    type: 'SET_SOCKET',
+    payload: socket,
+  };
+};
+
 const loginRequest = () => {
   return {
     type: authConstants.LOGIN_REQUEST,
@@ -32,4 +39,11 @@ const logout = () => {
   };
 };
 
-export { loginFailure, loginRequest, loginSuccess, logout, resetState };
+export {
+  loginFailure,
+  loginRequest,
+  loginSuccess,
+  logout,
+  resetState,
+  setSocket,
+};

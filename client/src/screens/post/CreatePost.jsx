@@ -4,21 +4,21 @@ import React, {
   useLayoutEffect,
   useRef,
   useState,
-} from "react";
-import PropTypes from "prop-types";
-import { Button, Divider, Input, Icon, Image } from "react-native-elements";
-import { FlatList, ImageBackground, StyleSheet, View } from "react-native";
-import { DEVICE_HEIGHT, DEVICE_WIDTH } from "../../constants/dimensions";
-import { post } from "../../apis";
-import { useNavigation, useRoute } from "@react-navigation/core";
-import { stacks } from "../../constants/title";
-import { ImageHelper } from "../../helpers";
-import { useDispatch, useSelector } from "react-redux";
-import { mediaActions, uploadActions } from "../../redux/actions";
-import * as ImageManipulator from "expo-image-manipulator";
+} from 'react';
+import PropTypes from 'prop-types';
+import { Button, Divider, Input, Icon, Image } from 'react-native-elements';
+import { FlatList, ImageBackground, StyleSheet, View } from 'react-native';
+import { DEVICE_HEIGHT, DEVICE_WIDTH } from '../../constants/dimensions';
+import { post } from '../../apis';
+import { useNavigation, useRoute } from '@react-navigation/core';
+import { stacks } from '../../constants/title';
+import { ImageHelper } from '../../helpers';
+import { useDispatch, useSelector } from 'react-redux';
+import { mediaActions, uploadActions } from '../../redux/actions';
+import * as ImageManipulator from 'expo-image-manipulator';
 
 const CreatePost = () => {
-  const [postContent, setPostContent] = useState("");
+  const [postContent, setPostContent] = useState('');
   const selectedAssets = useSelector((state) => state.media.selectedAssets);
   const dispatch = useDispatch();
 
@@ -38,8 +38,8 @@ const CreatePost = () => {
       headerRight: () => (
         <Button
           onPress={handleSave}
-          title='Save'
-          color='#fff'
+          title="Save"
+          color="#fff"
           buttonStyle={{ borderRadius: 10 }}
           disabled={postContent.length === 0}
           style={{ marginRight: 10 }}
@@ -66,10 +66,10 @@ const CreatePost = () => {
   const convertToBase64 = async (assets) => {
     const mimeTypes = assets.map((asset) => {
       const fileName = asset.filename;
-      const mediaType = asset.mediaType === "photo" ? "image" : "video";
-      let extension = fileName.split(".")[1];
-      if (extension === "jpg") {
-        extension = "jpeg";
+      const mediaType = asset.mediaType === 'photo' ? 'image' : 'video';
+      let extension = fileName.split('.')[1];
+      if (extension === 'jpg') {
+        extension = 'jpeg';
       }
 
       return `${mediaType}/${extension}`;
@@ -88,7 +88,7 @@ const CreatePost = () => {
     const convertedAssets = await Promise.all(assetPromises);
 
     const base64Assets = convertedAssets.map((asset, idx) =>
-      formatIntoBase64String(asset.base64, mimeTypes[idx])
+      formatIntoBase64String(asset.base64, mimeTypes[idx]),
     );
     return base64Assets;
   };
@@ -114,10 +114,10 @@ const CreatePost = () => {
     const now = new Date().getTime() / 1000;
 
     const imageAssets = selectedAssets.filter(
-      (asset) => asset.mediaType === "photo"
+      (asset) => asset.mediaType === 'photo',
     );
     const videoAssets = selectedAssets.filter(
-      (asset) => asset.mediaType === "video"
+      (asset) => asset.mediaType === 'video',
     );
 
     const convertedImageAssets = await convertToBase64(imageAssets);
@@ -136,7 +136,7 @@ const CreatePost = () => {
       dispatch(uploadActions.uploadSuccess(result.data.data));
       console.log(`upload finised in ${new Date().getTime() / 1000 - now}`);
     } catch (err) {
-      const errMsg = err.response ? err.response.message : "Error occured!";
+      const errMsg = err.response ? err.response.message : 'Error occured!';
       dispatch(uploadActions.uploadFailure(errMsg));
     }
   };
@@ -155,7 +155,7 @@ const CreatePost = () => {
         inputStyle={styles.inputText}
         multiline
         numberOfLines={25}
-        underlineColorAndroid='transparent'
+        underlineColorAndroid="transparent"
       />
 
       {selectedAssets.length > 0 && (
@@ -167,11 +167,11 @@ const CreatePost = () => {
               <ImageBackground
                 source={{ uri: item.uri }}
                 style={styles.media}
-                resizeMode='cover'
+                resizeMode="cover"
               >
                 <Icon
-                  name='close'
-                  type='ant-design'
+                  name="close"
+                  type="ant-design"
                   size={16}
                   iconStyle={styles.removeIcon}
                   onPress={() => handleRemoveAsset(item)}
@@ -184,16 +184,18 @@ const CreatePost = () => {
         </View>
       )}
 
-      <View style={styles.buttonGroup}>
-        <Icon type='entypo' name='emoji-happy' size={32} />
-        <Icon
-          type='material'
-          name='image'
-          size={32}
-          iconStyle={{ marginHorizontal: 20 }}
-          onPress={handleMediaButtonPressed}
-        />
-      </View>
+      {(!route.params || !route.params.postId) && (
+        <View style={styles.buttonGroup}>
+          <Icon type="entypo" name="emoji-happy" size={32} />
+          <Icon
+            type="material"
+            name="image"
+            size={32}
+            iconStyle={{ marginHorizontal: 20 }}
+            onPress={handleMediaButtonPressed}
+          />
+        </View>
+      )}
     </View>
   );
 };
@@ -210,34 +212,34 @@ const styles = StyleSheet.create({
   },
   inputText: {
     paddingTop: 10,
-    textAlignVertical: "top",
-    textAlign: "left",
+    textAlignVertical: 'top',
+    textAlign: 'left',
   },
   mediaContainer: {
     flex: 1,
     marginBottom: 20,
     marginLeft: 10,
-    flexDirection: "row",
-    justifyContent: "center",
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   media: {
     width: DEVICE_WIDTH / 2 - 10,
     height: DEVICE_WIDTH / 2 - 10,
   },
   mediaButtonGroup: {
-    flexDirection: "row",
+    flexDirection: 'row',
     marginRight: 20,
   },
   buttonGroup: {
-    flexDirection: "row",
+    flexDirection: 'row',
     marginBottom: 10,
     marginLeft: 20,
   },
   removeIcon: {
     padding: 2,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     borderRadius: 10,
-    alignSelf: "flex-end",
+    alignSelf: 'flex-end',
   },
 });
 

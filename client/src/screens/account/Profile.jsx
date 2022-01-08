@@ -39,6 +39,8 @@ const Profile = (props) => {
   const [userData, setUserData] = useState({ info: {}, posts: [] });
   const [userId, setUserId] = useState(null);
   const [isFirstLoad, setFirstLoad] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [isLoadingMore, setLoadingMore] = useState(false);
   const [friendStatus, setFriendStatus] = useState(FRIEND_STATUS.NON_FRIEND);
   const [profileImgUris, setProfileImgUris] = useState({
     avatar: null,
@@ -324,6 +326,45 @@ const Profile = (props) => {
     }
   }, [selectedAssets, updateType, route]);
 
+  const handleRefresh = async () => {
+    await initializeUserProfile();
+    setRefreshing(false);
+  };
+
+  const handleLoadMore = useCallback(async () => {
+    try {
+      const offset = userData.posts.length;
+      const nextPostList = await post.getListPostByOffset(
+        userId,
+        user.token,
+        offset,
+      );
+      const newPosts = nextPostList.data.data;
+      console.log(newPosts.length);
+      if (newPosts.length > 0) {
+        setUserData((prevUserData) => ({
+          ...prevUserData,
+          posts: prevUserData.posts.concat(newPosts),
+        }));
+      }
+      setLoadingMore(false);
+    } catch (err) {
+      console.log(err);
+    }
+  }, [userData, userId]);
+
+  useEffect(() => {
+    if (refreshing) {
+      handleRefresh();
+    }
+  }, [refreshing]);
+
+  useEffect(() => {
+    if (isLoadingMore) {
+      handleLoadMore();
+    }
+  }, [isLoadingMore]);
+
   const renderUserActionButtons = () => {
     if (!userId) {
       return null;
@@ -569,7 +610,14 @@ const Profile = (props) => {
   return (
     <View>
       {updateType && <LinearProgress color="white" trackColor="#2eb0fb" />}
-      <PostList posts={userData.posts} header={ProfileHeader} />
+      <PostList
+        handleRefresh={() => setRefreshing(true)}
+        handleEndReached={() => setLoadingMore(true)}
+        isFetchingNextPage={isLoadingMore}
+        refreshing={refreshing}
+        posts={userData.posts}
+        header={ProfileHeader}
+      />
     </View>
   );
 };
