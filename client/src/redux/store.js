@@ -1,4 +1,7 @@
 import { createStore, combineReducers, applyMiddleware } from 'redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { persistStore, persistReducer } from 'redux-persist';
+
 import {
   refreshReducer,
   authReducer,
@@ -9,9 +12,15 @@ import {
   uploadReducer,
 } from './reducers';
 
+const authPersistConfig = {
+  key: 'auth',
+  storage: AsyncStorage,
+  whitelist: ['user'],
+};
+
 const reducers = combineReducers({
   modal: modalReducer,
-  auth: authReducer,
+  auth: persistReducer(authPersistConfig, authReducer),
   chat: chatReducer,
   register: registerReducer,
   media: mediaReducer,
@@ -21,4 +30,5 @@ const reducers = combineReducers({
 
 const store = createStore(reducers);
 
+export const persistor = persistStore(store);
 export default store;
