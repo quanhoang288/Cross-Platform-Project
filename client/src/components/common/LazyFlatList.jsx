@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
   RefreshControl,
   View,
 } from 'react-native';
+import { useScrollToTop } from '@react-navigation/native';
 
 const LazyFlatList = ({
   data,
@@ -21,6 +22,9 @@ const LazyFlatList = ({
     setOnEndReachedCalledDuringMomentum,
   ] = useState(false);
 
+  const listRef = useRef(null);
+  useScrollToTop(listRef);
+
   const renderFooter = () => {
     return isFetchingNextPage ? (
       <View style={{ alignItems: 'center' }}>
@@ -31,6 +35,7 @@ const LazyFlatList = ({
 
   return (
     <FlatList
+      ref={listRef}
       ListHeaderComponent={listHeader}
       data={data}
       renderItem={renderItem}
