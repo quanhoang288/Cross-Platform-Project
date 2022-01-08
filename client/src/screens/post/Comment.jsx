@@ -8,6 +8,7 @@ import { comment } from '../../apis';
 import { useRoute } from '@react-navigation/core';
 import { useSelector } from 'react-redux';
 import { LazyFlatList } from '../../components/common';
+import { Toast } from '../../helpers';
 
 const Comment = (props) => {
   // user
@@ -29,13 +30,16 @@ const Comment = (props) => {
     }
   };
 
-  const actionAddComment = async (postId, content) => {
+  const handleAddComment = async (postId, content) => {
     try {
       const addResult = await comment.addComment(postId, content, user.token);
       const newComment = addResult.data.data;
       setComments([newComment, ...comments]);
     } catch (error) {
       console.log(error);
+      if (error.response && error.response.status == 410) {
+        Toast.showFailureMessage('This post has been deleted');
+      }
     }
   };
 
@@ -118,7 +122,7 @@ const Comment = (props) => {
                 onPress={() => {
                   setInputComment('');
                   Keyboard.dismiss();
-                  actionAddComment(postId, inputComment);
+                  handleAddComment(postId, inputComment);
                 }}
               />
             ) : null
