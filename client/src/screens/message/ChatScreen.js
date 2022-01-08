@@ -34,6 +34,7 @@ const ChatScreen = () => {
   const [blocked, setBlocked] = useState(route.params.blocked);
   const dispatch = useDispatch();
   const socket = useSelector((state) => state.auth.socket);
+  const [isRemovingMessage, setRemovingMessage] = useState(false);
 
   const fetchMessages = async () => {
     try {
@@ -80,31 +81,14 @@ const ChatScreen = () => {
       if (newMessages && newMessages.data.length > 0) {
         setMessages(
           newMessages.data.map((msg) => {
-            if (!msg.isDeleted) {
-              return {
-                ...msg,
-                _id: msg._id,
-                text: msg.content,
-                createdAt: msg.createdAt,
-                isDeleted: msg.isDeleted,
-                user: {
-                  _id: msg.user._id,
-                  name: msg.user.username,
-                },
-              };
-            } else {
-              return {
-                ...msg,
-                _id: msg._id,
-                text: 'Message unsent',
-                createdAt: msg.createdAt,
-                isdeleted: msg.isDeleted,
-                user: {
-                  _id: msg.user._id,
-                  name: msg.user.username,
-                },
-              };
-            }
+            return {
+              ...msg,
+              text: !msg.isDeleted ? msg.content : 'Message unsent',
+              user: {
+                _id: msg.user._id,
+                name: msg.user.username,
+              },
+            };
           }),
         );
         setChatId(newMessages.data[0].chat);
@@ -125,16 +109,19 @@ const ChatScreen = () => {
 
   useEffect(() => {
     socket?.on('getMessage', (data) => {
-      if (senderId === data.receivedId) {
+      if (chatId == data.chatId && senderId == data.receivedId) {
         const newMsg = {
           _id: data._id,
           text: data.content,
           createdAt: data.createdAt,
           user: {
             _id: data.senderId,
+            avatar: data.senderAvatar,
           },
-          image: data.senderAvatar,
         };
+
+        // mark as seen
+        message.updateLastSeenMessage(data._id, data.chatId, user.token);
 
         setMessages((previousMessages) =>
           GiftedChat.append(previousMessages, [newMsg]),
@@ -159,9 +146,9 @@ const ChatScreen = () => {
     });
 
     socket?.on('removeMess', (data) => {
-      if (chatId && chatId == data.chatId && data.userId != user.id) {
-        setMessages(
-          messages.map((msg) => {
+      if (chatId == data.chatId) {
+        setMessages((previousMessages) =>
+          previousMessages.map((msg) => {
             if (msg._id == data._id) {
               return {
                 ...msg,
@@ -205,7 +192,9 @@ const ChatScreen = () => {
           name: msg.user.username,
         },
       }));
-      setMessages(messages.concat(formattedEarlierMessages));
+      setMessages((prevMessages) =>
+        prevMessages.concat(formattedEarlierMessages),
+      );
       setLoadingEarlier(false);
     } catch (error) {
       console.log(error);
@@ -326,7 +315,7 @@ const ChatScreen = () => {
     return <FontAwesome name="angle-double-down" size={22} color="#333" />;
   };
 
-  const onDelete = async (messageIdToDelete) => {
+  const onDelete = async (messageIdToDelete, chatId) => {
     try {
       await message.deleteMessage(messageIdToDelete, token);
     } catch (err) {
@@ -334,8 +323,8 @@ const ChatScreen = () => {
       return;
     }
 
-    setMessages(
-      messages.map((msg) => {
+    setMessages((prevMessages) =>
+      prevMessages.map((msg) => {
         if (msg._id == messageIdToDelete) {
           return {
             ...msg,
@@ -357,8 +346,6 @@ const ChatScreen = () => {
 
   const onLongPress = (context, message) => {
     if (message.user._id == user.id && !message.isDeleted) {
-      console.log('message to delete: ', message);
-
       const options = ['Copy', 'Delete Message', 'Cancel'];
       const cancelButtonIndex = options.length - 1;
       context.actionSheet().showActionSheetWithOptions(
@@ -372,8 +359,7 @@ const ChatScreen = () => {
               Clipboard.setString(message.text);
               break;
             case 1:
-              console.log('delete');
-              onDelete(message._id);
+              onDelete(message._id, message.chat);
               break;
           }
         },

@@ -50,7 +50,9 @@ const NewsFeed = (props) => {
           userName: receiver.username,
           userImg: receiver.avatar.fileName,
           numUnseenMessages: chat.numUnseenMessages,
-          messageText: chat.latestMessage.content,
+          messageText: !chat.latestMessage.isDeleted
+            ? chat.latestMessage.content
+            : 'Message unsent',
           receivedId: receiver._id,
           latestMessageSentAt: chat.latestMessageSentAt,
         };

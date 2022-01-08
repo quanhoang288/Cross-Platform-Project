@@ -79,12 +79,13 @@ io.on("connection", (socket) => {
   });
 
   socket.on("sendMessage", (msg) => {
-    io.emit("getMessage", msg);
+    console.log("sending message");
+    socket.broadcast.emit("getMessage", msg);
     io.emit("latestMessage", msg);
   });
   socket.on("deleteMessage", (msg) => {
     console.log("deleted msg: ", msg);
-    io.emit("removeMess", msg);
+    socket.broadcast.emit("removeMess", msg);
     if (msg.isLatest) {
       io.emit("removeLatestMessage", msg);
     }

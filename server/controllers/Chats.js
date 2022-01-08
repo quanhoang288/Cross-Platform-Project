@@ -2,11 +2,8 @@ const { PRIVATE_CHAT, GROUP_CHAT } = require("../constants/constants");
 const ChatModel = require("../models/Chats");
 const MessagesModel = require("../models/Messages");
 const ChatHistoryModel = require("../models/ChatHistories");
-<<<<<<< HEAD
 const DeleteChatArchiveModel = require("../models/DeleteChatArchives");
-=======
 const UserModel = require("../models/Users");
->>>>>>> e933296 (update remove and block functionality)
 const getPaginationParams = require("../utils/getPaginationParams");
 const httpStatus = require("../utils/httpStatus");
 const { isValidId } = require("../utils/validateIdString");
@@ -150,6 +147,7 @@ chatController.getChats = async (req, res, next) => {
         latestMessage: {
           content: latestMessage ? latestMessage.content : null,
           createdAt: latestMessage ? latestMessage.createdAt : null,
+          isDeleted: latestMessage && latestMessage.isDeleted,
         },
         numUnseenMessages: 0,
       };
@@ -216,10 +214,16 @@ chatController.getMessages = async (req, res, next) => {
       }
     }
 
-<<<<<<< HEAD
+    const otherUser = existingChat.member.find((m) => m._id != userId);
+
+    const blockedOtherUser = existingChat.member
+      .find((m) => m._id == userId)
+      .blocked_inbox.includes(otherUser._id);
+    const blockedByOtherUser = otherUser.blocked_inbox.includes(userId);
+
     let fromMessage = null;
     const existingDeleteArchive = await DeleteChatArchiveModel.findOne({
-      chat: queryChatId,
+      chat: existingChat._id,
       deletedBy: userId,
     }).populate({
       path: "lastMessageBeforeDelete",
@@ -233,7 +237,7 @@ chatController.getMessages = async (req, res, next) => {
     const { offset, limit } = await getPaginationParams(req);
 
     let query = {
-      chat: queryChatId,
+      chat: existingChat._id,
     };
 
     if (fromMessage) {
@@ -247,18 +251,6 @@ chatController.getMessages = async (req, res, next) => {
     console.log("query: ", query);
 
     messages = await MessagesModel.find(query)
-=======
-    const otherUser = existingChat.member.find((m) => m._id != userId);
-
-    const blockedOtherUser = existingChat.member
-      .find((m) => m._id == userId)
-      .blocked_inbox.includes(otherUser._id);
-    const blockedByOtherUser = otherUser.blocked_inbox.includes(userId);
-
-    const { offset, limit } = await getPaginationParams(req);
-
-    messages = await MessagesModel.find({ chat: existingChat._id })
->>>>>>> e933296 (update remove and block functionality)
       .skip(offset)
       .limit(limit)
       .sort({ createdAt: "desc" })
@@ -305,6 +297,32 @@ chatController.getMessages = async (req, res, next) => {
       message: "Error getting messages",
     });
   }
+};
+
+chatController.updateLastSeenMessage = async (req, res) => {
+  const userId = req.userId;
+  const { messageId, chatId } = req.body;
+  const chatHistory = await ChatHistoryModel.findOne({
+    user: userId,
+    chat: chatId,
+  });
+  if (chatHistory) {
+    await chatHistory.update({
+      lastSeenMessage: messageId,
+      numUnseenMessages: 0,
+    });
+  } else {
+    const newChatHistory = new ChatHistoryModel({
+      user: userId,
+      chat: chatId,
+      lastSeenMessage: messageId,
+      numUnseenMessages: 0,
+    });
+    await newChatHistory.save();
+  }
+  return res.status(httpStatus.OK).json({
+    message: "Update successfully",
+  });
 };
 
 chatController.deleteMessage = async (req, res, next) => {
@@ -372,11 +390,9 @@ chatController.deleteChat = async (req, res, next) => {
       });
     }
 
-<<<<<<< HEAD
     const latestMessage = await MessagesModel.findOne({ chat: chatId }).sort({
       createdAt: -1,
     });
-    console.log("latest: ", latestMessage);
 
     if (!latestMessage) {
       return res.status(httpStatus.OK).json({
@@ -387,11 +403,6 @@ chatController.deleteChat = async (req, res, next) => {
     const existingArchive = await DeleteChatArchiveModel.findOne({
       chat: chatId,
       deletedBy: userId,
-=======
-    // delete the chat
-    const deletedChat = await ChatModel.findByIdAndUpdate(chatId, {
-      isDeleted: true,
->>>>>>> e933296 (update remove and block functionality)
     });
 
     // update or create new delete chat archive
