@@ -25,7 +25,6 @@ import { stacks } from '../../constants/title';
 const NewMessage = () => {
   // user
   const user = useSelector((state) => state.auth.user);
-
   const navigation = useNavigation();
 
   // valueInput and resultSearch
@@ -58,7 +57,7 @@ const NewMessage = () => {
       handleSearch(value, newListFriend);
     };
     initialize();
-  }, []);
+  }, [value]);
   const renderItem = ({ item }) => {
     console.log(item);
     return (
