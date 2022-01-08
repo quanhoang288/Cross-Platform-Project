@@ -13,6 +13,9 @@ import { useNavigation, useRoute } from '@react-navigation/core';
 import { stacks } from '../../constants/title';
 import ContentLoader, { Rect, Circle, Path } from 'react-content-loader/native';
 import { DEVICE_HEIGHT, DEVICE_WIDTH } from '../../constants/dimensions';
+import { io } from 'socket.io-client';
+import { SOCKET_URL } from '../../configs';
+import { authActions } from '../../redux/actions';
 
 const NewsFeed = (props) => {
   const [progressVal, setProgressVal] = useState(0);
@@ -120,6 +123,9 @@ const NewsFeed = (props) => {
   useEffect(() => {
     if (!user) {
       navigation.navigate(stacks.signIn.name);
+    } else if (!socket) {
+      const newSocket = io(SOCKET_URL);
+      dispatch(authActions.setSocket(newSocket));
     } else {
       socket?.on('latestMessage', (data) => {
         const { senderId, receivedId } = data;
@@ -135,6 +141,7 @@ const NewsFeed = (props) => {
       });
       fetchChats();
     }
+
     return () => {};
   }, [user, socket]);
 
