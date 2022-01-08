@@ -7,6 +7,8 @@ import { useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import { stacks } from '../../constants/title.js';
 import formatDate from '../../helpers/DateFormater.js';
+import { ASSET_API_URL } from '../../configs';
+
 
 const FriendRequest = () => {
   // user
@@ -58,10 +60,7 @@ const FriendRequest = () => {
           {listFriendRequests.map((request) => (
             <ProfileItem
               key={request._id}
-              avatar={{
-                source:
-                  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWx8bMzJMOdeGAEPuEkV3SVhHS6LwUaxVpCy7f3D95lDl8WVRlOewHb3_2QwnNUbPJFDY&usqp=CAU',
-              }}
+              avatar={{  source: `${ASSET_API_URL}/${request.avatar.fileName}`,}}
               title={request.username}
               displayButtonGroup={true}
               button={{
