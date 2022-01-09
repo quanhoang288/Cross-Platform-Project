@@ -94,6 +94,20 @@ const sendNewMessage = async (senderId, receiverId, msg, token) => {
   return sendResult;
 };
 
+const updateLastSeenMessage = (messageId, chatId, token) =>
+  api.post(
+    '/updateLastSeenMessage',
+    {
+      messageId,
+      chatId,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
 const blockChat = async (user_id, token) => {
   const userBlocked = {
     user_id: user_id,
@@ -132,6 +146,7 @@ export {
   deleteMessage,
   deleteChat,
   sendNewMessage,
+  updateLastSeenMessage,
   blockChat,
   unBlockChat,
 };

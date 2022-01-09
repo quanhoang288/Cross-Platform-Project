@@ -1,23 +1,35 @@
 const initialState = {
   chats: [],
+  curChatRoomId: null,
 };
 
-const updateChats = (chatData, chatList) => {
-  const chatToUpdate = chatList.find((chat) => chat.id == chatData.chatId);
+const updateChats = (latestMessage, chatList, curChatRoomId) => {
+  const chatToUpdate = chatList.find((chat) => chat.id == latestMessage.chatId);
 
   if (!chatToUpdate) {
     return [
-      { ...chatData, id: chatData.chatId, messageText: chatData.content },
+      {
+        ...latestMessage,
+        id: latestMessage.chatId,
+        messageText: latestMessage.content,
+        latestMessageSentAt: latestMessage.createdAt,
+      },
       ...chatList,
     ];
   }
 
   const updatedChat = {
     ...chatToUpdate,
-    messageText: chatData.content,
+    messageText: latestMessage.content,
+    latestMessageSentAt: latestMessage.createdAt,
+    numUnseenMessages:
+      latestMessage.senderId == chatToUpdate.receivedId &&
+      latestMessage.chatId != curChatRoomId
+        ? chatToUpdate.numUnseenMessages + 1
+        : 0,
   };
   const chatListWithoutUpdatedChat = chatList.filter(
-    (chat) => chat.id != chatData.chatId,
+    (chat) => chat.id != latestMessage.chatId,
   );
   return [updatedChat, ...chatListWithoutUpdatedChat];
 };
@@ -34,26 +46,55 @@ const updateSeenStatus = (chatId, chatList) => {
   });
 };
 
+const removeLatestMessage = (chatId, chatList) => {
+  return chatList.map((chat) => {
+    if (chat.id != chatId) {
+      return chat;
+    }
+    return {
+      ...chat,
+      messageText: 'Message unsent',
+    };
+  });
+};
+
 export default (state = initialState, action) => {
   switch (action.type) {
     case 'SAVE':
       return {
+        ...state,
         chats: action.payload,
       };
 
     case 'UPDATE':
       return {
-        chats: updateChats(action.payload, state.chats),
+        ...state,
+        chats: updateChats(action.payload, state.chats, state.curChatRoomId),
+      };
+
+    case 'UPDATE_CURRENT_CHAT_ROOM':
+      console.log('new chat room: ', action.payload);
+      return {
+        ...state,
+        curChatRoomId: action.payload,
       };
 
     case 'UPDATE_SEEN_STATUS':
       return {
+        ...state,
         chats: updateSeenStatus(action.payload, state.chats),
       };
 
     case 'REMOVE':
       return {
-        chats: state.chats.filter((chat) => chat.id != action.payload),
+        ...state,
+        chats: state.chats.filter((chat) => chat._id != action.payload),
+      };
+
+    case 'REMOVE_LATEST_MESSAGE':
+      return {
+        ...state,
+        chats: removeLatestMessage(action.payload, state.chats),
       };
 
     default:

@@ -79,24 +79,22 @@ io.on("connection", (socket) => {
   });
 
   socket.on("sendMessage", (msg) => {
-    console.log("sending...");
-    io.emit("getMessage", msg);
+    console.log("sending message");
+    socket.broadcast.emit("getMessage", msg);
     io.emit("latestMessage", msg);
   });
   socket.on("deleteMessage", (msg) => {
-    console.log("deleting");
-    io.emit("removeMess", msg);
+    console.log("deleted msg: ", msg);
+    socket.broadcast.emit("removeMess", msg);
+    if (msg.isLatest) {
+      io.emit("removeLatestMessage", msg);
+    }
   });
   socket.on("blockUser", (msg) => {
-    console.log("blocking");
-    io.emit("beBlocked", msg);
-    io.emit("blocked", msg);
-    io.emit("renderBlock", msg);
+    io.emit("blockChat", msg);
   });
   socket.on("unblock", (msg) => {
-    console.log("unblocking");
-    io.emit("beUnblocked", msg);
-    io.emit("renderUnblock", msg);
+    io.emit("unblockChat", msg);
   });
   socket.on("deleteChat", (data) => {
     console.log("emit chat delete event with data: ", data);

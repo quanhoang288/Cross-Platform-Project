@@ -18,6 +18,16 @@ const MessageScreen = () => {
   const navigation = useNavigation();
   const chatList = useSelector((state) => state.chat.chats);
 
+  const handleViewChat = (item) => {
+    navigation.navigate(stacks.chatScreen.name, {
+      receivedId: item.receivedId,
+      receiverName: item.userName,
+      receiverImg: item.userImg,
+      blocked: item.blocked,
+      isBlocked: item.isBlocked,
+    });
+  };
+
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -32,21 +42,12 @@ const MessageScreen = () => {
     });
   }, [navigation]);
 
-  const handleClick = (item) => {
-    navigation.navigate(stacks.chatScreen.name, {
-      receivedId: item.receivedId,
-      receiverName: item.userName,
-      receiverImg: item.userImg,
-      blocked: item.blocked,
-      isBlocked: item.isBlocked,
-    });
-  };
   return (
     <FlatList
       data={chatList}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => (
-        <TouchableOpacity onPress={() => handleClick(item)}>
+        <TouchableOpacity onPress={() => handleViewChat(item)}>
           <View>
             <ListItem>
               <Avatar
