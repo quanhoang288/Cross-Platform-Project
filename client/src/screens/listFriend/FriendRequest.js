@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import { stacks } from '../../constants/title.js';
 import formatDate from '../../helpers/DateFormater.js';
+import { ASSET_API_URL } from '../../configs';
 
 const FriendRequest = () => {
   // user
