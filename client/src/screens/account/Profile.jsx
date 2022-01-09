@@ -326,8 +326,8 @@ const Profile = (props) => {
     }
   }, [selectedAssets, updateType, route]);
 
-  const handleRefresh = async () => {
-    await initializeUserProfile();
+  const handleRefresh = async (userId) => {
+    await initializeUserProfile(userId);
     setRefreshing(false);
   };
 
@@ -354,10 +354,10 @@ const Profile = (props) => {
   }, [userData, userId]);
 
   useEffect(() => {
-    if (refreshing) {
-      handleRefresh();
+    if (refreshing && userId) {
+      handleRefresh(userId);
     }
-  }, [refreshing]);
+  }, [refreshing, userId]);
 
   useEffect(() => {
     if (isLoadingMore) {

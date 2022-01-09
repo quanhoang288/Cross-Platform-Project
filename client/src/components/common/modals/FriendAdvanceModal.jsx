@@ -16,10 +16,16 @@ const FriendAdvanceModal = ({ userId }) => {
 
   const handleMessage = () => {
     //TODO: redirect to message screen
+    dispatch(hideModal());
+    navigation.navigate(stacks.chatScreen.name, {
+      receivedId: userId,
+    });
   };
 
   const handleBlock = () => {
     //TODO: block user
+    dispatch(hideModal());
+    Toast.showFailureMessage('Not implemented yet');
   };
 
   const handleConfirmRemove = async () => {

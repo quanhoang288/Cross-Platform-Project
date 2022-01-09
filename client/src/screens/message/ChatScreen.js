@@ -22,23 +22,22 @@ import { HeaderBackButton } from '@react-navigation/elements';
 const ChatScreen = () => {
   // const socket = useRef();
   const [messages, setMessages] = useState([]);
-  const route = useRoute();
+  const [isLoadingEarlier, setLoadingEarlier] = useState(false);
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [blocked, setBlocked] = useState(false);
+  const [chatId, setChatId] = useState(null);
+
   const { receivedId, receiverName, receiverImg } = route.params;
   const user = useSelector((state) => state.auth.user);
-  const senderId = user.id;
-  const token = user.token;
-  const navigation = useNavigation();
-  const [chatId, setChatId] = useState(null);
-  const [isLoadingEarlier, setLoadingEarlier] = useState(false);
-  const [isBlocked, setIsBlocked] = useState(route.params.isBlocked);
-  const [blocked, setBlocked] = useState(route.params.blocked);
-  const dispatch = useDispatch();
   const socket = useSelector((state) => state.auth.socket);
-  const [isRemovingMessage, setRemovingMessage] = useState(false);
+
+  const dispatch = useDispatch();
+  const route = useRoute();
+  const navigation = useNavigation();
 
   const fetchMessages = async () => {
     try {
-      const res = await message.getMessageByOtherUserId(receivedId, token);
+      const res = await message.getMessageByOtherUserId(receivedId, user.token);
       return res.data;
     } catch (err) {
       if (err.response.status == 404) {
@@ -109,7 +108,7 @@ const ChatScreen = () => {
 
   useEffect(() => {
     socket?.on('getMessage', (data) => {
-      if (chatId == data.chatId && senderId == data.receivedId) {
+      if (chatId == data.chatId && user.id == data.receivedId) {
         const newMsg = {
           _id: data._id,
           text: data.content,
@@ -179,7 +178,7 @@ const ChatScreen = () => {
     try {
       const earlierMessages = await message.getMessageByOtherUserId(
         receivedId,
-        token,
+        user.token,
         messages.length,
       );
       const formattedEarlierMessages = earlierMessages.data.data.map((msg) => ({
@@ -210,7 +209,7 @@ const ChatScreen = () => {
         const sendResult = await message.sendMessage(
           receivedId,
           newMsgObj.text,
-          token,
+          user.token,
         );
 
         const newMessage = sendResult.data.data;
@@ -235,7 +234,7 @@ const ChatScreen = () => {
         socket?.emit('sendMessage', {
           chatId: newMessage.chat._id,
           _id: newMessage._id,
-          senderId: senderId,
+          senderId: user.id,
           senderAvatar: `${ASSET_API_URL}/${newMessage.user.avatar.fileName}`,
           receivedId: receivedId,
           // userName: receiverName,
@@ -317,7 +316,7 @@ const ChatScreen = () => {
 
   const onDelete = async (messageIdToDelete, chatId) => {
     try {
-      await message.deleteMessage(messageIdToDelete, token);
+      await message.deleteMessage(messageIdToDelete, user.token);
     } catch (err) {
       Toast.showFailureMessage('Error deleting message');
       return;
@@ -368,7 +367,7 @@ const ChatScreen = () => {
   };
   const onPressUnblockUser = async () => {
     try {
-      const rs = await message.unBlockChat(receivedId, token);
+      await message.unBlockChat(receivedId, user.token);
       setBlocked(false);
       socket?.emit('unblock', {
         userId: user.id,
@@ -423,7 +422,7 @@ const ChatScreen = () => {
       messages={messages}
       onSend={onSend}
       user={{
-        _id: senderId,
+        _id: user.id,
         name: user.username,
       }}
       onLongPress={onLongPress}

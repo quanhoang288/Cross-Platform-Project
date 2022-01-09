@@ -73,12 +73,12 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   noOptionStyle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
   },
   yesOptionStyle: {
     fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: 20,
     marginLeft: 20,
     color: 'blue',
   },

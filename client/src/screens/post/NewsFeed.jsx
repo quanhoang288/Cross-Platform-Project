@@ -144,8 +144,17 @@ const NewsFeed = (props) => {
       if (posts.findIndex((post) => post._id === postData._id) !== -1) {
         Toast.showSuccessMessage(successMessages.updatePostSuccess);
         setPosts(
-          posts.map((post) => (post._id === postData._id ? postData : post)),
+          posts.map((post) => {
+            if (post._id !== postData._id) {
+              return post;
+            }
+            return {
+              ...post,
+              described: postData.described,
+            };
+          }),
         );
+        dispatch(uploadActions.resetState());
       } else {
         Toast.showSuccessMessage(successMessages.createPostSuccess);
         refresh();

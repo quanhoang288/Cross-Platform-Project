@@ -10,7 +10,9 @@ const PostList = ({
   isFetchingNextPage,
   header,
 }) => {
-  const renderItem = ({ item }) => <PostItem post={item} postList={posts} />;
+  const renderItem = ({ item }) => (
+    <PostItem modalCallback={handleRefresh} post={item} postList={posts} />
+  );
 
   return (
     <LazyFlatList

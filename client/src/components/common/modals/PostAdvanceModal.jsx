@@ -9,7 +9,7 @@ import { useNavigation } from '@react-navigation/core';
 import { stacks } from '../../../constants/title';
 import { post } from '../../../apis';
 import { Toast } from '../../../helpers';
-const PostAdvanceModal = ({ postId, authorId }) => {
+const PostAdvanceModal = ({ postId, authorId, callback }) => {
   const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
 
@@ -45,9 +45,13 @@ const PostAdvanceModal = ({ postId, authorId }) => {
   };
 
   const handleConfirmDelete = async () => {
+    console.log('deleting');
     try {
       await post.deletePost(postId, user.token);
       dispatch(hideModal());
+      if (callback) {
+        callback();
+      }
       Toast.showSuccessMessage('Delete post successfully');
     } catch (error) {
       Toast.showFailureMessage('Error deleting post');

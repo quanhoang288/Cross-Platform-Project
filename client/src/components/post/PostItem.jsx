@@ -30,7 +30,7 @@ const areEqual = (prevProps, nextProps) => {
   return selectedIndex === prevSelectedIndex;
 };
 
-const PostItem = ({ post, postList }) => {
+const PostItem = ({ post, postList, modalCallback }) => {
   const user = useSelector((state) => state.auth.user);
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -101,6 +101,7 @@ const PostItem = ({ post, postList }) => {
                 propsData: {
                   postId: post._id,
                   authorId: post.author._id,
+                  callback: modalCallback,
                 },
               }),
             );
