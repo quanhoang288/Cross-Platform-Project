@@ -6,7 +6,7 @@ import { friend } from '../../apis';
 import { useSelector } from 'react-redux';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { stacks } from '../../constants/title.js';
-
+import { ASSET_API_URL } from '../../configs';
 
 const ListFriend = () =>{
     // user 
@@ -23,6 +23,7 @@ const ListFriend = () =>{
         .then(result => {
             // render
             const curListFr = result.data.data.friends;
+            console.log(result.data);
             setListFriend(curListFr);
         })
         .catch(error => {console.log(error);})
@@ -41,7 +42,7 @@ const ListFriend = () =>{
               // avatar={friend.avatar.filename}
               key={friend._id} 
               avatar={{
-                source:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWx8bMzJMOdeGAEPuEkV3SVhHS6LwUaxVpCy7f3D95lDl8WVRlOewHb3_2QwnNUbPJFDY&usqp=CAU",
+                source:   `${ASSET_API_URL}/${friend.avatar.fileName}`,
               }}
               userId={friend._id}
               title={friend.username}
