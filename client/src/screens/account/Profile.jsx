@@ -588,7 +588,7 @@ const Profile = (props) => {
               />
               <ListItem.Content>
                 <ListItem.Title>Friends</ListItem.Title>
-                <ListItem.Subtitle>{`20 friends`}</ListItem.Subtitle>
+                {/* <ListItem.Subtitle>{`20 friends`}</ListItem.Subtitle> */}
               </ListItem.Content>
               <ListItem.Chevron color="black" />
             </ListItem>
