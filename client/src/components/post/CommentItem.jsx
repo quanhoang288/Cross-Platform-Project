@@ -4,6 +4,7 @@ import { View, StyleSheet } from 'react-native';
 import { Avatar, Icon, Text } from 'react-native-elements';
 import { MoreOrLessText } from '../common';
 import { formatDate } from '../../helpers';
+import { ASSET_API_URL } from '../../configs';
 
 const areEqual = (prevProps, nextProps) => {
   const { comment, commentList } = nextProps;
@@ -29,7 +30,7 @@ const CommentItem = ({ comment, commentList }) => {
       <Avatar
         rounded
         source={{
-          uri: 'https://pbs.twimg.com/profile_images/1177303899243343872/B0sUJIH0_400x400.jpg',
+          uri: `${ASSET_API_URL}/${comment.user.avatar.fileName}`,
         }}
       />
       <View style={styles.commentContainer}>

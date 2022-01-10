@@ -20,11 +20,11 @@ const MessageScreen = () => {
 
   const handleViewChat = (item) => {
     navigation.navigate(stacks.chatScreen.name, {
-      receivedId: item.receivedId,
-      receiverName: item.userName,
-      receiverImg: item.userImg,
-      blocked: item.blocked,
-      isBlocked: item.isBlocked,
+      receiver: {
+        _id: item.receivedId,
+        username: item.userName,
+        avatar: item.userImg,
+      },
     });
   };
 

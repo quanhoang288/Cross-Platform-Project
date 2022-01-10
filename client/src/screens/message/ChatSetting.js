@@ -13,16 +13,12 @@ const ChatSetting = () => {
   const socket = useSelector((state) => state.auth.socket);
   const navigation = useNavigation();
 
-  useEffect(() => {
-    console.log(route.params);
-  }, [route]);
-
   const onPressDeleteChat = async () => {
     try {
       await message.deleteChat(chatId, user.token);
     } catch (err) {
       console.log(err);
-      if (err.response.status == 404) {
+      if (err.response && err.response.status == 404) {
         navigation.navigate('MessageStack');
       } else {
         Toast.showFailureMessage('Error deleting chat');
@@ -37,7 +33,7 @@ const ChatSetting = () => {
   };
 
   const onPressBlockUser = async () => {
-    await message.blockChat(receivedId, token);
+    await message.blockChat(receivedId, user.token);
     socket?.emit('blockUser', {
       userId: user.id,
       receivedId: receivedId,

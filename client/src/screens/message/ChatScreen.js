@@ -26,8 +26,8 @@ const ChatScreen = () => {
   const [isBlocked, setIsBlocked] = useState(false);
   const [blocked, setBlocked] = useState(false);
   const [chatId, setChatId] = useState(null);
+  const [receiver, setReceiver] = useState(null);
 
-  const { receivedId, receiverName, receiverImg } = route.params;
   const user = useSelector((state) => state.auth.user);
   const socket = useSelector((state) => state.auth.socket);
 
@@ -35,25 +35,176 @@ const ChatScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
 
-  const fetchMessages = async () => {
+  const fetchMessages = useCallback(async () => {
     try {
-      const res = await message.getMessageByOtherUserId(receivedId, user.token);
+      const res = await message.getMessageByOtherUserId(
+        receiver._id,
+        user.token,
+      );
       return res.data;
     } catch (err) {
-      if (err.response.status == 404) {
+      console.log(err);
+      if (err.response && err.response.status == 404) {
         return null;
       }
     }
-  };
+  }, [receiver, user]);
 
   const handleBack = () => {
     dispatch(chatActions.updateCurrentChatRoom(null));
     navigation.navigate('MessageStack');
   };
 
+  const handleLoadEarlier = useCallback(async () => {
+    try {
+      const earlierMessages = await message.getMessageByOtherUserId(
+        receiver._id,
+        user.token,
+        messages.length,
+      );
+      const formattedEarlierMessages = earlierMessages.data.data.map((msg) => ({
+        ...msg,
+        _id: msg._id,
+        text: !msg.isDeleted ? msg.content : 'Message unsent',
+        createdAt: msg.createdAt,
+        user: {
+          _id: msg.user._id,
+          name: msg.user.username,
+        },
+      }));
+      setMessages((prevMessages) =>
+        prevMessages.concat(formattedEarlierMessages),
+      );
+      setLoadingEarlier(false);
+    } catch (error) {
+      console.log(error);
+    }
+  }, [user, receiver, messages]);
+
+  const onSend = useCallback(
+    async (messages = []) => {
+      if (messages.length > 0) {
+        const newMsgObj = messages[0];
+        Keyboard.dismiss();
+
+        try {
+          const sendResult = await message.sendMessage(
+            receiver._id,
+            newMsgObj.text,
+            user.token,
+          );
+
+          const newMessage = sendResult.data.data;
+
+          setMessages((previousMessages) =>
+            GiftedChat.append(previousMessages, [
+              {
+                _id: newMessage._id,
+                text: newMessage.content,
+                createdAt: newMessage.createdAt,
+                isDeleted: newMessage.isDeleted,
+                user: {
+                  _id: newMessage.user._id,
+                  name: newMessage.user.username,
+                },
+              },
+            ]),
+          );
+
+          dispatch(chatActions.updateSeenStatus(newMessage.chat._id));
+
+          socket?.emit('sendMessage', {
+            chatId: newMessage.chat._id,
+            _id: newMessage._id,
+            senderId: user.id,
+            senderAvatar: `${ASSET_API_URL}/${newMessage.user.avatar.fileName}`,
+            receivedId: receiver._id,
+            content: newMessage.content,
+            createdAt: newMessage.createdAt,
+          });
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    },
+    [user, receiver],
+  );
+
+  const onDelete = async (messageIdToDelete, chatId) => {
+    try {
+      await message.deleteMessage(messageIdToDelete, user.token);
+    } catch (err) {
+      Toast.showFailureMessage('Error deleting message');
+      return;
+    }
+
+    setMessages((prevMessages) =>
+      prevMessages.map((msg) => {
+        if (msg._id == messageIdToDelete) {
+          return {
+            ...msg,
+            isDeleted: true,
+            text: 'Message unsent',
+          };
+        }
+        return msg;
+      }),
+    );
+
+    socket?.emit('deleteMessage', {
+      _id: messageIdToDelete,
+      chatId,
+      userId: user.id,
+      isLatest: messageIdToDelete == messages[0]._id,
+    });
+  };
+
+  const onLongPress = (context, message) => {
+    if (message.user._id == user.id && !message.isDeleted) {
+      const options = ['Copy', 'Delete Message', 'Cancel'];
+      const cancelButtonIndex = options.length - 1;
+      context.actionSheet().showActionSheetWithOptions(
+        {
+          options,
+          cancelButtonIndex,
+        },
+        (buttonIndex) => {
+          switch (buttonIndex) {
+            case 0:
+              Clipboard.setString(message.text);
+              break;
+            case 1:
+              onDelete(message._id, message.chat);
+              break;
+          }
+        },
+      );
+    }
+  };
+  const onPressUnblockUser = async () => {
+    try {
+      await message.unBlockChat(receiver._id, user.token);
+      setBlocked(false);
+      socket?.emit('unblock', {
+        userId: user.id,
+        receivedId: receiver._id,
+      });
+    } catch (error) {
+      console.log(error);
+      Toast.showFailureMessage('Error unblock');
+    }
+  };
+
   useEffect(() => {
+    if (route.params) {
+      setReceiver(route.params.receiver);
+    }
+
     navigation.setOptions({
-      title: receiverName,
+      title:
+        route.params && route.params.receiver
+          ? route.params.receiver.username
+          : null,
       headerRight: () => (
         <Icon
           type="feather"
@@ -63,7 +214,7 @@ const ChatScreen = () => {
           onPress={() =>
             navigation.navigate(stacks.chatSetting.name, {
               chatId,
-              receivedId: receivedId,
+              receivedId: receiver._id,
             })
           }
         />
@@ -96,9 +247,11 @@ const ChatScreen = () => {
         setIsBlocked(newMessages.blockStatus.isBlocked);
       }
     };
-    initialize();
+    if (user && receiver) {
+      initialize();
+    }
     return () => {};
-  }, []);
+  }, [user, receiver]);
 
   useEffect(() => {
     if (chatId) {
@@ -129,17 +282,33 @@ const ChatScreen = () => {
     });
 
     socket?.on('blockChat', (data) => {
-      if (user.id == data.userId && receivedId == data.receivedId) {
+      if (
+        user.id == data.userId &&
+        receiver &&
+        receiver._id == data.receivedId
+      ) {
         setBlocked(true);
-      } else if (user.id == data.receivedId && receivedId == data.userId) {
+      } else if (
+        user.id == data.receivedId &&
+        receiver &&
+        receiver._id == data.userId
+      ) {
         setIsBlocked(true);
       }
     });
 
     socket?.on('unblockChat', (data) => {
-      if (user.id == data.userId && receivedId == data.receivedId) {
+      if (
+        user.id == data.userId &&
+        receiver &&
+        receiver._id == data.receivedId
+      ) {
         setBlocked(false);
-      } else if (user.id == data.receivedId && receivedId == data.userId) {
+      } else if (
+        user.id == data.receivedId &&
+        receiver &&
+        receiver._id == data.userId
+      ) {
         setIsBlocked(false);
       }
     });
@@ -160,7 +329,7 @@ const ChatScreen = () => {
         );
       }
     });
-  }, [chatId, socket]);
+  }, [chatId, socket, user, receiver]);
 
   useEffect(() => {
     if (isLoadingEarlier) {
@@ -173,80 +342,6 @@ const ChatScreen = () => {
       navigation.navigate(stacks.signIn.name);
     }
   }, [user]);
-
-  const handleLoadEarlier = async () => {
-    try {
-      const earlierMessages = await message.getMessageByOtherUserId(
-        receivedId,
-        user.token,
-        messages.length,
-      );
-      const formattedEarlierMessages = earlierMessages.data.data.map((msg) => ({
-        ...msg,
-        _id: msg._id,
-        text: !msg.isDeleted ? msg.content : 'Message unsent',
-        createdAt: msg.createdAt,
-        user: {
-          _id: msg.user._id,
-          name: msg.user.username,
-        },
-      }));
-      setMessages((prevMessages) =>
-        prevMessages.concat(formattedEarlierMessages),
-      );
-      setLoadingEarlier(false);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const onSend = useCallback(async (messages = []) => {
-    if (messages.length > 0) {
-      const newMsgObj = messages[0];
-      Keyboard.dismiss();
-
-      try {
-        const sendResult = await message.sendMessage(
-          receivedId,
-          newMsgObj.text,
-          user.token,
-        );
-
-        const newMessage = sendResult.data.data;
-
-        setMessages((previousMessages) =>
-          GiftedChat.append(previousMessages, [
-            {
-              _id: newMessage._id,
-              text: newMessage.content,
-              createdAt: newMessage.createdAt,
-              isDeleted: newMessage.isDeleted,
-              user: {
-                _id: newMessage.user._id,
-                name: newMessage.user.username,
-              },
-            },
-          ]),
-        );
-
-        dispatch(chatActions.updateSeenStatus(newMessage.chat._id));
-
-        socket?.emit('sendMessage', {
-          chatId: newMessage.chat._id,
-          _id: newMessage._id,
-          senderId: user.id,
-          senderAvatar: `${ASSET_API_URL}/${newMessage.user.avatar.fileName}`,
-          receivedId: receivedId,
-          // userName: receiverName,
-          // userImg: receiverImg,
-          content: newMessage.content,
-          createdAt: newMessage.createdAt,
-        });
-      } catch (err) {
-        console.log(err);
-      }
-    }
-  }, []);
 
   const renderSend = (props) => {
     return (
@@ -314,70 +409,6 @@ const ChatScreen = () => {
     return <FontAwesome name="angle-double-down" size={22} color="#333" />;
   };
 
-  const onDelete = async (messageIdToDelete, chatId) => {
-    try {
-      await message.deleteMessage(messageIdToDelete, user.token);
-    } catch (err) {
-      Toast.showFailureMessage('Error deleting message');
-      return;
-    }
-
-    setMessages((prevMessages) =>
-      prevMessages.map((msg) => {
-        if (msg._id == messageIdToDelete) {
-          return {
-            ...msg,
-            isDeleted: true,
-            text: 'Message unsent',
-          };
-        }
-        return msg;
-      }),
-    );
-
-    socket?.emit('deleteMessage', {
-      _id: messageIdToDelete,
-      chatId,
-      userId: user.id,
-      isLatest: messageIdToDelete == messages[0]._id,
-    });
-  };
-
-  const onLongPress = (context, message) => {
-    if (message.user._id == user.id && !message.isDeleted) {
-      const options = ['Copy', 'Delete Message', 'Cancel'];
-      const cancelButtonIndex = options.length - 1;
-      context.actionSheet().showActionSheetWithOptions(
-        {
-          options,
-          cancelButtonIndex,
-        },
-        (buttonIndex) => {
-          switch (buttonIndex) {
-            case 0:
-              Clipboard.setString(message.text);
-              break;
-            case 1:
-              onDelete(message._id, message.chat);
-              break;
-          }
-        },
-      );
-    }
-  };
-  const onPressUnblockUser = async () => {
-    try {
-      await message.unBlockChat(receivedId, user.token);
-      setBlocked(false);
-      socket?.emit('unblock', {
-        userId: user.id,
-        receivedId: receivedId,
-      });
-    } catch (error) {
-      console.log(error);
-      Toast.showFailureMessage('Error unblock');
-    }
-  };
   const renderInputToolbar = (props) => {
     if (!blocked) {
       if (!isBlocked) {
