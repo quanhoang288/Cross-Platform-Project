@@ -79,7 +79,7 @@ const CreatePost = () => {
       // const actions = [{ resize: { width: 200, height: 200 } }];
       const actions = [];
       const saveOptions = {
-        // compress: 0.9,
+        compress: 0.7,
         base64: true,
       };
       return ImageManipulator.manipulateAsync(asset.uri, actions, saveOptions);
@@ -123,11 +123,17 @@ const CreatePost = () => {
     const convertedImageAssets = await convertToBase64(imageAssets);
     const convertedVideoAssets = await convertToBase64(videoAssets);
 
+    console.log(
+      `convert to base64 finished in ${new Date().getTime() / 1000 - now}`,
+    );
+
     const postData = {
       described: postContent,
       images: convertedImageAssets,
       videos: convertedVideoAssets,
     };
+
+    console.log('params: ', route.params);
 
     try {
       const result = route.params

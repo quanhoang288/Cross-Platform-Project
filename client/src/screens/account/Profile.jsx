@@ -148,25 +148,6 @@ const Profile = (props) => {
     );
   };
 
-  const handleFriendBtnPress = () => {
-    switch (friendStatus) {
-      case FRIEND_STATUS.NON_FRIEND:
-        handleAddFriend();
-        break;
-
-      case FRIEND_STATUS.SEND_REQUEST:
-        handleCancelFriendRequest();
-        break;
-
-      case FRIEND_STATUS.REQUESTED:
-        handleShowRespondModal();
-        break;
-
-      case FRIEND_STATUS.FRIENDS:
-        handleShowUnfriendConfirm();
-    }
-  };
-
   const getDate = (value) => {
     let result = '';
     let date = new Date(value);
@@ -192,7 +173,7 @@ const Profile = (props) => {
     };
   };
 
-  const getFriendBtnTitleByStatus = () => {
+  const getFriendBtnTitleByStatus = (friendStatus) => {
     switch (friendStatus) {
       case FRIEND_STATUS.NON_FRIEND:
         return 'Add friend';
@@ -215,6 +196,47 @@ const Profile = (props) => {
       setUserId(user.id);
     }
   }, [route]);
+
+  const handleFriendBtnPress = (friendStatus) => {
+    switch (friendStatus) {
+      case FRIEND_STATUS.NON_FRIEND:
+        handleAddFriend();
+        break;
+
+      case FRIEND_STATUS.SEND_REQUEST:
+        handleCancelFriendRequest();
+        break;
+
+      case FRIEND_STATUS.REQUESTED:
+        handleShowRespondModal();
+        break;
+
+      case FRIEND_STATUS.FRIENDS:
+        handleShowUnfriendConfirm();
+    }
+  };
+
+  // useEffect(() => {
+  //   if (isFriendBtnPressed) {
+  //     switch (friendStatus) {
+  //       case FRIEND_STATUS.NON_FRIEND:
+  //         handleAddFriend();
+  //         break;
+
+  //       case FRIEND_STATUS.SEND_REQUEST:
+  //         handleCancelFriendRequest();
+  //         break;
+
+  //       case FRIEND_STATUS.REQUESTED:
+  //         handleShowRespondModal();
+  //         break;
+
+  //       case FRIEND_STATUS.FRIENDS:
+  //         handleShowUnfriendConfirm();
+  //     }
+  //     setFriendBtnPress(false);
+  //   }
+  // }, [isFriendBtnPressed, friendStatus]);
 
   useEffect(() => {
     if (userId) {
@@ -340,7 +362,6 @@ const Profile = (props) => {
         offset,
       );
       const newPosts = nextPostList.data.data;
-      console.log(newPosts.length);
       if (newPosts.length > 0) {
         setUserData((prevUserData) => ({
           ...prevUserData,
@@ -365,95 +386,10 @@ const Profile = (props) => {
     }
   }, [isLoadingMore]);
 
-  const renderUserActionButtons = useCallback(() => {
-    console.log('rendering user action buttons');
-    if (!userId) {
-      return null;
-    }
-
-    if (userId === user.id) {
-      return (
-        <>
-          <Button
-            buttonStyle={styles.addPostBtn}
-            title="Add post"
-            icon={{
-              type: 'antdesign',
-              name: 'pluscircle',
-              color: 'rgb(255,255,255)',
-              size: 18,
-            }}
-            titleStyle={{
-              color: 'rgb(255,255,255)',
-            }}
-            onPress={() => navigation.navigate(stacks.createPost.name)}
-          />
-
-          <Button
-            buttonStyle={styles.updateProfileBtn}
-            title="Edit profile"
-            icon={{
-              type: 'antdesign',
-              name: 'edit',
-              color: 'rgb(0,0,0)',
-              size: 18,
-            }}
-            titleStyle={{
-              color: 'rgb(0,0,0)',
-            }}
-            onPress={() => navigation.navigate(stacks.personalInformation.name)}
-          />
-        </>
-      );
-    }
-
-    const friendBtnTitle = getFriendBtnTitleByStatus();
-    const { name: iconName, type: iconType } = getIconByFriendStatus();
-
-    return (
-      <>
-        <Button
-          buttonStyle={styles.addFriendBtn}
-          title={friendBtnTitle}
-          icon={{
-            type: iconType,
-            name: iconName,
-            color: 'rgb(255,255,255)',
-            size: 18,
-          }}
-          titleStyle={{
-            fontWeight: '100',
-            color: 'rgb(255,255,255)',
-          }}
-          onPress={handleFriendBtnPress}
-        />
-
-        <Button
-          buttonStyle={styles.messageBtn}
-          onPress={() =>
-            navigation.navigate(stacks.chatScreen.name, {
-              receiver: {
-                _id: userId,
-                username: userData.info ? userData.info.username : null,
-                avatar: userData.info ? userData.info.avatar : null,
-              },
-            })
-          }
-          title="Message"
-          icon={{
-            type: 'fontisto',
-            name: 'messenger',
-            color: 'rgb(255,255,255)',
-            size: 18,
-          }}
-          titleStyle={{
-            fontWeight: '100',
-            color: 'rgb(255,255,255)',
-          }}
-        />
-      </>
-    );
-  }, [userId, user, userData]);
+  useEffect(() => {
+    console.log('user id: ', userId);
+    console.log('current user id: ', user.id);
+  }, [userId, user]);
 
   const ProfileHeader = () => {
     return (
@@ -530,7 +466,83 @@ const Profile = (props) => {
         <Text style={styles.name}> {userData.info.username} </Text>
 
         <View style={styles.buttonGroup}>
-          {renderUserActionButtons()}
+          {userId === user.id ? (
+            <>
+              <Button
+                buttonStyle={styles.addPostBtn}
+                title="Add post"
+                icon={{
+                  type: 'antdesign',
+                  name: 'pluscircle',
+                  color: 'rgb(255,255,255)',
+                  size: 18,
+                }}
+                titleStyle={{
+                  color: 'rgb(255,255,255)',
+                }}
+                onPress={() => navigation.navigate(stacks.createPost.name)}
+              />
+
+              <Button
+                buttonStyle={styles.updateProfileBtn}
+                title="Edit profile"
+                icon={{
+                  type: 'antdesign',
+                  name: 'edit',
+                  color: 'rgb(0,0,0)',
+                  size: 18,
+                }}
+                titleStyle={{
+                  color: 'rgb(0,0,0)',
+                }}
+                onPress={() =>
+                  navigation.navigate(stacks.personalInformation.name)
+                }
+              />
+            </>
+          ) : (
+            <>
+              <Button
+                buttonStyle={styles.addFriendBtn}
+                title={getFriendBtnTitleByStatus(friendStatus)}
+                icon={{
+                  type: getIconByFriendStatus(friendStatus).type,
+                  name: getIconByFriendStatus(friendStatus).name,
+                  color: 'rgb(255,255,255)',
+                  size: 18,
+                }}
+                titleStyle={{
+                  fontWeight: '100',
+                  color: 'rgb(255,255,255)',
+                }}
+                onPress={() => handleFriendBtnPress(friendStatus)}
+              />
+
+              <Button
+                buttonStyle={styles.messageBtn}
+                onPress={() =>
+                  navigation.navigate(stacks.chatScreen.name, {
+                    receiver: {
+                      _id: userId,
+                      username: userData.info ? userData.info.username : null,
+                      avatar: userData.info ? userData.info.avatar : null,
+                    },
+                  })
+                }
+                title="Message"
+                icon={{
+                  type: 'fontisto',
+                  name: 'messenger',
+                  color: 'rgb(255,255,255)',
+                  size: 18,
+                }}
+                titleStyle={{
+                  fontWeight: '100',
+                  color: 'rgb(255,255,255)',
+                }}
+              />
+            </>
+          )}
           <Icon
             type="feather"
             name="more-horizontal"
