@@ -4,31 +4,40 @@ import { View, StyleSheet } from 'react-native';
 import { Button, Icon, Image, Text } from 'react-native-elements';
 import { DEVICE_HEIGHT, DEVICE_WIDTH } from '../../constants/dimensions';
 
-const Empty = (title, description) => {
+const Empty = ({
+  title,
+  description,
+  hasButton,
+  buttonTitle,
+  handleButtonPress,
+}) => {
   return (
     <View style={styles.container}>
       <Image
         source={require('../../../assets/NoContent.png')}
         style={styles.image}
       />
-      <Text style={styles.textTitle}>No Result</Text>
-      <Text style={styles.textDescription}>Bạn chưa đăng bài viết nào</Text>
+      <Text style={styles.textTitle}>{title}</Text>
+      <Text style={styles.textDescription}>{description}</Text>
+      {hasButton && (
+        <Text style={styles.textButton} onPress={handleButtonPress}>
+          {buttonTitle}
+        </Text>
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    // backgroundColor: 'rgb(255, 255, 255)',
+    flex: 1,
     alignItems: 'center',
     paddingVertical: 16,
   },
 
   image: {
-    height: DEVICE_HEIGHT / 4,
+    height: DEVICE_HEIGHT / 5,
     width: DEVICE_WIDTH / 1.5,
-    // height: 200,
-    // width: 300,
     minHeight: 100,
     minWidth: 150,
     maxHeight: 200,
@@ -49,6 +58,16 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     marginBottom: 4,
   },
+  textButton: {
+    marginTop: 10,
+    fontSize: 14,
+    fontWeight: '500',
+    color: 'blue',
+  },
 });
+
+Empty.defaultProps = {
+  hasButton: false,
+};
 
 export default Empty;

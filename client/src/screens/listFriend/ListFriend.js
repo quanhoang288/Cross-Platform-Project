@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { stacks } from '../../constants/title.js';
 import { ASSET_API_URL } from '../../configs/index.js';
+import Empty from '../../components/emptyAndError/Empty.jsx';
 
 const ListFriend = () => {
   // user
@@ -37,6 +38,10 @@ const ListFriend = () => {
     navigation.navigate(stacks.profile.name, {
       userId: userId,
     });
+
+  if (listFriend.length == 0) {
+    return <Empty title="No friends yet" />;
+  }
 
   return (
     <>
