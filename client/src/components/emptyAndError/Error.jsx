@@ -4,17 +4,15 @@ import { View, StyleSheet } from 'react-native';
 import { Image, Text } from 'react-native-elements';
 import { DEVICE_HEIGHT, DEVICE_WIDTH } from '../../constants/dimensions';
 
-const Error = (title, description) => {
+const Error = ({ title, description }) => {
   return (
     <View style={styles.container}>
       <Image
         source={require('../../../assets/NoConnection.png')}
         style={styles.image}
       />
-      <Text style={styles.textTitle}>OOPS !!</Text>
-      <Text style={styles.textDescription}>
-        Your connection seems off... Check your internet or try again later
-      </Text>
+      <Text style={styles.textTitle}>{title}</Text>
+      <Text style={styles.textDescription}>{description}</Text>
       <Text style={styles.textButton} onPress={() => console.log('try again')}>
         Retry
       </Text>

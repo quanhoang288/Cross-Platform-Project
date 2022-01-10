@@ -39,7 +39,12 @@ postCommentController.create = async (req, res, next) => {
       postCommentSaved._id
     ).populate({
       path: "user",
-      select: "_id username phonenumber",
+      select: "_id username",
+      populate: {
+        path: "avatar",
+        select: "_id fileName",
+        model: "Documents",
+      },
       model: "Users",
     });
 

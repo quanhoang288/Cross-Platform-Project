@@ -9,6 +9,7 @@ import { useRoute } from '@react-navigation/core';
 import { useSelector } from 'react-redux';
 import { LazyFlatList } from '../../components/common';
 import { Toast } from '../../helpers';
+import Empty from '../../components/emptyAndError/Empty';
 
 const Comment = (props) => {
   // user
@@ -87,15 +88,22 @@ const Comment = (props) => {
 
   return (
     <View style={styles.container}>
-      <LazyFlatList
-        data={comments}
-        renderItem={renderItem}
-        refreshing={isRefreshing}
-        isFetchingNextPage={isLoadingMore}
-        handleRefresh={() => setRefreshing(true)}
-        handleEndReached={() => setLoadingMore(true)}
-        listStyle={styles.commentList}
-      />
+      {comments.length == 0 ? (
+        <Empty
+          title="No comments yet"
+          description="Be the first person to comment on this post"
+        />
+      ) : (
+        <LazyFlatList
+          data={comments}
+          renderItem={renderItem}
+          refreshing={isRefreshing}
+          isFetchingNextPage={isLoadingMore}
+          handleRefresh={() => setRefreshing(true)}
+          handleEndReached={() => setLoadingMore(true)}
+          listStyle={styles.commentList}
+        />
+      )}
 
       <View style={styles.commentSection}>
         <Icon
