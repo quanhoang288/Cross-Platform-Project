@@ -20,6 +20,7 @@ const convertToBase64 = async (assets) => {
     const actions = [];
     const saveOptions = {
       base64: true,
+      compress: 0.7,
     };
     return ImageManipulator.manipulateAsync(asset.uri, actions, saveOptions);
   });

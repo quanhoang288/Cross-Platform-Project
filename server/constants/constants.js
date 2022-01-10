@@ -32,7 +32,7 @@ const MONGO_URI = process.env.MONGO_URI;
 const PORT = process.env.PORT;
 
 const DEFAULT_PAGE_SIZE = 10;
-const NUM_REPORTS_LIMIT = 10;
+const NUM_REPORTS_LIMIT = 1;
 
 module.exports = {
   GENDER_MALE,

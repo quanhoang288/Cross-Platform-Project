@@ -300,7 +300,7 @@ const Profile = (props) => {
       Toast.showSuccessMessage(successMsg);
       setUpdateType(null);
     } catch (error) {
-      console.log('error');
+      console.log(error);
       const errMsg =
         type == 'avatar'
           ? 'Error updating avatar'
@@ -385,11 +385,6 @@ const Profile = (props) => {
       handleLoadMore();
     }
   }, [isLoadingMore]);
-
-  useEffect(() => {
-    console.log('user id: ', userId);
-    console.log('current user id: ', user.id);
-  }, [userId, user]);
 
   const ProfileHeader = () => {
     return (
