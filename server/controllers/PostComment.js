@@ -63,7 +63,16 @@ postCommentController.list = async (req, res, next) => {
       .skip(offset)
       .limit(limit)
       .sort({ createdAt: "desc" })
-      .populate("user", ["username", "phonenumber"]);
+      .populate({
+        path: "user",
+        select: "_id username",
+        populate: {
+          path: "avatar",
+          select: "_id fileName",
+          model: "Documents",
+        },
+        model: "Users",
+      });
     return res.status(httpStatus.OK).json({
       data: postComments,
     });

@@ -21,6 +21,7 @@ import { friend, search } from '../../apis';
 import { useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/core';
 import { stacks } from '../../constants/title';
+import { ASSET_API_URL } from '../../configs';
 
 const NewMessage = () => {
   // user
@@ -43,11 +44,10 @@ const NewMessage = () => {
   // API search
   const handleSearch = (keyword, newListFriend) => {
     if (keyword === '') {
-      setListFriend([]);
-      return;
+      setListFriend(newListFriend);
     } else {
       setListFriend(
-        newListFriend.filter((item) => item.username.includes(keyword)),
+        newListFriend.filter((item) => item.name.includes(keyword)),
       );
     }
   };
@@ -55,17 +55,26 @@ const NewMessage = () => {
   useEffect(() => {
     const initialize = async () => {
       const newListFriend = await fetchFriendList();
-      handleSearch(value, newListFriend);
+      const nListFriend = newListFriend.map((friend) => ({
+        id: friend._id,
+        name: friend.username,
+        avatar: friend.avatar,
+      }));
+      handleSearch(value, nListFriend);
     };
     initialize();
-  }, []);
+  }, [value]);
   const renderItem = ({ item }) => {
     console.log(item);
     return (
       <TouchableOpacity
         onPress={() =>
           navigation.navigate(stacks.chatScreen.name, {
-            receivedId: item.id,
+            receiver: {
+              _id: item.id,
+              username: item.name,
+              avatar: item.avatar,
+            },
           })
         }
       >
@@ -74,11 +83,11 @@ const NewMessage = () => {
             <Avatar
               rounded
               size={40}
-              source={require('../../../assets/avatar2.jpg')}
+              source={{ uri: `${ASSET_API_URL}/${item.avatar.fileName}` }}
             />
             <ListItem.Content>
               <ListItem.Title>
-                <Text>{item.username}</Text>
+                <Text>{item.name}</Text>
               </ListItem.Title>
             </ListItem.Content>
           </ListItem>

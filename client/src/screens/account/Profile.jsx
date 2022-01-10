@@ -365,7 +365,8 @@ const Profile = (props) => {
     }
   }, [isLoadingMore]);
 
-  const renderUserActionButtons = () => {
+  const renderUserActionButtons = useCallback(() => {
+    console.log('rendering user action buttons');
     if (!userId) {
       return null;
     }
@@ -431,7 +432,11 @@ const Profile = (props) => {
           buttonStyle={styles.messageBtn}
           onPress={() =>
             navigation.navigate(stacks.chatScreen.name, {
-              receivedId: userId,
+              receiver: {
+                _id: userId,
+                username: userData.info ? userData.info.username : null,
+                avatar: userData.info ? userData.info.avatar : null,
+              },
             })
           }
           title="Message"
@@ -448,7 +453,7 @@ const Profile = (props) => {
         />
       </>
     );
-  };
+  }, [userId, user, userData]);
 
   const ProfileHeader = () => {
     return (

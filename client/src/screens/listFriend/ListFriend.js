@@ -46,9 +46,7 @@ const ListFriend = () => {
             <ProfileItem
               // avatar={friend.avatar.filename}
               key={friend._id}
-              avatar={{
-                source: `${ASSET_API_URL}/${friend.avatar.fileName}`,
-              }}
+              avatar={friend.avatar}
               userId={friend._id}
               title={friend.username}
               displayButtonAdvance={true}

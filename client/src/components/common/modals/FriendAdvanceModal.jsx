@@ -9,7 +9,7 @@ import { useNavigation } from '@react-navigation/core';
 import { stacks } from '../../../constants/title';
 import { friend } from '../../../apis';
 import { Toast } from '../../../helpers';
-const FriendAdvanceModal = ({ userId }) => {
+const FriendAdvanceModal = ({ userId, username, avatar }) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
@@ -18,7 +18,11 @@ const FriendAdvanceModal = ({ userId }) => {
     //TODO: redirect to message screen
     dispatch(hideModal());
     navigation.navigate(stacks.chatScreen.name, {
-      receivedId: userId,
+      receiver: {
+        _id: userId,
+        username,
+        avatar,
+      },
     });
   };
 
