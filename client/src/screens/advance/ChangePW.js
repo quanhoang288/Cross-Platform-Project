@@ -7,6 +7,7 @@ import { errorMessages } from '../../constants/message';
 import { auth } from '../../apis';
 import { useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/core';
+import { showFailureMessage, showSuccessMessage } from '../../helpers/Toast';
 
 const ChangePW = () =>{
 
@@ -96,19 +97,31 @@ const ChangePW = () =>{
         }
     }
 
-    const update = (data) => {
-        const {
-            currentPassword,
-            newPassword,
-        } = data;
+    const update = async (data) => {
+        try {
+          const {
+              currentPassword,
+              newPassword,
+          } = data;
 
-        auth.changePassword(currentPassword, newPassword, user.token)
-        .then(result => {
-            navigation.navigate('PersonalStack');
-        })
-        .catch(error => {
-            console.log(error);
-        })
+          auth.changePassword(currentPassword, newPassword, user.token)
+          .then(result => {
+              console.log(result);
+              showSuccessMessage("Change password successfully");
+              navigation.navigate('PersonalStack');
+          })
+          .catch(err => {
+            console.log(err);
+            if(err.response){
+              showFailureMessage("Current password incorrect");
+            }
+            else{
+              showFailureMessage("The connection with the server was lost");
+            }
+          })
+        } catch (error) {
+          console.log(error);
+        }
     }
 
   return(
@@ -117,7 +130,7 @@ const ChangePW = () =>{
         name="curPassword"
         label={"Current password"}
         placeholderText={"Enter current password"}
-        secureTextEntry={true}
+        isPassword={true}
         value={passwords.curPassword}
         errorMessage={errors.curPassword}
         handleTextChange={handleTextChange}
@@ -127,7 +140,7 @@ const ChangePW = () =>{
         name="newPassword"
         label={"New password"} 
         placeholderText={"Enter new password"}
-        secureTextEntry={true}
+        isPassword={true}
         value={passwords.newPassword}
         errorMessage={errors.newPassword}
         handleTextChange={handleTextChange}
@@ -136,7 +149,7 @@ const ChangePW = () =>{
       <InputText
         name="confirmPassword" 
         placeholderText={"Confirm new Password"}
-        secureTextEntry={true}
+        isPassword={true}
         value={passwords.confirmPassword}
         errorMessage={errors.confirmPassword}
         handleTextChange={handleTextChange}
