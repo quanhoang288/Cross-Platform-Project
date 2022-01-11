@@ -12,6 +12,7 @@ import { Picker } from '@react-native-picker/picker';
 import { StatusBar } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useCallback } from 'react';
+import * as FileSystem from 'expo-file-system';
 
 const Header = (props) => {
   const Item = Picker.Item;
@@ -73,13 +74,28 @@ const MediaItem = (props) => {
   const selectedAssets = useSelector((state) => state.media.selectedAssets);
   const { item, isSingleSelect } = props;
 
+  const getFileSize = async (fileUri) => {
+    const fileInfo = await FileSystem.getInfoAsync(fileUri);
+    return fileInfo.size;
+  };
+
   const handleItemSelected = useCallback(
-    (item) => {
+    async (item) => {
       const isAlreadySelected =
         selectedAssets.findIndex((asset) => asset.uri == item.uri) >= 0;
 
       if (isAlreadySelected) {
         dispatch(mediaActions.removeAsset(item));
+        return;
+      }
+
+      const fileSize = await getFileSize(item.uri);
+      if (item.mediaType == 'photo' && fileSize > 4000000) {
+        Toast.showFailureMessage('Image size must not exceed 4MB');
+        return;
+      }
+      if (item.mediaType == 'video' && fileSize > 10000000) {
+        Toast.showFailureMessage('Video size must not exceed 10MB');
         return;
       }
 

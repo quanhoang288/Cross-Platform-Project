@@ -189,14 +189,6 @@ const Profile = (props) => {
     }
   };
 
-  useEffect(() => {
-    if (route.params && route.params.userId) {
-      setUserId(route.params.userId);
-    } else {
-      setUserId(user.id);
-    }
-  }, [route]);
-
   const handleFriendBtnPress = (friendStatus) => {
     switch (friendStatus) {
       case FRIEND_STATUS.NON_FRIEND:
@@ -216,27 +208,13 @@ const Profile = (props) => {
     }
   };
 
-  // useEffect(() => {
-  //   if (isFriendBtnPressed) {
-  //     switch (friendStatus) {
-  //       case FRIEND_STATUS.NON_FRIEND:
-  //         handleAddFriend();
-  //         break;
-
-  //       case FRIEND_STATUS.SEND_REQUEST:
-  //         handleCancelFriendRequest();
-  //         break;
-
-  //       case FRIEND_STATUS.REQUESTED:
-  //         handleShowRespondModal();
-  //         break;
-
-  //       case FRIEND_STATUS.FRIENDS:
-  //         handleShowUnfriendConfirm();
-  //     }
-  //     setFriendBtnPress(false);
-  //   }
-  // }, [isFriendBtnPressed, friendStatus]);
+  useEffect(() => {
+    if (route.params && route.params.userId) {
+      setUserId(route.params.userId);
+    } else {
+      setUserId(user.id);
+    }
+  }, [route]);
 
   useEffect(() => {
     if (userId) {
@@ -288,9 +266,19 @@ const Profile = (props) => {
       const editRes = await auth.editInfo(updateData, user.token);
       const userInfo = editRes.data.data;
 
-      setProfileImgUris({
-        avatar: `${ASSET_API_URL}/${userInfo.avatar.fileName}`,
-        coverImage: `${ASSET_API_URL}/${userInfo.cover_image.fileName}`,
+      setUserData({
+        info: {
+          ...userData.info,
+          avatar: userInfo.avatar,
+          cover_image: userInfo.cover_image,
+        },
+        posts: userData.posts.map((post) => ({
+          ...post,
+          author: {
+            ...post.author,
+            avatar: userInfo.avatar,
+          },
+        })),
       });
       dispatch(mediaActions.resetState());
       const successMsg =
@@ -318,6 +306,10 @@ const Profile = (props) => {
   }, [route]);
 
   useEffect(() => {
+    console.log(profileImgUris.avatar);
+  }, [profileImgUris]);
+
+  useEffect(() => {
     const initializeUserProfile = async (userId) => {
       const info = await fetchUserInfo(userId);
       const posts = await fetchUserPosts(userId);
@@ -327,16 +319,6 @@ const Profile = (props) => {
       initializeUserProfile(userId);
     }
   }, [userId]);
-
-  useEffect(() => {
-    const info = userData.info;
-    if (info.avatar && info.cover_image) {
-      setProfileImgUris({
-        avatar: `${ASSET_API_URL}/${info.avatar.fileName}`,
-        coverImage: `${ASSET_API_URL}/${info.cover_image.fileName}`,
-      });
-    }
-  }, [userData]);
 
   useEffect(() => {
     if (
