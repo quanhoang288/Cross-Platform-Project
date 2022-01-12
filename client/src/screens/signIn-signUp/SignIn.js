@@ -166,6 +166,7 @@ const SignIn = () => {
           name: 'phone',
           type: 'antdesign',
         }}
+        keyboardType="number-pad"
         placeholderText={'Phone number'}
         // rightIcon={true}
         errorMessage={errors.phoneNumber}

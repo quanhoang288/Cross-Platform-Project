@@ -188,6 +188,7 @@ const SignUp = () => {
           name:"phone",
           type:"antdesign"
         }}
+        keyboardType="number-pad"
         errorMessage={errors.phoneNumber}
         value={credentials.phoneNumber}
         handleTextChange={handleTextChange}

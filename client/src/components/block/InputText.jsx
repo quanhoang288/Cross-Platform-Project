@@ -60,7 +60,7 @@ const InputText = (props) => {
       placeholder={props.placeholderText}
       autoCapitalize="none"
       autoCorrect={false}
-      keyboardType="default"
+      keyboardType={props.keyboardType}
       returnKeyType="next"
       value={props.value}
       onChangeText={(text) => props.handleTextChange(props.name, text)}
@@ -97,6 +97,7 @@ InputText.propTypes = {};
 
 InputText.defaultProps = {
   type: 'name',
+  keyboardType: 'default',
 };
 
 export default InputText;
