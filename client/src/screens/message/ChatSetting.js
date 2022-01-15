@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { Icon, ListItem } from 'react-native-elements';
 import { message } from '../../apis';
@@ -8,12 +8,12 @@ import { stacks } from '../../constants/title';
 import { Toast } from '../../helpers';
 const ChatSetting = () => {
   const route = useRoute();
-  const { chatId, receivedId } = route.params;
+  const { chatId, receiver } = route.params;
   const user = useSelector((state) => state.auth.user);
   const socket = useSelector((state) => state.auth.socket);
   const navigation = useNavigation();
 
-  const onPressDeleteChat = async () => {
+  const onPressDeleteChat = useCallback(async () => {
     try {
       await message.deleteChat(chatId, user.token);
     } catch (err) {
@@ -30,16 +30,17 @@ const ChatSetting = () => {
       deletedBy: user.id,
     });
     navigation.navigate('MessageStack');
-  };
+  }, [chatId]);
 
-  const onPressBlockUser = async () => {
-    await message.blockChat(receivedId, user.token);
+  const onPressBlockUser = useCallback(async () => {
+    await message.blockChat(receiver._id, user.token);
     socket?.emit('blockUser', {
       userId: user.id,
-      receivedId: receivedId,
+      receivedId: receiver._id,
     });
-    navigation.navigate(stacks.chatScreen.name);
-  };
+    navigation.navigate(stacks.chatScreen.name, { receiver });
+  }, [receiver]);
+
   return (
     <ScrollView style={styles.ScrollView}>
       <TouchableOpacity onPress={onPressDeleteChat}>

@@ -112,6 +112,9 @@ const ChatScreen = () => {
           );
 
           dispatch(chatActions.updateSeenStatus(newMessage.chat._id));
+          if (!chatId) {
+            setChatId(newMessage.chat._id);
+          }
 
           socket?.emit('sendMessage', {
             chatId: newMessage.chat._id,
@@ -119,6 +122,8 @@ const ChatScreen = () => {
             senderId: user.id,
             senderAvatar: `${ASSET_API_URL}/${newMessage.user.avatar.fileName}`,
             receivedId: receiver._id,
+            userName: receiver.username,
+            userImg: receiver.avatar.fileName,
             content: newMessage.content,
             createdAt: newMessage.createdAt,
           });
@@ -214,7 +219,7 @@ const ChatScreen = () => {
           onPress={() =>
             navigation.navigate(stacks.chatSetting.name, {
               chatId,
-              receivedId: receiver._id,
+              receiver,
             })
           }
         />
@@ -223,7 +228,7 @@ const ChatScreen = () => {
         <HeaderBackButton style={{ marginLeft: 0 }} onPress={handleBack} />
       ),
     });
-  }, [route, navigation, chatId]);
+  }, [route, navigation, chatId, receiver]);
 
   useEffect(() => {
     const initialize = async () => {
@@ -237,6 +242,7 @@ const ChatScreen = () => {
               user: {
                 _id: msg.user._id,
                 name: msg.user.username,
+                avatar: `${ASSET_API_URL}/${msg.user.avatar.fileName}`,
               },
             };
           }),
@@ -329,6 +335,7 @@ const ChatScreen = () => {
         );
       }
     });
+    return () => {};
   }, [chatId, socket, user, receiver]);
 
   useEffect(() => {

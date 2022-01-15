@@ -61,11 +61,7 @@ const SearchFriend = () => {
           navigation.navigate(stacks.profile.name, { userId: item._id })
         }
       >
-        <Avatar
-          rounded
-          size={40}
-          source={require('../../../assets/avatar2.jpg')}
-        />
+        <Avatar rounded size={40} source={{ uri: item.avatar.fileName }} />
 
         <ListItem.Content>
           <ListItem.Title>

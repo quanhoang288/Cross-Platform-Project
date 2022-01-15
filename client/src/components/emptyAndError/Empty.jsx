@@ -13,10 +13,7 @@ const Empty = ({
 }) => {
   return (
     <View style={styles.container}>
-      <Image
-        source={require('../../../assets/NoContent.png')}
-        style={styles.image}
-      />
+      <Image source={require('./NoContent.png')} style={styles.image} />
       <Text style={styles.textTitle}>{title}</Text>
       <Text style={styles.textDescription}>{description}</Text>
       {hasButton && (

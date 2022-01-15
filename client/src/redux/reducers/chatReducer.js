@@ -88,7 +88,7 @@ export default (state = initialState, action) => {
     case 'REMOVE':
       return {
         ...state,
-        chats: state.chats.filter((chat) => chat._id != action.payload),
+        chats: state.chats.filter((chat) => chat.id != action.payload),
       };
 
     case 'REMOVE_LATEST_MESSAGE':

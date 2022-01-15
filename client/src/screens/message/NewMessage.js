@@ -73,7 +73,7 @@ const NewMessage = () => {
             receiver: {
               _id: item.id,
               username: item.name,
-              avatar: item.avatar,
+              avatar: item.avatar.fileName,
             },
           })
         }

@@ -127,6 +127,9 @@ const stackScreens = [
   {
     name: stacks.chatSetting.name,
     component: ChatSetting,
+    options: {
+      title: stacks.chatSetting.title,
+    },
   },
   {
     name: stacks.friendTabs.name,

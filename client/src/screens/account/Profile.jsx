@@ -501,8 +501,10 @@ const Profile = (props) => {
                   navigation.navigate(stacks.chatScreen.name, {
                     receiver: {
                       _id: userId,
-                      username: userData.info ? userData.info.username : null,
-                      avatar: userData.info ? userData.info.avatar : null,
+                      username: userData.info.username,
+                      avatar: userData.info.avatar
+                        ? userData.info.avatar.fileName
+                        : null,
                     },
                   })
                 }
