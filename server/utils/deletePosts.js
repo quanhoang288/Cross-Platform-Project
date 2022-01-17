@@ -8,7 +8,7 @@ module.exports = async () => {
       { $group: { _id: "$post", reportCount: { $sum: 1 } } },
       {
         $match: {
-          reportCount: { $gt: NUM_REPORTS_LIMIT },
+          reportCount: { $gte: NUM_REPORTS_LIMIT },
         },
       },
     ]);

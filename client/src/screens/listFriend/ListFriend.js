@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import ProfileItem from '../../components/account/ProfileItem.jsx';
 import { friend } from '../../apis';
 import { useSelector } from 'react-redux';
@@ -18,21 +18,32 @@ const ListFriend = () => {
   const [userId, setUserId] = useState(
     route.params && route.params.userId ? route.params.userId : null,
   );
-
-  // API getListFriend
+  const [refreshing, setRefreshing] = useState(false);
   const [listFriend, setListFriend] = useState([]);
+
+  const fetchFriendList = async (userId, token) => {
+    try {
+      const result = await friend.getListFriends(userId, token);
+      setListFriend(result.data.data.friends);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleRefresh = useCallback(async () => {
+    await fetchFriendList(userId, user.token);
+    setRefreshing(false);
+  }, [user, userId]);
+
   useEffect(() => {
-    friend
-      .getListFriends(userId, user.token)
-      .then((result) => {
-        // render
-        const curListFr = result.data.data.friends;
-        setListFriend(curListFr);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    fetchFriendList(userId, user.token);
   }, [userId]);
+
+  useEffect(() => {
+    if (refreshing) {
+      handleRefresh();
+    }
+  }, [refreshing]);
 
   const navigate = (userId) =>
     navigation.navigate(stacks.profile.name, {
@@ -44,23 +55,29 @@ const ListFriend = () => {
   }
 
   return (
-    <>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles.container}>
-          {listFriend.map((friend) => (
-            <ProfileItem
-              // avatar={friend.avatar.filename}
-              key={friend._id}
-              avatar={friend.avatar}
-              userId={friend._id}
-              title={friend.username}
-              displayButtonAdvance={true}
-              navigate={navigate}
-            />
-          ))}
-        </View>
-      </ScrollView>
-    </>
+    <ScrollView
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={() => setRefreshing(true)}
+        />
+      }
+      showsVerticalScrollIndicator={false}
+    >
+      <View style={styles.container}>
+        {listFriend.map((friend) => (
+          <ProfileItem
+            // avatar={friend.avatar.filename}
+            key={friend._id}
+            avatar={friend.avatar}
+            userId={friend._id}
+            title={friend.username}
+            displayButtonAdvance={true}
+            navigate={navigate}
+          />
+        ))}
+      </View>
+    </ScrollView>
   );
 };
 

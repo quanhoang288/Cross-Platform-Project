@@ -6,7 +6,7 @@ import { FunctionalityItem } from '../../components/block';
 import { useNavigation } from '@react-navigation/core';
 import { stacks } from '../../constants/title';
 import { useDispatch, useSelector } from 'react-redux';
-import { authActions } from '../../redux/actions';
+import { authActions, chatActions } from '../../redux/actions';
 
 const MenuAdvance = () => {
   // user
@@ -19,6 +19,7 @@ const MenuAdvance = () => {
 
   const handleSignOut = () => {
     socket?.disconnect();
+    dispatch(chatActions.reset());
     dispatch(authActions.logout());
     navigation.navigate(stacks.signIn.name);
   };

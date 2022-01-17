@@ -40,6 +40,12 @@ const updateCurrentChatRoom = (chatId) => {
   };
 };
 
+const reset = () => {
+  return {
+    type: 'RESET_CHATS',
+  };
+};
+
 export {
   saveChats,
   updateChat,
@@ -47,4 +53,5 @@ export {
   removeLatestMessage,
   updateSeenStatus,
   updateCurrentChatRoom,
+  reset,
 };

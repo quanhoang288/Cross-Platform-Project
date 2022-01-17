@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import ProfileItem from '../../components/account/ProfileItem.jsx';
 import { friend } from '../../apis';
 import { useSelector } from 'react-redux';
@@ -14,20 +14,34 @@ const FriendRequest = () => {
   const user = useSelector((state) => state.auth.user);
   const navigation = useNavigation();
 
-  // API getListFriendRequest
   const [listFriendRequests, setListFriendRequest] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchFriendRequestList = async (token) => {
+    try {
+      const result = await friend.getListFriendRequests(token);
+      setListFriendRequest(result.data.data.friends);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleRefresh = useCallback(async () => {
+    await fetchFriendRequestList(user.token);
+    setRefreshing(false);
+  }, [user]);
+
   useEffect(() => {
-    friend
-      .getListFriendRequests(user.token)
-      .then((result) => {
-        // render
-        const curRequest = result.data.data.friends;
-        setListFriendRequest(curRequest);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
+    if (user) {
+      fetchFriendRequestList(user.token);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (refreshing) {
+      handleRefresh();
+    }
+  }, [refreshing]);
 
   const navigate = (userId) =>
     navigation.navigate(stacks.profile.name, {
@@ -53,32 +67,38 @@ const FriendRequest = () => {
   };
 
   return (
-    <>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles.container}>
-          {listFriendRequests.map((request) => (
-            <ProfileItem
-              key={request._id}
-              avatar={{
-                source: `${ASSET_API_URL}/${request.avatar.fileName}`,
-              }}
-              title={request.username}
-              displayButtonGroup={true}
-              button={{
-                userId: request._id,
-                buttonAccept: 'accept',
-                buttonDelete: 'delete',
-              }}
-              displayDescription={true}
-              time={formatDate(request.updatedAt)}
-              acceptRequest={acceptRequest}
-              userId={request._id}
-              navigate={navigate}
-            />
-          ))}
-        </View>
-      </ScrollView>
-    </>
+    <ScrollView
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={() => setRefreshing(true)}
+        />
+      }
+      showsVerticalScrollIndicator={false}
+    >
+      <View style={styles.container}>
+        {listFriendRequests.map((request) => (
+          <ProfileItem
+            key={request._id}
+            avatar={{
+              source: `${ASSET_API_URL}/${request.avatar.fileName}`,
+            }}
+            title={request.username}
+            displayButtonGroup={true}
+            button={{
+              userId: request._id,
+              buttonAccept: 'accept',
+              buttonDelete: 'delete',
+            }}
+            displayDescription={true}
+            time={formatDate(request.updatedAt)}
+            acceptRequest={acceptRequest}
+            userId={request._id}
+            navigate={navigate}
+          />
+        ))}
+      </View>
+    </ScrollView>
   );
 };
 

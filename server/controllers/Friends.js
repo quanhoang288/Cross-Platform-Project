@@ -29,7 +29,7 @@ friendsController.setRequest = async (req, res, next) => {
           message: "Đối phương đã gửi lời mời kết bạn hoặc đã là bạn",
         });
       }
-      checkBack.status = "0";
+      await FriendModel.findByIdAndDelete(checkBack._id);
     }
 
     let isFriend = await FriendModel.findOne({
@@ -45,20 +45,23 @@ friendsController.setRequest = async (req, res, next) => {
         });
       }
 
-      isFriend.status = "0";
-      isFriend.save();
+      await FriendModel.findByIdAndUpdate(
+        isFriend._id,
+        { status: "0" },
+        { useFindAndModify: false }
+      );
+
       res.status(200).json({
         code: 200,
         message: "Gửi lời mời kết bạn thành công",
       });
     } else {
-      let status = "0";
       const makeFriend = new FriendModel({
         sender: sender,
         receiver: receiver,
-        status: status,
+        status: "0",
       });
-      makeFriend.save();
+      await makeFriend.save();
       res.status(200).json({
         code: 200,
         message: "Gửi lời mời kết bạn thành công",
@@ -128,7 +131,7 @@ friendsController.setAccept = async (req, res, next) => {
     }
 
     friend.status = req.body.is_accept;
-    friend.save();
+    await friend.save();
     let mes;
     if (req.body.is_accept === "1") {
       mes = "Kết bạn thành công";
@@ -149,7 +152,7 @@ friendsController.setAccept = async (req, res, next) => {
   }
 };
 
-friendsController.setRemoveFriend = async (req, res, next) => {
+friendsController.setRemoveFriend = async (req, res) => {
   try {
     let receiver = req.userId;
     let sender = req.body.user_id;
@@ -169,25 +172,27 @@ friendsController.setRemoveFriend = async (req, res, next) => {
       final = friendRc1;
     }
     if (final.status != "1") {
-      res.status(200).json({
-        code: 200,
+      return res.status(400).json({
         success: false,
         message: "Khong thể thao tác",
       });
     }
 
-    final.status = "3";
-    final.save();
+    await FriendModel.findByIdAndUpdate(
+      final._id,
+      { status: "3" },
+      { new: true }
+    );
 
-    res.status(200).json({
+    return res.status(200).json({
       code: 200,
       success: true,
       message: "Xóa bạn thành công",
-      data: final,
     });
   } catch (e) {
+    console.error(e.message);
     return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-      message: e.message,
+      message: "Error removing friend",
     });
   }
 };

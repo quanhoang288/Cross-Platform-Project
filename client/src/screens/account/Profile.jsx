@@ -107,6 +107,7 @@ const Profile = (props) => {
       dispatch(hideModal());
     } catch (error) {
       console.log(error);
+      dispatch(hideModal());
       Toast.showFailureMessage('Error unfriending this person');
     }
   };
@@ -230,6 +231,7 @@ const Profile = (props) => {
 
   useEffect(() => {
     const friendStatus = userData.info.friendStatus;
+    console.log('friend status: ', friendStatus);
     const info = userData.info;
 
     if (info.avatar && info.cover_image) {
@@ -304,10 +306,6 @@ const Profile = (props) => {
       setUserId(user.id);
     }
   }, [route]);
-
-  useEffect(() => {
-    console.log(profileImgUris.avatar);
-  }, [profileImgUris]);
 
   useEffect(() => {
     const initializeUserProfile = async (userId) => {

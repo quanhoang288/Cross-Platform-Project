@@ -97,6 +97,9 @@ export default (state = initialState, action) => {
         chats: removeLatestMessage(action.payload, state.chats),
       };
 
+    case 'RESET_CHATS':
+      return initialState;
+
     default:
       return state;
   }

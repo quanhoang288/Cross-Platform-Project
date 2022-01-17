@@ -4,7 +4,6 @@ const PostModel = require("../models/Posts");
 const httpStatus = require("../utils/httpStatus");
 const postReportController = {};
 postReportController.create = async (req, res, next) => {
-  console.log()
   try {
     let userId = req.userId;
     let post = await await PostModel.findById(req.params.postId);
