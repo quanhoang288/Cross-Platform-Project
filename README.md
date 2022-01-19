@@ -6,7 +6,7 @@ This is a social networking application that allows you to message, share feelin
 
 NodeJS: we use version v14.18.0
 
-## Installation
+## Installation and run App
 
 Open your IDE and clone this project
 
