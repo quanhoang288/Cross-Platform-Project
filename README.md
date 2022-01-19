@@ -1,12 +1,49 @@
 # Cross-platform Project 20211
-1.Mở Folder Cross-PlatForm-Project bằng VS Code
-2.Vào file client/src/configs/index.js, thay đổi địa chỉ IPv4 mặc định thành địa chỉ IP của máy bạn
-3.Mở terminal
-4.Ở terminal gõ lần lượt các lệnh:
+
+This is a social networking application that allows you to message, share feelings,... with friends
+
+## Environment
+
+NodeJS: we use version v14.18.0
+
+## Installation
+
+Open your IDE and clone this project
+
+```
+git clone https://github.com/quanhoang288/Cross-Platform-Project.git
+edit file in "client/src/configs/index.js": change the default IPv4 address to your machine's IP address and save
+cd to path of the project, and open 2 terminals:
+```
+
+- terminal 1:
+
+```
 cd client
-yarn install
-5.Mở một terminal mới gõ lần lượt các lệnh:
+npm install -g expo-cli  or  yarn global add expo-cli
+npm install  or  yarn install
+npm start  or  yarn start  # you can also use: expo start
+    - your default browser will display a QR code
+```
+
+- terminal 2:
+
+```
 cd server
-yarn install
-6.Sau khi install thành công gõ "yarn start" vào cả hai termianl
-7.Sử dụng app Expo-Go trên Android hoặc Camera trên Ios để quét mã QR xuất hiện ở terminal client
+npm install
+npm start
+```
+
+## Use App
+
+```
+use your phone and download the app named expo-go (both IOS and android)
+connect to the same LAN of the device running client and server
+use the expo-go and scan the QR code on the browser
+```
+
+## Authors
+
+- quanhoang288
+- NXTung1102000
+- trung141421
