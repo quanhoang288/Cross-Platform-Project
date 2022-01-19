@@ -1,17 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {ListItem, Text, Icon } from 'react-native-elements';
+import { ListItem, Text, Icon } from 'react-native-elements';
 
-const IconGroup = props => {
-  return (
-    <ListItem>
-      
-    </ListItem>
-  );
+const IconGroup = (props) => {
+  return <ListItem></ListItem>;
 };
 
-IconGroup.propTypes = {
-    
-};
+IconGroup.propTypes = {};
 
 export default IconGroup;
